@@ -1,6 +1,8 @@
 "use client";
 import { useAccount } from "wagmi";
 
+import Image from 'next/image';
+
 export default function Home() {
   const { isConnected } = useAccount();
 
@@ -8,7 +10,7 @@ export default function Home() {
     <main className="min-h-screen px-8 py-0 pb-12 flex-1 flex flex-col items-center">
       <header className="w-full py-4 flex justify-between items-center">
         <div className="flex items-center">
-          <img src="/reown-logo.png" alt="logo" className="w-35 h-10 mr-2" />
+          <Image src="/reown-logo.png" alt="logo" width={35} height={10} className="mr-2" />
           <div className="hidden sm:inline text-xl font-bold">Reown - AppKit EVM</div>
         </div>
       </header>
@@ -17,15 +19,15 @@ export default function Home() {
         <div className="grid bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
           <h3 className="text-sm font-semibold bg-gray-100 p-2 text-center">Connect your wallet</h3>
           <div className="flex justify-center items-center p-4">
-          <appkit-button />
+            <appkit-button></appkit-button>
           </div>
-        </div> 
+        </div>
         <br></br>
         {isConnected && (
           <div className="grid bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
             <h3 className="text-sm font-semibold bg-gray-100 p-2 text-center">Network selection button</h3>
             <div className="flex justify-center items-center p-4">
-              <appkit-network-button />
+              <appkit-network-button></appkit-network-button>
             </div>
           </div>
         )}
