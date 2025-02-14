@@ -8,12 +8,18 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import MusicPlayer from './ui/MusicPlayer';
 import AppKitButton from './appkit/appkitButton';
+import { useAccount } from 'wagmi';
+
+const ADMIN_ADDRESS = '0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37';
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMembershipOpen, setIsMembershipOpen] = useState(false);
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const { address } = useAccount();
+
+    const isAdmin = address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
 
     useEffect(() => {
         AOS.init({
@@ -55,6 +61,8 @@ const Navbar = () => {
                 { name: 'Compare', path: '/membership/compare' },
             ],
         },
+        // Conditionally add admin link
+        ...(isAdmin ? [{ name: 'Admin', path: '/admin/dashboard', delay: 250 }] : []),
     ];
 
     return (
@@ -121,6 +129,8 @@ const Navbar = () => {
                                             <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" />
                                         </svg>
                                     </button>
+                                    {/* Add invisible padding div to create a hover bridge */}
+                                    <div className="absolute left-0 h-4 w-full" />
                                     {(item.name === 'Membership'
                                         ? isMembershipOpen
                                         : isMoreOpen) && (
@@ -247,7 +257,7 @@ const Navbar = () => {
                         )
                     )}
                     <div className="pt-2 flex justify-center">
-                        <appkit-button />
+                        <AppKitButton />
                     </div>
                 </div>
             </div>

@@ -2,6 +2,7 @@
 import { Sparkles, ArrowUpRight } from 'lucide-react';
 import { useEffect, ReactElement } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
@@ -13,9 +14,12 @@ interface Tier {
     iconPath: string;
     color: string;
     highlighted: boolean;
+    path: string;  // Added path property
 }
 
 const MembershipTiers = () => {
+    const router = useRouter();
+
     useEffect(() => {
         AOS.init({
             duration: 1000,
@@ -33,7 +37,8 @@ const MembershipTiers = () => {
             Tier: "Tier 1",
             iconPath: "/tier-icons/DBW-icon.png",
             color: "from-[#FFD700] via-[#FFA500] to-[#FF4500]",
-            highlighted: true
+            highlighted: true,
+            path: "/membership/tier-1"
         },
         {
             name: "RHODIUM",
@@ -42,7 +47,8 @@ const MembershipTiers = () => {
             Tier: "Tier 2",
             iconPath: "/tier-icons/Rh-icon.png",
             color: "from-[#E5E4E2] via-[#C0C0C0] to-[#A9A9A9]",
-            highlighted: false
+            highlighted: false,
+            path: "/membership/tier-2"
         },
         {
             name: "PLATINUM",
@@ -51,7 +57,8 @@ const MembershipTiers = () => {
             Tier: "Tier 3",
             iconPath: "/tier-icons/Pt-icon.png",
             color: "from-[#E5E4E2] via-[#C0C0C0] to-[#A9A9A9]",
-            highlighted: false
+            highlighted: false,
+            path: "/membership/tier-3"
         },
         {
             name: "GOLD",
@@ -60,7 +67,8 @@ const MembershipTiers = () => {
             Tier: "Tier 4",
             iconPath: "/tier-icons/Au-icon.png",
             color: "from-[#FFD700] via-[#FFA500] to-[#FF8C00]",
-            highlighted: false
+            highlighted: false,
+            path: "/membership/tier-4"
         },
         {
             name: "RUTHENIUM",
@@ -69,7 +77,8 @@ const MembershipTiers = () => {
             Tier: "Tier 5",
             iconPath: "/tier-icons/Ru-icon.png",
             color: "from-[#CD7F32] via-[#B87333] to-[#A0522D]",
-            highlighted: false
+            highlighted: false,
+            path: "/membership/tier-5"
         },
         {
             name: "IRIDIUM",
@@ -78,7 +87,8 @@ const MembershipTiers = () => {
             Tier: "Tier 6",
             iconPath: "/tier-icons/Ir-icon.png",
             color: "from-[#C0C0C0] via-[#A9A9A9] to-[#808080]",
-            highlighted: false
+            highlighted: false,
+            path: "/membership/tier-6"
         },
         {
             name: "OSMIUM",
@@ -87,9 +97,14 @@ const MembershipTiers = () => {
             Tier: "Tier 7",
             iconPath: "/tier-icons/Os-icon.png",
             color: "from-[#CD7F32] via-[#B87333] to-[#A0522D]",
-            highlighted: false
+            highlighted: false,
+            path: "/membership/tier-7"
         }
     ];
+
+    const handleTierClick = (path: string) => {
+        router.push(path);
+    };
 
     const renderTierCard = (tier: Tier, index: number): ReactElement => (
         <div
@@ -148,9 +163,12 @@ const MembershipTiers = () => {
                     <div className="w-full h-px bg-gradient-to-r from-transparent via-[#BC1A1E]/30 to-transparent"></div>
 
                     {/* CTA Button */}
-                    <button className={`w-full py-3 rounded-lg font-medium transition-all duration-500 flex items-center justify-center gap-2 
-                        ${tier.highlighted ? 'bg-white text-[#BC1A1E] hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]' : 'bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] text-white hover:shadow-[0_0_20px_rgba(188,26,30,0.3)]'} 
-                        transform hover:scale-[1.02] group`}>
+                    <button
+                        onClick={() => handleTierClick(tier.path)}
+                        className={`w-full py-3 rounded-lg font-medium transition-all duration-500 flex items-center justify-center gap-2 
+                            ${tier.highlighted ? 'bg-white text-[#BC1A1E] hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]' : 'bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] text-white hover:shadow-[0_0_20px_rgba(188,26,30,0.3)]'} 
+                            transform hover:scale-[1.02] group`}
+                    >
                         View Full Details
                         <ArrowUpRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </button>
@@ -161,6 +179,7 @@ const MembershipTiers = () => {
 
     return (
         <section className="py-24 relative overflow-hidden">
+            {/* Rest of the component remains the same */}
             {/* Background Elements */}
             <div className="absolute inset-0">
                 <div
