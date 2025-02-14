@@ -31,6 +31,7 @@ const Navbar = () => {
 
     const navItems = [
         { name: 'Home', path: '/', delay: 0 },
+        { name: 'Dashboard', path: '/dashboard', delay: 50 },
         {
             name: 'More',
             delay: 100,

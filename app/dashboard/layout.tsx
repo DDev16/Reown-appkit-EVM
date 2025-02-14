@@ -125,7 +125,7 @@ export default function DashboardLayout({
         if (!mounted) return;
 
         if (!isConnected) {
-            router.push('/');
+            router.push('/not-connected');
             return;
         }
 
@@ -136,7 +136,7 @@ export default function DashboardLayout({
             );
 
             if (!hasNFT) {
-                router.push('/');
+                router.push('/unauthorized');
             }
         }
     }, [isConnected, balances, router, mounted, address]);

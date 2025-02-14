@@ -1,90 +1,80 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useAccount } from 'wagmi';
+import React, { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import { useAccount } from 'wagmi'
 
 const ADMIN_ADDRESS = '0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37';
 
 export default function AdminLayout({
     children,
 }: {
-    children: React.ReactNode;
+    children: React.ReactNode
 }) {
-    const router = useRouter();
-    const pathname = usePathname();
-    const { address, isConnected } = useAccount();
-    const [loading, setLoading] = useState(true);
-    const [mounted, setMounted] = useState(false);
+    const pathname = usePathname()
+    const router = useRouter()
+    const { address, isConnected } = useAccount()
+    const [isAdmin, setIsAdmin] = useState(false)
+
+    const navItems = [
+        { name: 'Dashboard', path: '/admin/dashboard' },
+        { name: 'Settings', path: '/admin/settings' },
+    ]
 
     useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    useEffect(() => {
-        if (!mounted) return;
-
-        const checkAccess = () => {
-            if (!isConnected || !address) {
-                // Not connected, redirect to home
-                router.push('/');
-                setLoading(false);
-                return;
+        // Check if user is connected and is the admin
+        if (isConnected) {
+            if (address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase()) {
+                setIsAdmin(true)
+            } else {
+                // Redirect non-admin users
+                router.push('/unauthorized-admin')
             }
+        } else {
+            // Redirect if not connected
+            router.push('/')
+        }
+    }, [isConnected, address, router])
 
-            // Check if connected address is admin
-            const isAdmin = address.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
-
-            if (!isAdmin) {
-                // User is connected but not admin
-                router.push('/unauthorized');
-                setLoading(false);
-                return;
-            }
-
-            setLoading(false);
-        };
-
-        checkAccess();
-    }, [pathname, router, isConnected, address, mounted]);
-
-    // Handle initial server render
-    if (!mounted) {
+    // Render a loading or placeholder state during initial check
+    if (!isConnected || !isAdmin) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900" />
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <p className="text-xl text-gray-600">Checking admin access...</p>
+                </div>
             </div>
-        );
+        )
     }
 
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900" />
-            </div>
-        );
-    }
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {/* Simple header */}
+            <header className="bg-white shadow-sm">
+                <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                    <h1 className="text-lg font-semibold">Admin Panel</h1>
+                    <nav className="flex gap-4">
+                        {navItems.map((item) => (
+                            <Link
+                                key={item.path}
+                                href={item.path}
+                                className={`${pathname === item.path
+                                    ? 'text-blue-600'
+                                    : 'text-gray-600 hover:text-gray-900'
+                                    }`}
+                            >
+                                {item.name}
+                            </Link>
+                        ))}
+                    </nav>
+                </div>
+            </header>
 
-    // Show connect wallet message if not connected
-    if (!isConnected) {
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
-                <h1 className="text-xl font-semibold">Connect Wallet to Access Admin</h1>
-                <appkit-button></appkit-button>
-            </div>
-        );
-    }
-
-    // Show unauthorized message if not admin
-    if (address?.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <h1 className="text-xl font-semibold">
-                    Unauthorized: Only admin wallet can access this area
-                </h1>
-            </div>
-        );
-    }
-
-    return <section>{children}</section>;
+            {/* Main content */}
+            <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                {children}
+            </main>
+        </div>
+    )
 }

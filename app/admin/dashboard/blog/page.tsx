@@ -1,16 +1,14 @@
 'use client';
-
+//app\admin\dashboard\blog\page.tsx
 import { useState, FormEvent } from 'react';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useRouter } from 'next/navigation';
-import { useAccount } from 'wagmi';
 
 export default function BlogForm() {
     const router = useRouter();
-    const { address, isConnected } = useAccount();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [image, setImage] = useState<File | null>(null);
@@ -22,28 +20,12 @@ export default function BlogForm() {
         setLoading(true);
         setError('');
 
-        // Check Web3 authentication
-        if (!isConnected || !address) {
-            setError('You must be connected with your wallet to create a post');
-            setLoading(false);
-            return;
-        }
-
-        // Check if Firebase is initialized
-        if (!storage || !db) {
-            setError('Storage is not initialized');
-            setLoading(false);
-            return;
-        }
-
         try {
             let imageUrl = '';
             if (image) {
-                // Create a reference with the user's wallet address in the path
+                // Create a reference with timestamp for uniqueness
                 const safeFileName = image.name.replace(/[^a-zA-Z0-9.]/g, '_');
-                const imagePath = `blog-images/${Date.now()}-${address}-${safeFileName}`;
-
-                // Now TypeScript knows storage is not null
+                const imagePath = `blog-images/${Date.now()}-${safeFileName}`;
                 const imageRef = ref(storage, imagePath);
 
                 try {
@@ -63,9 +45,7 @@ export default function BlogForm() {
                 title,
                 content,
                 imageUrl,
-                createdAt: Timestamp.now(),
-                authorId: address,
-                authorAddress: address
+                createdAt: Timestamp.now()
             };
 
             console.log('Creating post with data:', postData);
@@ -85,35 +65,6 @@ export default function BlogForm() {
             setLoading(false);
         }
     };
-
-    // Add connection check UI
-    if (!isConnected) {
-        return (
-            <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
-                <Alert className="mb-4">
-                    <AlertDescription>
-                        Please connect your wallet to create a blog post
-                    </AlertDescription>
-                </Alert>
-                <div className="flex justify-center">
-                    <appkit-button></appkit-button>
-                </div>
-            </div>
-        );
-    }
-
-    // Add initialization check UI
-    if (!storage || !db) {
-        return (
-            <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
-                <Alert variant="destructive" className="mb-4">
-                    <AlertDescription>
-                        Storage is not properly initialized. Please try again later.
-                    </AlertDescription>
-                </Alert>
-            </div>
-        );
-    }
 
     return (
         <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { parseAbi } from "viem";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+const ADMIN_ADDRESS = "0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37";
+
 const TOTAL_TIERS = 7;
 
 // ERC1155 minimal ABI for balanceOf
@@ -39,6 +41,11 @@ const AppKitButton = () => {
     // Handle NFT check and routing
     useEffect(() => {
         if (!mounted) return;
+
+        // If the connected address is the admin address, don't redirect.
+        if (isConnected && address && address.toLowerCase() === ADMIN_ADDRESS.toLowerCase()) {
+            return;
+        }
 
         const checkNFTAndRoute = async () => {
             if (isConnected && address && balances && balances.length > 0) {
