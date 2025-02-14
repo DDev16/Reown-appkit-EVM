@@ -1,3 +1,4 @@
+// types/blog.ts
 import { Timestamp } from 'firebase/firestore';
 
 export interface BlogPost {
@@ -8,7 +9,8 @@ export interface BlogPost {
     tags?: string[];
     createdAt: Timestamp;
     readTime?: number;
-    authorEmail?: string;
+    authorAddress?: string;  // Changed from authorEmail
+    authorId?: string;       // Wallet address that created the post
 }
 
 export interface SerializedBlogPost {
@@ -22,7 +24,8 @@ export interface SerializedBlogPost {
         nanoseconds: number;
     };
     readTime?: number;
-    authorEmail?: string;
+    authorAddress?: string;  // Changed from authorEmail
+    authorId?: string;       // Wallet address that created the post
 }
 
 export interface BlogFormData {

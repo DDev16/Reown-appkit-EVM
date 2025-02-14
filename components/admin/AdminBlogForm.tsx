@@ -1,6 +1,5 @@
 'use client';
 
-// components/AdminBlogForm.tsx
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -8,10 +7,12 @@ import { db, storage } from '@/lib/firebase';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BlogFormData, AlertState } from '@/types/blog';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/components/auth/AuthProvider';
+import { useAccount } from 'wagmi';
+
+const ADMIN_ADDRESS = '0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37';
 
 const AdminBlogForm = () => {
-    const { user } = useAuth();
+    const { address, isConnected } = useAccount();
     const router = useRouter();
     const [formData, setFormData] = useState<BlogFormData>({
         title: '',
@@ -20,6 +21,9 @@ const AdminBlogForm = () => {
     });
     const [loading, setLoading] = useState<boolean>(false);
     const [alert, setAlert] = useState<AlertState>({ type: '', message: '' });
+
+    // Check if user is admin
+    const isAdmin = isConnected && address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
 
     const handleInputChange = (
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -53,6 +57,23 @@ const AdminBlogForm = () => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
+
+        if (!isAdmin) {
+            setAlert({
+                type: 'error',
+                message: 'Unauthorized: Only admin can create posts'
+            });
+            return;
+        }
+
+        if (!storage || !db) {
+            setAlert({
+                type: 'error',
+                message: 'Storage is not initialized'
+            });
+            return;
+        }
+
         setLoading(true);
         setAlert({ type: '', message: '' });
 
@@ -60,7 +81,9 @@ const AdminBlogForm = () => {
             let imageUrl: string | undefined;
 
             if (formData.image) {
-                const imageRef = ref(storage, `blog-images/${Date.now()}-${formData.image.name}`);
+                const safeFileName = formData.image.name.replace(/[^a-zA-Z0-9.]/g, '_');
+                const imagePath = `blog-images/${Date.now()}-${address}-${safeFileName}`;
+                const imageRef = ref(storage, imagePath);
                 const uploadResult = await uploadBytes(imageRef, formData.image);
                 imageUrl = await getDownloadURL(uploadResult.ref);
             }
@@ -69,7 +92,8 @@ const AdminBlogForm = () => {
                 title: formData.title,
                 content: formData.content,
                 imageUrl,
-                createdAt: new Date()
+                createdAt: new Date(),
+                authorAddress: address
             });
 
             setAlert({
@@ -88,6 +112,33 @@ const AdminBlogForm = () => {
             setLoading(false);
         }
     };
+
+    if (!isConnected) {
+        return (
+            <div className="max-w-4xl mx-auto p-6">
+                <Alert>
+                    <AlertDescription>
+                        Please connect your wallet to access admin features
+                    </AlertDescription>
+                </Alert>
+                <div className="mt-4 flex justify-center">
+                    <appkit-button></appkit-button>
+                </div>
+            </div>
+        );
+    }
+
+    if (!isAdmin) {
+        return (
+            <div className="max-w-4xl mx-auto p-6">
+                <Alert variant="destructive">
+                    <AlertDescription>
+                        Unauthorized: Only admin wallet can access this area
+                    </AlertDescription>
+                </Alert>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-4xl mx-auto p-6">
