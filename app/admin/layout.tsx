@@ -20,6 +20,7 @@ export default function AdminLayout({
     const navItems = [
         { name: 'Dashboard', path: '/admin/dashboard' },
         { name: 'Settings', path: '/admin/settings' },
+        { name: 'Post Blog', path: '/admin/post-blog' },
     ]
 
     useEffect(() => {

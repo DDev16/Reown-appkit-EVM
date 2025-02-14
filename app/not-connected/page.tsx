@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 export default function NotConnectedPage() {
     return (
-        <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+        <div className="min-h-screen text-white flex items-center justify-center p-4">
             <div className="max-w-md w-full text-center">
                 <div className="bg-[#1E1E1E] rounded-lg p-8 shadow-2xl border border-red-900/30">
                     <div className="mb-6">
