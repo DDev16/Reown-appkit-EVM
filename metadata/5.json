@@ -1,0 +1,25 @@
+{
+    "name": "Defi Bull World NFT - Tier 5",
+    "description": "Strong benefits for a balanced membership experience.",
+    "image": "ipfs://bafybeielwh6nxnwpzlznzkbcvfy74mvl2heey3l53urvgfva5hfsk34o7i/5.png",
+    "external_url": "https://www.defibullworld.com",
+    "attributes": [
+      { "trait_type": "Tier", "value": 5 },
+      { "trait_type": "Metal", "value": "Ruthenium" },
+      { "trait_type": "Token Allocation", "value": "150,000 XXX" },
+      { "trait_type": "Video Library Access", "value": "Yes" },
+      { "trait_type": "Blog Access", "value": "General Blog" },
+      { "trait_type": "Monthly Giveaways", "value": "Yes" },
+      { "trait_type": "Monthly Knowledge Tests", "value": "Yes" },
+      { "trait_type": "Early Access to Features", "value": "Yes" },
+      { "trait_type": "Early Access to Launches", "value": "Yes" },
+      { "trait_type": "Airdrops", "value": "No" },
+      { "trait_type": "Zoom Calls Frequency", "value": "Every 2 months" },
+      { "trait_type": "Cashback", "value": "Up to 80%" },
+      { "trait_type": "Revenue Split", "value": "30%" },
+      { "trait_type": "Sweepstake Tickets", "value": 4 },
+      { "trait_type": "Education Duration", "value": "60+ months" },
+      { "trait_type": "Membership Cost", "value": "2 USD/month" }
+    ]
+  }
+  

@@ -1,0 +1,86 @@
+// app/dashboard/tier-1/page.tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+import { BookOpen, Play, Download, Lock } from 'lucide-react';
+
+export default function Tier1Page() {
+    const [isAuthorized, setIsAuthorized] = useState(false);
+
+    useEffect(() => {
+        // TODO: Implement token verification logic
+        setIsAuthorized(true); // Temporary for development
+    }, []);
+
+    if (!isAuthorized) {
+        return (
+            <div className="min-h-[80vh] flex items-center justify-center">
+                <div className="text-center space-y-4">
+                    <Lock className="w-16 h-16 mx-auto text-red-600" />
+                    <h2 className="text-2xl font-bold">Access Required</h2>
+                    <p className="text-gray-400">
+                        You need to hold the Tier 1 token to access this content
+                    </p>
+                    <button className="px-6 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
+                        Learn More
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-6">
+            <div className="border-b border-red-900/30 pb-6">
+                <h1 className="text-3xl font-bold">Tier 1 - Foundation</h1>
+                <p className="text-gray-400 mt-2">
+                    Master the fundamentals of trading and market analysis with our comprehensive beginner-friendly content.
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="bg-black/50 border border-red-900/30 rounded-xl p-6 hover:border-red-600/50 transition-colors">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold">Getting Started</h3>
+                        <BookOpen className="text-red-600" />
+                    </div>
+                    <ul className="space-y-4">
+                        <li className="flex items-center text-gray-300 hover:text-white cursor-pointer">
+                            <Play size={16} className="mr-2 text-red-600" />
+                            Introduction to Trading
+                        </li>
+                        <li className="flex items-center text-gray-300 hover:text-white cursor-pointer">
+                            <Play size={16} className="mr-2 text-red-600" />
+                            Basic Market Analysis
+                        </li>
+                        <li className="flex items-center text-gray-300 hover:text-white cursor-pointer">
+                            <Play size={16} className="mr-2 text-red-600" />
+                            Understanding Risk
+                        </li>
+                    </ul>
+                </div>
+
+                <div className="bg-black/50 border border-red-900/30 rounded-xl p-6 hover:border-red-600/50 transition-colors">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold">Resources</h3>
+                        <Download className="text-red-600" />
+                    </div>
+                    <ul className="space-y-4">
+                        <li className="flex items-center text-gray-300 hover:text-white cursor-pointer">
+                            <Download size={16} className="mr-2 text-red-600" />
+                            Beginner&apos;s Guide PDF
+                        </li>
+                        <li className="flex items-center text-gray-300 hover:text-white cursor-pointer">
+                            <Download size={16} className="mr-2 text-red-600" />
+                            Trading Glossary
+                        </li>
+                        <li className="flex items-center text-gray-300 hover:text-white cursor-pointer">
+                            <Download size={16} className="mr-2 text-red-600" />
+                            Practice Worksheets
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    );
+}

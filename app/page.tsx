@@ -1,37 +1,39 @@
-"use client";
-import { useAccount } from "wagmi";
-
-import Image from 'next/image';
+// Home.js
+import Hero from "@/components/sections/hero";
+import FeaturesSection from "@/components/sections/features";
+import MembershipTiers from "@/components/sections/membership";
+import Blog from "@/components/sections/blog";
+import HeroFeatures from "@/components/sections/hero-features";
+import Stats from "@/components/sections/stats";
+import FAQ from "@/components/sections/FAQ";
+import TechStack from "@/components/sections/techStack";
+// import Partners from "@/components/sections/partners";
+import Flare from "@/components/sections/flare";
+// import Team from "@/components/sections/team";
+// import Affiliate from "@/components/sections/affiliate";
+import SweepstakesComingSoon from "@/components/sections/sweepstakes";
+import RoadmapComingSoon from "@/components/sections/coming-soon-roadmap";
+import Roadmap from "@/components/sections/roadmap";
+import AboutSection from "@/components/sections/about";
 
 export default function Home() {
-  const { isConnected } = useAccount();
-
   return (
-    <main className="min-h-screen px-8 py-0 pb-12 flex-1 flex flex-col items-center">
-      <header className="w-full py-4 flex justify-between items-center">
-        <div className="flex items-center">
-          <Image src="/reown-logo.png" alt="logo" width={35} height={10} className="mr-2" />
-          <div className="hidden sm:inline text-xl font-bold">Reown - AppKit EVM</div>
-        </div>
-      </header>
-      <h2 className="my-8 text-2xl font-bold leading-snug text-center">Examples</h2>
-      <div className="max-w-4xl">
-        <div className="grid bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-          <h3 className="text-sm font-semibold bg-gray-100 p-2 text-center">Connect your wallet</h3>
-          <div className="flex justify-center items-center p-4">
-            <appkit-button></appkit-button>
-          </div>
-        </div>
-        <br></br>
-        {isConnected && (
-          <div className="grid bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-            <h3 className="text-sm font-semibold bg-gray-100 p-2 text-center">Network selection button</h3>
-            <div className="flex justify-center items-center p-4">
-              <appkit-network-button></appkit-network-button>
-            </div>
-          </div>
-        )}
-      </div>
+    <main>
+      <Hero />
+      <Stats />
+      <AboutSection />
+      <FeaturesSection />
+      <MembershipTiers />
+      {/* <Affiliate /> */}
+      <SweepstakesComingSoon />
+      <TechStack />
+      <Flare />
+      {/* <Partners /> */}
+
+      <Roadmap />
+
+      <FAQ />
+      <Blog />
     </main>
   );
 }

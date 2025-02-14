@@ -2,7 +2,7 @@
 
 import { wagmiAdapter, projectId } from '@/config'
 import { createAppKit } from '@reown/appkit/react'
-import { mainnet, flare, arbitrum, scroll, morph, berachainTestnetbArtio, mantle, soneium, zircuit, rootstock, abstractTestnet, viction } from '@reown/appkit/networks'
+import { flare, songbirdTestnet } from '@reown/appkit/networks'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React, { type ReactNode } from 'react'
@@ -27,19 +27,12 @@ const metadata = { //this is optional
 const modal = createAppKit({
   adapters: [wagmiAdapter],
   chainImages: { // Customize networks' logos
-    5000: '/mantle.png', // <chainId>: 'www.network.com/logo.png'
-    534_352: '/scroll.png',
-    80084: '/berachain.png',
-    2818: '/morph.png',
-    1868: '/soneium.png',
-    48900: '/zircuit.svg',
-    11_124: '/abstract.png',
-    30: '/rootstock.png',
-    14: '/flare.jpg',
+    14: '/network-logos/flare.jpg',
+    16: '/network-logos/songbird.jpg'
   },
   projectId,
-  networks: [mainnet, flare, arbitrum, scroll, morph, berachainTestnetbArtio, mantle, soneium, zircuit, rootstock, abstractTestnet, viction],
-  defaultNetwork: mainnet,
+  networks: [flare, songbirdTestnet],
+  defaultNetwork: flare,
   metadata: metadata,
   features: {
     analytics: true, // Optional - defaults to your Cloud configuration
@@ -47,7 +40,13 @@ const modal = createAppKit({
     socials: ['google', 'x', 'github', 'discord', 'apple', 'facebook', 'farcaster'],
     emailShowWallets: true, // default to true
   },
-  themeMode: 'light'
+  themeMode: 'dark',
+  themeVariables: {
+    '--w3m-accent': 'gray', // Bright green
+    '--w3m-border-radius-master': '1px',
+
+
+  }
 })
 
 function ContextProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {
