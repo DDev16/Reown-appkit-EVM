@@ -14,7 +14,7 @@ interface Tier {
     iconPath: string;
     color: string;
     highlighted: boolean;
-    path: string;  // Added path property
+    path: string;
 }
 
 const MembershipTiers = () => {
@@ -36,7 +36,7 @@ const MembershipTiers = () => {
             description: "The ultimate experience/exclusive access & premium benefits",
             Tier: "Tier 1",
             iconPath: "/tier-icons/DBW-icon.png",
-            color: "from-[#FFD700] via-[#FFA500] to-[#FF4500]",
+            color: "from-red-500 via-red-500 to-red-900",
             highlighted: true,
             path: "/membership/tier-1"
         },
@@ -46,7 +46,7 @@ const MembershipTiers = () => {
             description: "Premium access to advanced features and dedicated support",
             Tier: "Tier 2",
             iconPath: "/tier-icons/Rh-icon.png",
-            color: "from-[#E5E4E2] via-[#C0C0C0] to-[#A9A9A9]",
+            color: "from-red-500 via-red-500 to-red-900",
             highlighted: false,
             path: "/membership/tier-2"
         },
@@ -56,7 +56,7 @@ const MembershipTiers = () => {
             description: "Elite membership with enhanced capabilities and priority access",
             Tier: "Tier 3",
             iconPath: "/tier-icons/Pt-icon.png",
-            color: "from-[#E5E4E2] via-[#C0C0C0] to-[#A9A9A9]",
+            color: "from-gray-100 via-gray-500 to-gray-500",
             highlighted: false,
             path: "/membership/tier-3"
         },
@@ -66,7 +66,7 @@ const MembershipTiers = () => {
             description: "Professional grade features with advanced trading capabilities",
             Tier: "Tier 4",
             iconPath: "/tier-icons/Au-icon.png",
-            color: "from-[#FFD700] via-[#FFA500] to-[#FF8C00]",
+            color: "from-yellow-100 via-yellow-600 to-yellow-500",
             highlighted: false,
             path: "/membership/tier-4"
         },
@@ -76,7 +76,7 @@ const MembershipTiers = () => {
             description: "Advanced tools and features for serious traders",
             Tier: "Tier 5",
             iconPath: "/tier-icons/Ru-icon.png",
-            color: "from-[#CD7F32] via-[#B87333] to-[#A0522D]",
+            color: "from-orange-500 via-orange-500 to-orange-500",
             highlighted: false,
             path: "/membership/tier-5"
         },
@@ -86,7 +86,7 @@ const MembershipTiers = () => {
             description: "Perfect starting point for your DBW journey",
             Tier: "Tier 6",
             iconPath: "/tier-icons/Ir-icon.png",
-            color: "from-[#C0C0C0] via-[#A9A9A9] to-[#808080]",
+            color: "from-red-500 via-red-500 to-red-800",
             highlighted: false,
             path: "/membership/tier-6"
         },
@@ -96,7 +96,7 @@ const MembershipTiers = () => {
             description: "Essential features to begin your DBW experience",
             Tier: "Tier 7",
             iconPath: "/tier-icons/Os-icon.png",
-            color: "from-[#CD7F32] via-[#B87333] to-[#A0522D]",
+            color: "from-blue-400 via-blue-400 to-blue-500",
             highlighted: false,
             path: "/membership/tier-7"
         }
@@ -116,8 +116,8 @@ const MembershipTiers = () => {
             {/* Background Glow Effect */}
             <div className="absolute -inset-[1px] bg-gradient-to-r from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E] rounded-xl opacity-70 group-hover:opacity-100 blur-[2px] transition-all duration-500"></div>
 
-            <div className={`relative rounded-xl p-6 h-full backdrop-blur-sm border border-[#BC1A1E]/20 
-                ${tier.highlighted ? 'bg-gradient-to-br from-[#BC1A1E]/90 to-[#BC1A1E]/70' : 'bg-black/90'}`}>
+            <div className="relative rounded-xl p-6 h-full backdrop-blur-sm border border-[#BC1A1E]/20">
+                <div className={`absolute inset-0 rounded-xl ${tier.highlighted ? 'bg-gradient-to-br from-black/90 to-black/70' : 'bg-black/90'}`}></div>
 
                 {/* Tier Badge */}
                 <div className="absolute -top-3 right-4 z-20">
@@ -138,8 +138,7 @@ const MembershipTiers = () => {
                 <div className="relative z-10 space-y-4">
                     {/* Icon and Title */}
                     <div className="flex items-center gap-4">
-                        <div className={`w-16 h-16 flex items-center justify-center relative
-                            ${tier.highlighted ? 'bg-white' : 'bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51]'}`}>
+                        <div className={`w-16 h-16 flex items-center justify-center relative bg-gradient-to-r ${tier.color} rounded-sm`}>
                             <Image
                                 src={tier.iconPath}
                                 alt={`${tier.name} icon`}
@@ -179,7 +178,6 @@ const MembershipTiers = () => {
 
     return (
         <section className="py-24 relative overflow-hidden">
-            {/* Rest of the component remains the same */}
             {/* Background Elements */}
             <div className="absolute inset-0">
                 <div

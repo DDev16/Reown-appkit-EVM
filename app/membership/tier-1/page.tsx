@@ -183,7 +183,7 @@ const Tier1Page = () => {
                     title: 'Congratulations on your Tier-1 DBW NFT! 🎉',
                     text: 'Now that you own a DBW NFT, You can access your token gated education dashboard where only users who own DBW NFTs have access to!',
                     icon: 'success',
-                    confirmButtonText: 'Sign Up Now',
+                    confirmButtonText: 'Click here to access your dashboard!',
                     confirmButtonColor: '#BC1A1E',
                     background: '#1a1a1a',
                     color: '#ffffff',

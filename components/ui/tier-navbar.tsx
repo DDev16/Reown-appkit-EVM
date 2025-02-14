@@ -3,67 +3,65 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-    Crown,
-    Star,
-    Shield,
-    Rocket,
-    Bolt,
-    Compass,
-    Triangle,
-    ChevronDown,
-    ChevronUp
-} from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import Image from 'next/image';
 
 const tierItems = [
     {
         name: 'Top Tier',
         path: '/membership/tier-1',
-        icon: <Crown className="w-5 h-5 text-[#BC1A1E]" />,
-        hoverClass: 'hover:bg-[#BC1A1E]/30 hover:border-[#BC1A1E]',
-        activeClass: 'bg-[#BC1A1E]/20 border-[#BC1A1E]'
+        icon: <Image src="/tier-icons/DBW-icon.png" alt="Top Tier" width={34} height={34} />,
+        bgColor: 'bg-[#BC1A1E]',
+        hoverClass: 'hover:bg-[#BC1A1E] hover:bg-opacity-80',
+        borderColor: 'border-[#BC1A1E]'
     },
     {
         name: 'Tier 2',
         path: '/membership/tier-2',
-        icon: <Star className="w-5 h-5 text-yellow-500" />,
-        hoverClass: 'hover:bg-yellow-500/30 hover:border-yellow-500',
-        activeClass: 'bg-yellow-500/20 border-yellow-500'
+        icon: <Image src="/tier-icons/Rh-icon.png" alt="Tier 2" width={34} height={34} />,
+        bgColor: 'bg-[#BC1A1E]',
+        hoverClass: 'hover:bg-[#BC1A1E] hover:bg-opacity-80',
+        borderColor: 'border-[#BC1A1E]'
     },
     {
         name: 'Tier 3',
         path: '/membership/tier-3',
-        icon: <Shield className="w-5 h-5 text-blue-500" />,
-        hoverClass: 'hover:bg-blue-500/30 hover:border-blue-500',
-        activeClass: 'bg-blue-500/20 border-blue-500'
+        icon: <Image src="/tier-icons/Pt-icon.png" alt="Tier 3" width={34} height={34} />,
+        bgColor: 'bg-gray-200',
+        hoverClass: 'hover:bg-gray-300 hover:bg-opacity-80',
+        borderColor: 'border-gray-400'
     },
     {
         name: 'Tier 4',
         path: '/membership/tier-4',
-        icon: <Rocket className="w-5 h-5 text-purple-500" />,
-        hoverClass: 'hover:bg-purple-500/30 hover:border-purple-500',
-        activeClass: 'bg-purple-500/20 border-purple-500'
+        icon: <Image src="/tier-icons/Au-icon.png" alt="Tier 4" width={34} height={34} />,
+        bgColor: 'bg-yellow-500',
+        hoverClass: 'hover:bg-yellow-500 hover:bg-opacity-80',
+        borderColor: 'border-yellow-500'
     },
     {
         name: 'Tier 5',
         path: '/membership/tier-5',
-        icon: <Bolt className="w-5 h-5 text-orange-500" />,
-        hoverClass: 'hover:bg-orange-500/30 hover:border-orange-500',
-        activeClass: 'bg-orange-500/20 border-orange-500'
+        icon: <Image src="/tier-icons/Ru-icon.png" alt="Tier 5" width={34} height={34} />,
+        bgColor: 'bg-orange-500',
+        hoverClass: 'hover:bg-orange-500 hover:bg-opacity-80',
+        borderColor: 'border-orange-500'
     },
     {
         name: 'Tier 6',
         path: '/membership/tier-6',
-        icon: <Compass className="w-5 h-5 text-green-500" />,
-        hoverClass: 'hover:bg-green-500/30 hover:border-green-500',
-        activeClass: 'bg-green-500/20 border-green-500'
+        icon: <Image src="/tier-icons/Ir-icon.png" alt="Tier 6" width={34} height={34} />,
+        bgColor: 'bg-[#BC1A1E]',
+        hoverClass: 'hover:bg-[#BC1A1E] hover:bg-opacity-80',
+        borderColor: 'border-[#BC1A1E]'
     },
     {
         name: 'Tier 7',
         path: '/membership/tier-7',
-        icon: <Triangle className="w-5 h-5 text-pink-500" />,
-        hoverClass: 'hover:bg-pink-500/30 hover:border-pink-500',
-        activeClass: 'bg-pink-500/20 border-pink-500'
+        icon: <Image src="/tier-icons/Os-icon.png" alt="Tier 7" width={34} height={34} />,
+        bgColor: 'bg-blue-500',
+        hoverClass: 'hover:bg-blue-500 hover:bg-opacity-80',
+        borderColor: 'border-blue-500'
     },
 ];
 
@@ -83,7 +81,7 @@ const TierNavbar = () => {
             <div className="sm:hidden">
                 <button
                     onClick={toggleMobileDropdown}
-                    className="w-full flex items-center justify-between px-4 py-3 bg-black/80 backdrop-blur-sm border-b border-[#BC1A1E]/20"
+                    className={`w-full flex items-center justify-between px-4 py-3 ${currentTier.bgColor} bg-opacity-90 backdrop-blur-sm border-b ${currentTier.borderColor}`}
                 >
                     <div className="flex items-center gap-2">
                         {currentTier.icon}
@@ -97,7 +95,7 @@ const TierNavbar = () => {
                 </button>
 
                 {isMobileDropdownOpen && (
-                    <div className="absolute w-full bg-black/90 backdrop-blur-sm border-b border-[#BC1A1E]/20">
+                    <div className="absolute w-full bg-black/90 backdrop-blur-sm">
                         {tierItems.map((item) => (
                             <Link
                                 key={item.path}
@@ -106,12 +104,10 @@ const TierNavbar = () => {
                                 className={`
                                     flex items-center gap-3 px-4 py-3 
                                     transition-all duration-300 ease-in-out
-                                    ${pathname === item.path
-                                        ? 'bg-[#BC1A1E]/20 text-white'
-                                        : 'text-gray-300 hover:bg-[#BC1A1E]/10'}
-                                    border border-transparent 
+                                    ${pathname === item.path ? `${item.bgColor} bg-opacity-90` : 'hover:bg-opacity-20'}
                                     ${item.hoverClass}
-                                    ${pathname === item.path ? item.activeClass : ''}
+                                    border-b ${item.borderColor}
+                                    text-white
                                 `}
                             >
                                 {item.icon}
@@ -132,17 +128,16 @@ const TierNavbar = () => {
                             className={`
                                 flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium 
                                 transition-all duration-300 ease-in-out
-                                border border-transparent
-                                ${pathname === item.path
-                                    ? `${item.activeClass} text-white`
-                                    : `text-gray-300 ${item.hoverClass}`}
+                                ${item.bgColor} ${pathname === item.path ? 'bg-opacity-90' : 'bg-opacity-20'}
+                                ${item.hoverClass}
+                                border ${item.borderColor}
+                                text-white
                                 whitespace-nowrap
                                 relative
-                                overflow-hidden
                                 group
                             `}
                         >
-                            {/* Hover effect background */}
+                            {/* Shimmer effect */}
                             <span className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/20 to-transparent"></span>
 
                             {item.icon}

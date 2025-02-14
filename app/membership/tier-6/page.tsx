@@ -124,7 +124,7 @@ const Tier6Page = () => {
             hash,
         });
 
-    // Confetti effect function with iron/iridium colors
+    // Confetti effect function with updated red colors
     const fireConfetti = () => {
         const duration = 3000;
         const animationEnd = Date.now() + duration;
@@ -145,13 +145,13 @@ const Tier6Page = () => {
                 ...defaults,
                 particleCount,
                 origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-                colors: ['#696969', '#4A4A4A', '#363636', '#FFFFFF'], // Iron/iridium themed colors
+                colors: ['#BC1A1E', '#FF4B51', '#FF6B6E', '#FFFFFF'],
             });
             confetti({
                 ...defaults,
                 particleCount,
                 origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-                colors: ['#696969', '#4A4A4A', '#363636', '#FFFFFF'], // Iron/iridium themed colors
+                colors: ['#BC1A1E', '#FF4B51', '#FF6B6E', '#FFFFFF'],
             });
         }, 250);
     };
@@ -170,7 +170,7 @@ const Tier6Page = () => {
                     text: 'Now that you own one, sign up for an account to access your token gated education page where only users who own Tier-6 NFT have access to!',
                     icon: 'success',
                     confirmButtonText: 'Sign Up Now',
-                    confirmButtonColor: '#4A4A4A', // Iron color for the button
+                    confirmButtonColor: '#BC1A1E',
                     background: '#1a1a1a',
                     color: '#ffffff',
                     showClass: {
@@ -252,9 +252,9 @@ const Tier6Page = () => {
         <div className="min-h-screen text-white overflow-auto">
             <TierNavbar />
             <div className="relative min-h-screen">
-                {/* Background Gradients - Updated to iron/iridium theme */}
-                <div className="absolute inset-0 bg-gradient-radial from-[#4A4A4A]/20 via-transparent to-transparent opacity-40"></div>
-                <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#4A4A4A]/10 to-transparent"></div>
+                {/* Background Gradients - Updated to red theme */}
+                <div className="absolute inset-0 bg-gradient-radial from-[#BC1A1E]/20 via-transparent to-transparent opacity-40"></div>
+                <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#BC1A1E]/10 to-transparent"></div>
 
                 {/* Main content container */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-4 lg:px-5 relative z-10 flex flex-col justify-center py-8">
@@ -264,8 +264,8 @@ const Tier6Page = () => {
                             {/* Header & Description */}
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
-                                    <Crown className="w-10 h-10 text-[#696969]" />
-                                    <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#696969] to-[#4A4A4A]">
+                                    <Crown className="w-10 h-10 text-[#BC1A1E]" />
+                                    <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51]">
                                         Iridium Tier NFT
                                     </h1>
                                 </div>
@@ -276,24 +276,24 @@ const Tier6Page = () => {
 
                             {/* Price / Supply & Mint Button */}
                             <div className="flex items-center justify-center space-y-2 flex-wrap gap-8">
-                                <div className="px-4 py-2 bg-black border border-[#4A4A4A] rounded-xl text-center shadow-lg shadow-[#4A4A4A]/50">
+                                <div className="px-4 py-2 bg-black border border-[#BC1A1E] rounded-xl text-center shadow-lg shadow-[#BC1A1E]/50">
                                     <p className="text-gray-300 text-base font-semibold">
-                                        Price: <span className="text-[#696969]">{formatPrice()} FLR</span>
+                                        Price: <span className="text-[#FF4B51]">{formatPrice()} FLR</span>
                                     </p>
                                     <p className="text-gray-300 text-base font-semibold">
-                                        Supply: <span className="text-[#696969]">{formatSupply()}</span>
+                                        Supply: <span className="text-[#FF4B51]">{formatSupply()}</span>
                                     </p>
                                 </div>
                                 <div className="relative">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-[#4A4A4A] via-[#696969] to-[#4A4A4A] rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all duration-500"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-r from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E] rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all duration-500"></div>
                                     <button
                                         onClick={handleMint}
                                         disabled={isMinting || isConfirming || isConfirmed}
-                                        className="relative px-6 py-2 bg-black rounded-xl group transition-all duration-300 hover:shadow-2xl hover:shadow-[#4A4A4A]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="relative px-6 py-2 bg-black rounded-xl group transition-all duration-300 hover:shadow-2xl hover:shadow-[#BC1A1E]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-[#4A4A4A] to-[#696969] opacity-0 group-hover:opacity-20 rounded-xl transition-opacity duration-300"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] opacity-0 group-hover:opacity-20 rounded-xl transition-opacity duration-300"></div>
                                         <span className="relative flex items-center gap-2">
-                                            <Sparkles className="w-5 h-5 text-[#696969] group-hover:scale-110 transition-transform duration-300" />
+                                            <Sparkles className="w-5 h-5 text-[#BC1A1E] group-hover:scale-110 transition-transform duration-300" />
                                             <span className="text-base font-semibold text-white">
                                                 {getMintButtonText()}
                                             </span>
@@ -304,14 +304,14 @@ const Tier6Page = () => {
 
                             {/* NFT Image */}
                             <div className="relative group">
-                                <div className="absolute -inset-3 bg-gradient-to-br from-[#4A4A4A] via-[#696969] to-[#4A4A4A]/50 rounded-2xl opacity-75 group-hover:opacity-100 blur-2xl transition-all duration-500"></div>
+                                <div className="absolute -inset-3 bg-gradient-to-br from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E]/50 rounded-2xl opacity-75 group-hover:opacity-100 blur-2xl transition-all duration-500"></div>
                                 <div className="relative bg-gradient-to-br from-black/80 to-black p-1 rounded-2xl">
                                     <div className="relative aspect-square w-full overflow-hidden rounded-xl">
                                         <div
                                             className="absolute inset-0 opacity-30"
                                             style={{
                                                 backgroundImage:
-                                                    "radial-gradient(circle at 2px 2px, rgba(74, 74, 74, 0.4) 2px, transparent 0)",
+                                                    "radial-gradient(circle at 2px 2px, rgba(221, 84, 84, 0.4) 2px, transparent 0)",
                                                 backgroundSize: "24px 24px",
                                             }}
                                         ></div>
@@ -338,12 +338,12 @@ const Tier6Page = () => {
                                 {benefits.map((benefit, index) => (
                                     <div
                                         key={index}
-                                        className="benefit-card opacity-0 group relative p-4 rounded-xl bg-gradient-to-br from-gray-900 to-black border border-[#4A4A4A]/20 hover:border-[#4A4A4A]/40 transition-all duration-300"
+                                        className="benefit-card opacity-0 group relative p-4 rounded-xl bg-gradient-to-br from-gray-900 to-black border border-[#BC1A1E]/20 hover:border-[#BC1A1E]/40 transition-all duration-300"
                                         style={{ animationDelay: `${index * 100}ms` }}
                                     >
-                                        <div className="absolute -inset-[1px] bg-gradient-to-r from-[#4A4A4A] via-[#696969] to-[#4A4A4A] rounded-xl opacity-0 group-hover:opacity-30 blur-sm transition-opacity duration-500"></div>
+                                        <div className="absolute -inset-[1px] bg-gradient-to-r from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E] rounded-xl opacity-0 group-hover:opacity-30 blur-sm transition-opacity duration-500"></div>
                                         <div className="relative">
-                                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#4A4A4A] to-[#696969] p-2 mb-2">
+                                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#BC1A1E] to-[#FF4B51] p-2 mb-2">
                                                 <div className="w-full h-full text-white">{benefit.icon}</div>
                                             </div>
                                             <h3 className="text-lg font-semibold mb-1">{benefit.title}</h3>
@@ -354,7 +354,7 @@ const Tier6Page = () => {
                             </div>
 
                             {/* Education Banner */}
-                            <div className="p-4 rounded-xl bg-gradient-to-r from-[#4A4A4A] to-[#696969] relative overflow-hidden">
+                            <div className="p-4 rounded-xl bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] relative overflow-hidden">
                                 <div
                                     className="absolute inset-0 opacity-10"
                                     style={{

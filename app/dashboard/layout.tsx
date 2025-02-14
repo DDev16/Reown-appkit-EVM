@@ -14,7 +14,11 @@ import {
     Rocket,
     Target,
     Award,
-    Wallet
+    Wallet,
+    VideoIcon,
+    Library,
+    Newspaper,
+    LayoutDashboard
 } from 'lucide-react';
 import { parseAbi } from 'viem';
 
@@ -76,6 +80,34 @@ const MEMBERSHIP_TIERS = [
         path: '/dashboard/tier-7',
         icon: <Crown className="w-5 h-5" />,
         color: 'from-red-400 to-red-600'
+    },
+    {
+        id: 8,
+        name: 'Video Library',
+        path: '/dashboard/video-library',
+        icon: <VideoIcon className="w-5 h-5" />,
+        color: 'from-pink-400 to-pink-600'
+    },
+    {
+        id: 9,
+        name: 'Dictionary',
+        path: '/dashboard/dictionary',
+        icon: <Library className="w-5 h-5" />,
+        color: 'from-teal-400 to-teal-600'
+    },
+    {
+        id: 10,
+        name: 'Wallet',
+        path: '/dashboard/wallet',
+        icon: <Wallet className="w-5 h-5" />,
+        color: 'from-indigo-400 to-indigo-600'
+    },
+    {
+        id: 11,
+        name: 'General Blog',
+        path: '/blog',
+        icon: <Newspaper className="w-5 h-5" />,
+        color: 'from-cyan-400 to-cyan-600'
     }
 ];
 
@@ -208,10 +240,10 @@ export default function DashboardLayout({
                                 : 'text-gray-400 hover:bg-red-900/10 hover:text-white'
                                 }`}
                         >
-                            <Layout className="w-5 h-5 flex-shrink-0" />
+                            <LayoutDashboard className="w-5 h-5 flex-shrink-0" />
                             {(isSidebarOpen || window?.innerWidth >= 768) && (
                                 <span className={`ml-3 text-sm font-medium whitespace-nowrap ${!isSidebarOpen ? 'md:hidden' : ''}`}>
-                                    Overview
+                                    Dashboard
                                 </span>
                             )}
                         </Link>
