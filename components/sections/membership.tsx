@@ -76,7 +76,7 @@ const MembershipTiers = () => {
             description: "Advanced tools and features for serious traders",
             Tier: "Tier 5",
             iconPath: "/tier-icons/Ru-icon.png",
-            color: "from-orange-500 via-orange-500 to-orange-500",
+            color: "from-gray-200 via-gray-300 to-gray-500",
             highlighted: false,
             path: "/membership/tier-5"
         },
