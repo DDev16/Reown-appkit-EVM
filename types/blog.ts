@@ -10,7 +10,7 @@ export interface BlogPost {
     createdAt: Timestamp;
     readTime?: number;
     authorAddress?: string;  // Changed from authorEmail
-    authorId?: string;       // Wallet address that created the post
+    authorId?: string;       
 }
 
 export interface SerializedBlogPost {
