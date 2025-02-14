@@ -1,80 +1,75 @@
 "use client";
 
-import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
-import Image from 'next/image';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-import MusicPlayer from './ui/MusicPlayer';
-import AppKitButton from './appkit/appkitButton';
-import { useAccount } from 'wagmi';
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { Menu, X } from "lucide-react";
+import Image from "next/image";
+import MusicPlayer from "./ui/MusicPlayer";
+import AppKitButton from "./appkit/appkitButton";
+import { useAccount } from "wagmi";
 
-const ADMIN_ADDRESS = '0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37';
+const ADMIN_ADDRESS = "0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37";
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMembershipOpen, setIsMembershipOpen] = useState(false);
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    // Use a mounted flag to ensure client-only code isn’t run during SSR.
+    const [mounted, setMounted] = useState(false);
     const { address } = useAccount();
 
-    const isAdmin = address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
-
     useEffect(() => {
-        AOS.init({
-            duration: 1000,
-            once: true,
-        });
-
+        setMounted(true);
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
         };
 
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Only check admin after the component has mounted
+    const isAdmin =
+        mounted && address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
+
     const navItems = [
-        { name: 'Home', path: '/', delay: 0 },
-        { name: 'Dashboard', path: '/dashboard', delay: 50 },
+        { name: "Home", path: "/" },
+        { name: "Dashboard", path: "/dashboard" },
         {
-            name: 'More',
-            delay: 100,
+            name: "More",
             subItems: [
-                { name: 'Blog', path: '/blog' },
-                { name: 'Education', path: '/education' },
-                { name: 'Shop', path: '/shop' },
+                { name: "Blog", path: "/blog" },
+                { name: "Education", path: "/education" },
+                { name: "Shop", path: "/shop" },
             ],
         },
         {
-            name: 'Membership',
-            delay: 200,
+            name: "Membership",
             subItems: [
-                { name: 'Tier 1', path: '/membership/tier-1' },
-                { name: 'Tier 2', path: '/membership/tier-2' },
-                { name: 'Tier 3', path: '/membership/tier-3' },
-                { name: 'Tier 4', path: '/membership/tier-4' },
-                { name: 'Tier 5', path: '/membership/tier-5' },
-                { name: 'Tier 6', path: '/membership/tier-6' },
-                { name: 'Tier 7', path: '/membership/tier-7' },
-                { name: 'Compare', path: '/membership/compare' },
+                { name: "Tier 1", path: "/membership/tier-1" },
+                { name: "Tier 2", path: "/membership/tier-2" },
+                { name: "Tier 3", path: "/membership/tier-3" },
+                { name: "Tier 4", path: "/membership/tier-4" },
+                { name: "Tier 5", path: "/membership/tier-5" },
+                { name: "Tier 6", path: "/membership/tier-6" },
+                { name: "Tier 7", path: "/membership/tier-7" },
+                { name: "Compare", path: "/membership/compare" },
             ],
         },
-        // Conditionally add admin link
-        ...(isAdmin ? [{ name: 'Admin', path: '/admin/dashboard', delay: 250 }] : []),
+        ...(isAdmin ? [{ name: "Admin", path: "/admin/dashboard" }] : []),
     ];
 
     return (
         <nav
             className={`fixed w-full top-0 z-[9999] border-b transition-[background-color,backdrop-filter,border-color] duration-300 ${scrolled
-                ? 'bg-[#242223]/95 backdrop-blur-sm border-[#BC1A1E]/50'
-                : 'bg-transparent border-transparent'
+                    ? "bg-[#242223]/95 backdrop-blur-sm border-[#BC1A1E]/50"
+                    : "bg-transparent border-transparent"
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
-                    <div className="flex items-center" data-aos="fade-right">
+                    <div className="flex items-center">
                         <Link href="/" className="flex items-center">
                             <Image
                                 src="/assets/DBWLogo.png"
@@ -96,19 +91,17 @@ const Navbar = () => {
                                 <div
                                     key={item.name}
                                     className="relative group"
-                                    data-aos="fade-down"
-                                    data-aos-delay={item.delay}
                                     onMouseEnter={() => {
-                                        if (item.name === 'Membership') {
+                                        if (item.name === "Membership") {
                                             setIsMembershipOpen(true);
-                                        } else if (item.name === 'More') {
+                                        } else if (item.name === "More") {
                                             setIsMoreOpen(true);
                                         }
                                     }}
                                     onMouseLeave={() => {
-                                        if (item.name === 'Membership') {
+                                        if (item.name === "Membership") {
                                             setIsMembershipOpen(false);
-                                        } else if (item.name === 'More') {
+                                        } else if (item.name === "More") {
                                             setIsMoreOpen(false);
                                         }
                                     }}
@@ -118,20 +111,19 @@ const Navbar = () => {
                                     >
                                         {item.name}
                                         <svg
-                                            className={`ml-1 h-4 w-4 fill-current transform transition-transform duration-300 ${(item.name === 'Membership'
-                                                ? isMembershipOpen
-                                                : isMoreOpen)
-                                                ? 'rotate-180'
-                                                : ''
+                                            className={`ml-1 h-4 w-4 fill-current transform transition-transform duration-300 ${(item.name === "Membership"
+                                                    ? isMembershipOpen
+                                                    : isMoreOpen)
+                                                    ? "rotate-180"
+                                                    : ""
                                                 }`}
                                             viewBox="0 0 20 20"
                                         >
                                             <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" />
                                         </svg>
                                     </button>
-                                    {/* Add invisible padding div to create a hover bridge */}
                                     <div className="absolute left-0 h-4 w-full" />
-                                    {(item.name === 'Membership'
+                                    {(item.name === "Membership"
                                         ? isMembershipOpen
                                         : isMoreOpen) && (
                                             <ul className="absolute left-0 mt-2 w-48 bg-[#242223] border border-[#BC1A1E]/20 rounded-lg shadow-lg z-[9999]">
@@ -153,8 +145,6 @@ const Navbar = () => {
                                     key={item.name}
                                     href={item.path}
                                     className="text-gray-300 hover:text-white hover:bg-[#BC1A1E]/10 px-4 py-2 rounded-lg text-sm font-medium transition-colors relative group"
-                                    data-aos="fade-down"
-                                    data-aos-delay={item.delay}
                                 >
                                     {item.name}
                                     <div className="absolute bottom-0 left-0 w-full h-0.5 overflow-hidden">
@@ -163,11 +153,7 @@ const Navbar = () => {
                                 </Link>
                             )
                         )}
-                        <div
-                            className="ml-4 flex items-center"
-                            data-aos="fade-left"
-                            data-aos-delay="500"
-                        >
+                        <div className="ml-4 flex items-center">
                             <MusicPlayer />
                             <AppKitButton />
                         </div>
@@ -190,8 +176,8 @@ const Navbar = () => {
             {/* Mobile Dropdown Menu */}
             <div
                 className={`sm:hidden fixed inset-x-0 top-16 bg-[#242223] border-b border-[#BC1A1E]/20 backdrop-blur-sm bg-opacity-90 transition-all duration-300 ease-in-out z-[9999] ${isMenuOpen
-                    ? 'max-h-screen opacity-100 overflow-y-auto'
-                    : 'max-h-0 opacity-0 overflow-hidden'
+                        ? "max-h-screen opacity-100 overflow-y-auto"
+                        : "max-h-0 opacity-0 overflow-hidden"
                     }`}
             >
                 <div className="px-4 pt-2 pb-3 space-y-1">
@@ -200,9 +186,9 @@ const Navbar = () => {
                             <div key={item.name}>
                                 <button
                                     onClick={() => {
-                                        if (item.name === 'Membership') {
+                                        if (item.name === "Membership") {
                                             setIsMembershipOpen(!isMembershipOpen);
-                                        } else if (item.name === 'More') {
+                                        } else if (item.name === "More") {
                                             setIsMoreOpen(!isMoreOpen);
                                         }
                                     }}
@@ -210,18 +196,18 @@ const Navbar = () => {
                                 >
                                     {item.name}
                                     <svg
-                                        className={`inline ml-1 h-4 w-4 fill-current transform transition-transform duration-300 ${(item.name === 'Membership'
-                                            ? isMembershipOpen
-                                            : isMoreOpen)
-                                            ? 'rotate-180'
-                                            : ''
+                                        className={`inline ml-1 h-4 w-4 fill-current transform transition-transform duration-300 ${(item.name === "Membership"
+                                                ? isMembershipOpen
+                                                : isMoreOpen)
+                                                ? "rotate-180"
+                                                : ""
                                             }`}
                                         viewBox="0 0 20 20"
                                     >
                                         <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" />
                                     </svg>
                                 </button>
-                                {(item.name === 'Membership'
+                                {(item.name === "Membership"
                                     ? isMembershipOpen
                                     : isMoreOpen) && (
                                         <div className="pl-4">
@@ -232,9 +218,9 @@ const Navbar = () => {
                                                     className="text-gray-300 hover:text-white hover:bg-[#BC1A1E]/10 block px-4 py-2 rounded-lg text-base font-medium transition-colors"
                                                     onClick={() => {
                                                         setIsMenuOpen(false);
-                                                        if (item.name === 'Membership') {
+                                                        if (item.name === "Membership") {
                                                             setIsMembershipOpen(false);
-                                                        } else if (item.name === 'More') {
+                                                        } else if (item.name === "More") {
                                                             setIsMoreOpen(false);
                                                         }
                                                     }}
