@@ -16,10 +16,15 @@ interface BlogPost {
         nanoseconds: number;
     };
     readTime?: number;
-    authorEmail?: string;
+    authorAddress?: string; // Changed from authorEmail
 }
 
 async function getBlogPost(id: string) {
+    if (!db) {
+        console.error('Firestore is not initialized');
+        return null;
+    }
+
     try {
         const docRef = doc(db, 'posts', id);
         const docSnap = await getDoc(docRef);
@@ -44,12 +49,13 @@ async function getBlogPost(id: string) {
     }
 }
 
-// After
-export default async function BlogPage({ params }: { params: any }) {
+export default async function BlogPage({ params }: { params: { id: string } }) {
     const post = await getBlogPost(params.id);
+
     if (!post) {
         notFound();
     }
+
     return (
         <Suspense
             fallback={

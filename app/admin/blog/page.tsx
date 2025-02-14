@@ -29,12 +29,21 @@ export default function BlogForm() {
             return;
         }
 
+        // Check if Firebase is initialized
+        if (!storage || !db) {
+            setError('Storage is not initialized');
+            setLoading(false);
+            return;
+        }
+
         try {
             let imageUrl = '';
             if (image) {
                 // Create a reference with the user's wallet address in the path
                 const safeFileName = image.name.replace(/[^a-zA-Z0-9.]/g, '_');
                 const imagePath = `blog-images/${Date.now()}-${address}-${safeFileName}`;
+
+                // Now TypeScript knows storage is not null
                 const imageRef = ref(storage, imagePath);
 
                 try {
@@ -55,8 +64,8 @@ export default function BlogForm() {
                 content,
                 imageUrl,
                 createdAt: Timestamp.now(),
-                authorId: address,  // Using wallet address instead of Firebase UID
-                authorAddress: address // Store the wallet address
+                authorId: address,
+                authorAddress: address
             };
 
             console.log('Creating post with data:', postData);
@@ -89,6 +98,19 @@ export default function BlogForm() {
                 <div className="flex justify-center">
                     <appkit-button></appkit-button>
                 </div>
+            </div>
+        );
+    }
+
+    // Add initialization check UI
+    if (!storage || !db) {
+        return (
+            <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
+                <Alert variant="destructive" className="mb-4">
+                    <AlertDescription>
+                        Storage is not properly initialized. Please try again later.
+                    </AlertDescription>
+                </Alert>
             </div>
         );
     }
