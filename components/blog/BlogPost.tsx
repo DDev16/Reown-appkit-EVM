@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
-import { Calendar, Clock, User, ChevronRight, Heart, Share2, Bookmark, MessageSquare } from 'lucide-react';
+import { Calendar, Clock, User, ChevronRight, Heart, Share2, Bookmark } from 'lucide-react';
 import {
     Alert,
     AlertDescription

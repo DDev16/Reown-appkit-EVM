@@ -3,12 +3,14 @@
 import { useState, FormEvent } from 'react';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage, auth } from '@/lib/firebase';
+import { db, storage } from '@/lib/firebase';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useRouter } from 'next/navigation';
+import { useAccount } from 'wagmi';
 
 export default function BlogForm() {
     const router = useRouter();
+    const { address, isConnected } = useAccount();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [image, setImage] = useState<File | null>(null);
@@ -20,9 +22,9 @@ export default function BlogForm() {
         setLoading(true);
         setError('');
 
-        // Check authentication first
-        if (!auth.currentUser) {
-            setError('You must be logged in to create a post');
+        // Check Web3 authentication
+        if (!isConnected || !address) {
+            setError('You must be connected with your wallet to create a post');
             setLoading(false);
             return;
         }
@@ -30,9 +32,9 @@ export default function BlogForm() {
         try {
             let imageUrl = '';
             if (image) {
-                // Create a reference with the user's ID in the path
+                // Create a reference with the user's wallet address in the path
                 const safeFileName = image.name.replace(/[^a-zA-Z0-9.]/g, '_');
-                const imagePath = `blog-images/${Date.now()}-${auth.currentUser.uid}-${safeFileName}`;
+                const imagePath = `blog-images/${Date.now()}-${address}-${safeFileName}`;
                 const imageRef = ref(storage, imagePath);
 
                 try {
@@ -53,8 +55,8 @@ export default function BlogForm() {
                 content,
                 imageUrl,
                 createdAt: Timestamp.now(),
-                authorId: auth.currentUser.uid,
-                authorEmail: auth.currentUser.email
+                authorId: address,  // Using wallet address instead of Firebase UID
+                authorAddress: address // Store the wallet address
             };
 
             console.log('Creating post with data:', postData);
@@ -74,6 +76,22 @@ export default function BlogForm() {
             setLoading(false);
         }
     };
+
+    // Add connection check UI
+    if (!isConnected) {
+        return (
+            <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
+                <Alert className="mb-4">
+                    <AlertDescription>
+                        Please connect your wallet to create a blog post
+                    </AlertDescription>
+                </Alert>
+                <div className="flex justify-center">
+                    <appkit-button></appkit-button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
