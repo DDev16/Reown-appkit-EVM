@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'viem';
+import TierNavbar from '@/components/ui/tier-navbar';
 
 // Contract details
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
@@ -249,6 +250,7 @@ const Tier7Page = () => {
 
     return (
         <div className="min-h-screen text-white overflow-auto">
+            <TierNavbar />
             <div className="relative min-h-screen">
                 {/* Background Gradients - Updated to blue/osmium theme */}
                 <div className="absolute inset-0 bg-gradient-radial from-[#1e90ff]/20 via-transparent to-transparent opacity-40"></div>
