@@ -59,7 +59,7 @@ const Navbar = () => {
 
     return (
         <nav
-            className={`fixed w-full top-0 z-50 border-b transition-[background-color,backdrop-filter,border-color] duration-300 ${scrolled
+            className={`fixed w-full top-0 z-[9999] border-b transition-[background-color,backdrop-filter,border-color] duration-300 ${scrolled
                 ? 'bg-[#242223]/95 backdrop-blur-sm border-[#BC1A1E]/50'
                 : 'bg-transparent border-transparent'
                 }`}
@@ -87,18 +87,25 @@ const Navbar = () => {
                             item.subItems ? (
                                 <div
                                     key={item.name}
-                                    className="relative"
+                                    className="relative group"
                                     data-aos="fade-down"
                                     data-aos-delay={item.delay}
+                                    onMouseEnter={() => {
+                                        if (item.name === 'Membership') {
+                                            setIsMembershipOpen(true);
+                                        } else if (item.name === 'More') {
+                                            setIsMoreOpen(true);
+                                        }
+                                    }}
+                                    onMouseLeave={() => {
+                                        if (item.name === 'Membership') {
+                                            setIsMembershipOpen(false);
+                                        } else if (item.name === 'More') {
+                                            setIsMoreOpen(false);
+                                        }
+                                    }}
                                 >
                                     <button
-                                        onClick={() => {
-                                            if (item.name === 'Membership') {
-                                                setIsMembershipOpen(!isMembershipOpen);
-                                            } else if (item.name === 'More') {
-                                                setIsMoreOpen(!isMoreOpen);
-                                            }
-                                        }}
                                         className="text-gray-300 hover:text-white hover:bg-[#BC1A1E]/10 px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center"
                                     >
                                         {item.name}
@@ -117,7 +124,7 @@ const Navbar = () => {
                                     {(item.name === 'Membership'
                                         ? isMembershipOpen
                                         : isMoreOpen) && (
-                                            <ul className="absolute left-0 mt-2 w-48 bg-[#242223] border border-[#BC1A1E]/20 rounded-lg shadow-lg">
+                                            <ul className="absolute left-0 mt-2 w-48 bg-[#242223] border border-[#BC1A1E]/20 rounded-lg shadow-lg z-[9999]">
                                                 {item.subItems.map((subItem) => (
                                                     <li key={subItem.name}>
                                                         <Link
@@ -172,7 +179,7 @@ const Navbar = () => {
 
             {/* Mobile Dropdown Menu */}
             <div
-                className={`sm:hidden fixed inset-x-0 top-16 bg-[#242223] border-b border-[#BC1A1E]/20 backdrop-blur-sm bg-opacity-90 transition-all duration-300 ease-in-out ${isMenuOpen
+                className={`sm:hidden fixed inset-x-0 top-16 bg-[#242223] border-b border-[#BC1A1E]/20 backdrop-blur-sm bg-opacity-90 transition-all duration-300 ease-in-out z-[9999] ${isMenuOpen
                     ? 'max-h-screen opacity-100 overflow-y-auto'
                     : 'max-h-0 opacity-0 overflow-hidden'
                     }`}
