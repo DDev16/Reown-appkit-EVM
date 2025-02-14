@@ -43,9 +43,9 @@ const tierItems = [
         name: 'Tier 5',
         path: '/membership/tier-5',
         icon: <Image src="/tier-icons/Ru-icon.png" alt="Tier 5" width={34} height={34} />,
-        bgColor: 'bg-orange-500',
-        hoverClass: 'hover:bg-orange-500 hover:bg-opacity-80',
-        borderColor: 'border-orange-500'
+        bgColor: 'bg-gray-500',
+        hoverClass: 'hover:bg-gray-500 hover:bg-opacity-80',
+        borderColor: 'border-gray-500'
     },
     {
         name: 'Tier 6',
