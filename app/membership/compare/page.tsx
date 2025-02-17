@@ -1,7 +1,8 @@
-import React from 'react';
+"use client";
+import React, { useState } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Check, X, Sparkles } from 'lucide-react';
+import { Check, X, Sparkles, ChevronRight, ChevronLeft } from 'lucide-react';
 
 interface TierFeatures {
     "Blog Access": string;
@@ -50,6 +51,8 @@ const featureOrder: (keyof TierFeatures)[] = [
 ];
 
 const TierComparison = () => {
+    const [activeTierIndex, setActiveTierIndex] = useState(0);
+
     const tiers: Tier[] = [
         {
             name: "Top Tier",
@@ -222,49 +225,141 @@ const TierComparison = () => {
         }
     ];
 
+    const nextTier = () => {
+        setActiveTierIndex((prev) => (prev + 1) % tiers.length);
+    };
+
+    const prevTier = () => {
+        setActiveTierIndex((prev) => (prev - 1 + tiers.length) % tiers.length);
+    };
+
+    const DesktopTable = () => (
+        <div className="hidden md:block overflow-x-auto">
+            <Table className="w-full border-collapse min-w-[900px]">
+                <TableHeader>
+                    <TableRow>
+                        <TableHead className="text-white bg-black/20 sticky left-0 z-10">Features</TableHead>
+                        {tiers.map((tier) => (
+                            <TableHead key={tier.name} className="text-center min-w-[150px]">
+                                <div className="space-y-2">
+                                    <Badge
+                                        className={`w-full py-1 ${tier.textColor} bg-gradient-to-r ${tier.gradientFrom} ${tier.gradientTo} transition-all duration-300 ${tier.hoverGradient}`}
+                                    >
+                                        {tier.name === "Top Tier" && <Sparkles className="w-4 h-4 inline mr-1" />}
+                                        {tier.displayName}
+                                    </Badge>
+                                </div>
+                            </TableHead>
+                        ))}
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {featureOrder.map((feature) => (
+                        <TableRow key={feature} className="border-b border-white/10">
+                            <TableCell className="font-medium text-white bg-black/20 sticky left-0">{feature}</TableCell>
+                            {tiers.map((tier) => (
+                                <TableCell key={`${tier.name}-${feature}`} className="text-center">
+                                    {typeof tier.features[feature] === 'boolean' ? (
+                                        tier.features[feature] ?
+                                            <Check className="mx-auto text-green-500" /> :
+                                            <X className="mx-auto text-red-500" />
+                                    ) : (
+                                        <span className="text-gray-200">{tier.features[feature]}</span>
+                                    )}
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
+    );
+
+    const MobileView = () => {
+        const activeTier = tiers[activeTierIndex];
+
+        return (
+            <div className="md:hidden">
+                <div className="flex items-center justify-between mb-6">
+                    <button
+                        onClick={prevTier}
+                        className="p-2 text-white hover:bg-white/10 rounded-full transition-colors"
+                        aria-label="Previous tier"
+                    >
+                        <ChevronLeft className="w-6 h-6" />
+                    </button>
+
+                    <div className="flex flex-col items-center">
+                        <Badge
+                            className={`px-6 py-2 ${activeTier.textColor} bg-gradient-to-r ${activeTier.gradientFrom} ${activeTier.gradientTo} text-lg`}
+                        >
+                            {activeTier.name === "Top Tier" && <Sparkles className="w-4 h-4 inline mr-1" />}
+                            {activeTier.displayName}
+                        </Badge>
+                        <span className="text-gray-400 text-sm mt-2">{activeTier.name}</span>
+                    </div>
+
+                    <button
+                        onClick={nextTier}
+                        className="p-2 text-white hover:bg-white/10 rounded-full transition-colors"
+                        aria-label="Next tier"
+                    >
+                        <ChevronRight className="w-6 h-6" />
+                    </button>
+                </div>
+
+                <div className="space-y-3 px-2">
+                    {featureOrder.map((feature) => (
+                        <div
+                            key={feature}
+                            className="bg-black/20 p-4 rounded-lg flex justify-between items-center hover:bg-black/30 transition-colors"
+                        >
+                            <span className="text-white font-medium">{feature}</span>
+                            <div className="flex items-center">
+                                {typeof activeTier.features[feature] === 'boolean' ? (
+                                    activeTier.features[feature] ? (
+                                        <div className="flex items-center space-x-2">
+                                            <span className="text-green-500">Yes</span>
+                                            <Check className="text-green-500 w-5 h-5" />
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center space-x-2">
+                                            <span className="text-red-500">No</span>
+                                            <X className="text-red-500 w-5 h-5" />
+                                        </div>
+                                    )
+                                ) : (
+                                    <span className="text-gray-200 font-medium ml-4">
+                                        {activeTier.features[feature]}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="flex justify-center gap-2 mt-6">
+                    {tiers.map((tier, index) => (
+                        <button
+                            key={tier.name}
+                            onClick={() => setActiveTierIndex(index)}
+                            className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${index === activeTierIndex
+                                ? 'bg-white scale-110'
+                                : 'bg-white/30 hover:bg-white/50'
+                                }`}
+                            aria-label={`Go to ${tier.name}`}
+                        />
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="p-4 bg-gray/50 space-y-4">
             <h2 className="text-3xl font-bold text-white mb-6">Tier Comparison</h2>
-
-            <div className="overflow-x-auto">
-                <Table className="w-full border-collapse">
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="text-white">Features</TableHead>
-                            {tiers.map((tier) => (
-                                <TableHead key={tier.name} className="text-center min-w-[150px]">
-                                    <div className="space-y-2">
-                                        <Badge
-                                            className={`w-full py-1 ${tier.textColor} bg-gradient-to-r ${tier.gradientFrom} ${tier.gradientTo} transition-all duration-300 ${tier.hoverGradient}`}
-                                        >
-                                            {tier.name === "Top Tier" && <Sparkles className="w-4 h-4 inline mr-1" />}
-                                            {tier.displayName}
-                                        </Badge>
-                                    </div>
-                                </TableHead>
-                            ))}
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {featureOrder.map((feature) => (
-                            <TableRow key={feature} className="border-b border-white/10">
-                                <TableCell className="font-medium text-white">{feature}</TableCell>
-                                {tiers.map((tier) => (
-                                    <TableCell key={`${tier.name}-${feature}`} className="text-center">
-                                        {typeof tier.features[feature] === 'boolean' ? (
-                                            tier.features[feature] ?
-                                                <Check className="mx-auto text-green-500" /> :
-                                                <X className="mx-auto text-red-500" />
-                                        ) : (
-                                            <span className="text-gray-200">{tier.features[feature]}</span>
-                                        )}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </div>
+            <DesktopTable />
+            <MobileView />
         </div>
     );
 };

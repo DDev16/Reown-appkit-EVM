@@ -4,12 +4,13 @@ import { ArrowRight } from 'lucide-react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const Hero: React.FC = () => {
     const backgroundRef = useRef<HTMLDivElement>(null);
     const bullHeadRef = useRef<HTMLDivElement>(null);
     const [isMobile, setIsMobile] = useState(false);
-
+    const router = useRouter();
     useEffect(() => {
         // Initialize AOS for scroll animations
         AOS.init({
@@ -18,6 +19,16 @@ const Hero: React.FC = () => {
             mirror: false,
             disable: 'phone'
         });
+
+
+
+        const handleStartLearning = () => {
+            router.push('/learn');
+        };
+
+        const handleViewMembership = () => {
+            router.push('/membership');
+        };
 
         // Function to check if the device is mobile based on width
         const checkMobile = () => {

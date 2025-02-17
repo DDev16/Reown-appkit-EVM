@@ -54,6 +54,8 @@ const Navbar = () => {
                 { name: "Tier 5", path: "/membership/tier-5" },
                 { name: "Tier 6", path: "/membership/tier-6" },
                 { name: "Tier 7", path: "/membership/tier-7" },
+                { name: "Tier 8", path: "/membership/tier-8" },
+                { name: "Tier 9", path: "/membership/tier-9" },
                 { name: "Compare", path: "/membership/compare" },
             ],
         },
@@ -63,8 +65,8 @@ const Navbar = () => {
     return (
         <nav
             className={`fixed w-full top-0 z-[9999] border-b transition-[background-color,backdrop-filter,border-color] duration-300 ${scrolled
-                    ? "bg-[#242223]/95 backdrop-blur-sm border-[#BC1A1E]/50"
-                    : "bg-transparent border-transparent"
+                ? "bg-[#242223]/95 backdrop-blur-sm border-[#BC1A1E]/50"
+                : "bg-transparent border-transparent"
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -112,10 +114,10 @@ const Navbar = () => {
                                         {item.name}
                                         <svg
                                             className={`ml-1 h-4 w-4 fill-current transform transition-transform duration-300 ${(item.name === "Membership"
-                                                    ? isMembershipOpen
-                                                    : isMoreOpen)
-                                                    ? "rotate-180"
-                                                    : ""
+                                                ? isMembershipOpen
+                                                : isMoreOpen)
+                                                ? "rotate-180"
+                                                : ""
                                                 }`}
                                             viewBox="0 0 20 20"
                                         >
@@ -176,8 +178,8 @@ const Navbar = () => {
             {/* Mobile Dropdown Menu */}
             <div
                 className={`sm:hidden fixed inset-x-0 top-16 bg-[#242223] border-b border-[#BC1A1E]/20 backdrop-blur-sm bg-opacity-90 transition-all duration-300 ease-in-out z-[9999] ${isMenuOpen
-                        ? "max-h-screen opacity-100 overflow-y-auto"
-                        : "max-h-0 opacity-0 overflow-hidden"
+                    ? "max-h-screen opacity-100 overflow-y-auto"
+                    : "max-h-0 opacity-0 overflow-hidden"
                     }`}
             >
                 <div className="px-4 pt-2 pb-3 space-y-1">
@@ -197,10 +199,10 @@ const Navbar = () => {
                                     {item.name}
                                     <svg
                                         className={`inline ml-1 h-4 w-4 fill-current transform transition-transform duration-300 ${(item.name === "Membership"
-                                                ? isMembershipOpen
-                                                : isMoreOpen)
-                                                ? "rotate-180"
-                                                : ""
+                                            ? isMembershipOpen
+                                            : isMoreOpen)
+                                            ? "rotate-180"
+                                            : ""
                                             }`}
                                         viewBox="0 0 20 20"
                                     >

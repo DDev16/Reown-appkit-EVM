@@ -36,7 +36,7 @@ const MembershipTiers = () => {
             description: "The ultimate experience/exclusive access & premium benefits",
             Tier: "Tier 1",
             iconPath: "/tier-icons/DBW-icon.png",
-            color: "from-red-500 via-red-500 to-red-900",
+            color: "from-[#d4af37] via-[#d4af37] to-[#b3941f]",
             highlighted: true,
             path: "/membership/tier-1"
         },
@@ -46,7 +46,7 @@ const MembershipTiers = () => {
             description: "Premium access to advanced features and dedicated support",
             Tier: "Tier 2",
             iconPath: "/tier-icons/Rh-icon.png",
-            color: "from-red-500 via-red-500 to-red-900",
+            color: "from-[#00bf63] via-[#00bf63] to-[#009e52]",
             highlighted: false,
             path: "/membership/tier-2"
         },
@@ -56,27 +56,27 @@ const MembershipTiers = () => {
             description: "Elite membership with enhanced capabilities and priority access",
             Tier: "Tier 3",
             iconPath: "/tier-icons/Pt-icon.png",
-            color: "from-gray-100 via-gray-500 to-gray-500",
+            color: "from-[#ff8018] via-[#ff8018] to-[#e67216]",
             highlighted: false,
             path: "/membership/tier-3"
         },
         {
             name: "GOLD",
             subtitle: "Pro Tier",
-            description: "Professional grade features with advanced trading capabilities",
+            description: "Professional membership with advanced features and benefits",
             Tier: "Tier 4",
             iconPath: "/tier-icons/Au-icon.png",
-            color: "from-yellow-100 via-yellow-600 to-yellow-500",
+            color: "from-[#d4af37] via-[#d4af37] to-[#b3941f]",
             highlighted: false,
             path: "/membership/tier-4"
         },
         {
             name: "RUTHENIUM",
             subtitle: "Advanced Tier",
-            description: "Advanced tools and features for serious traders",
+            description: "Advanced membership with exclusive features and benefits",
             Tier: "Tier 5",
             iconPath: "/tier-icons/Ru-icon.png",
-            color: "from-gray-200 via-gray-300 to-gray-500",
+            color: "from-[#f6cefc] via-[#f6cefc] to-[#eab5f1]",
             highlighted: false,
             path: "/membership/tier-5"
         },
@@ -86,7 +86,7 @@ const MembershipTiers = () => {
             description: "Perfect starting point for your DBW journey",
             Tier: "Tier 6",
             iconPath: "/tier-icons/Ir-icon.png",
-            color: "from-red-500 via-red-500 to-red-800",
+            color: "from-[#BC1A1E] via-[#BC1A1E] to-[#8B1315]",
             highlighted: false,
             path: "/membership/tier-6"
         },
@@ -96,9 +96,29 @@ const MembershipTiers = () => {
             description: "Essential features to begin your DBW experience",
             Tier: "Tier 7",
             iconPath: "/tier-icons/Os-icon.png",
-            color: "from-blue-400 via-blue-400 to-blue-500",
+            color: "from-[#0099CC] via-[#0099CC] to-[#007399]",
             highlighted: false,
             path: "/membership/tier-7"
+        },
+        {
+            name: "PALLADIUM",
+            subtitle: "Advanced Tier",
+            description: "Basic access to fundamental DBW features + more",
+            Tier: "Tier 8",
+            iconPath: "/tier-icons/Pd-icon.png",
+            color: "from-[#2ECC71] via-[#2ECC71] to-[#27AE60]", // Updated to bright green
+            highlighted: false,
+            path: "/membership/tier-8"
+        },
+        {
+            name: "RHENIUM",
+            subtitle: "Basic Tier",
+            description: "Basic access to fundamental DBW features",
+            Tier: "Tier 9",
+            iconPath: "/tier-icons/Re-icon.png",
+            color: "from-[#FFD700] via-[#FFD700] to-[#FFC000]", // Updated to bright yellow
+            highlighted: false,
+            path: "/membership/tier-9"
         }
     ];
 
@@ -225,15 +245,19 @@ const MembershipTiers = () => {
                     </p>
                 </div>
 
-                {/* Grid Layout - Modified for 3-4 split */}
+                {/* Updated Grid Layout */}
                 <div className="space-y-12">
-                    {/* First Row - 3 cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1600px] mx-auto">
-                        {tiers.slice(0, 3).map((tier, index) => renderTierCard(tier, index))}
+                    {/* First Row - 2 cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1600px] mx-auto">
+                        {tiers.slice(0, 2).map((tier, index) => renderTierCard(tier, index))}
                     </div>
-                    {/* Second Row - 4 cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-[1600px] mx-auto">
-                        {tiers.slice(3).map((tier, index) => renderTierCard(tier, index + 3))}
+                    {/* Second Row - 3 cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1600px] mx-auto">
+                        {tiers.slice(2, 5).map((tier, index) => renderTierCard(tier, index + 2))}
+                    </div>
+                    {/* Third Row - 4 cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-[1600px] mx-auto">
+                        {tiers.slice(5, 9).map((tier, index) => renderTierCard(tier, index + 5))}
                     </div>
                 </div>
             </div>

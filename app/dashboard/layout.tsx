@@ -83,27 +83,42 @@ const MEMBERSHIP_TIERS = [
     },
     {
         id: 8,
+        name: 'Tier 8',
+        path: '/dashboard/tier-8',
+        icon: <Crown className="w-5 h-5" />,
+        color: 'from-red-400 to-red-600'
+    },
+    {
+        id: 9,
+        name: 'Tier 9',
+        path: '/dashboard/tier-9',
+        icon: <Crown className="w-5 h-5" />,
+        color: 'from-red-400 to-red-600'
+    },
+
+    {
+        id: 10,
         name: 'Video Library',
         path: '/dashboard/video-library',
         icon: <VideoIcon className="w-5 h-5" />,
         color: 'from-pink-400 to-pink-600'
     },
     {
-        id: 9,
+        id: 11,
         name: 'Dictionary',
         path: '/dashboard/dictionary',
         icon: <Library className="w-5 h-5" />,
         color: 'from-teal-400 to-teal-600'
     },
     {
-        id: 10,
+        id: 12,
         name: 'Wallet',
         path: '/dashboard/wallet',
         icon: <Wallet className="w-5 h-5" />,
         color: 'from-indigo-400 to-indigo-600'
     },
     {
-        id: 11,
+        id: 13,
         name: 'General Blog',
         path: '/blog',
         icon: <Newspaper className="w-5 h-5" />,
