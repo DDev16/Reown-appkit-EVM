@@ -85,8 +85,10 @@ const Navbar = () => {
                 { name: "Shop", path: "/shop" },
                 { name: "About Us", path: "/about-us" },
                 { name: "Sale Page", path: "/sales" },
+                { name: "Contributors", path: "/contributors" },
                 { name: "Features", path: "/our-features" },
                 { name: "Contact", path: "/contact" },
+
             ],
         },
         {
