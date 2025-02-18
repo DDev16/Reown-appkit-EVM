@@ -300,7 +300,9 @@ const Tier7Page = () => {
                             <div className="flex items-center justify-center space-y-2 flex-wrap gap-8">
                                 <div className="px-4 py-2 bg-black border border-[#1e90ff] rounded-xl text-center shadow-lg shadow-[#1e90ff]/50">
                                     <p className="text-gray-300 text-base font-semibold">
-                                        Price: <span className="text-[#00bfff]">{formatPrice()} FLR</span>
+                                        Price: <span className="text-[#00bfff]">5,000 FLR</span>
+                                        {/* Price: <span className="text-[#00bfff]">{formatPrice()} FLR</span> */}
+
                                     </p>
                                     <p className="text-gray-300 text-base font-semibold">
                                         Supply: <span className="text-[#00bfff]">{formatSupply()}</span>
