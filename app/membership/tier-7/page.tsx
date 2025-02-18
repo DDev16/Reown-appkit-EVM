@@ -238,7 +238,7 @@ const Tier7Page = () => {
     };
 
     const formatPrice = () => {
-        if (!priceData) return "2,500";
+        if (!priceData) return "5,000";
         return (Number(priceData) / 1e18).toLocaleString();
     };
 
