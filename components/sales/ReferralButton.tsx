@@ -67,7 +67,7 @@ export const ReferralButton = () => {
                                 </p>
                                 <p className="flex items-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-[#BC1A1E] shrink-0 inline-block" />
-                                    When they mint using your link, both of you receive rewards
+                                    When they mint using your link, you receive rewards in the form of $FLR
                                 </p>
                                 <p className="flex items-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-[#BC1A1E] shrink-0 inline-block" />
