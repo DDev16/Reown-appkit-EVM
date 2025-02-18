@@ -1,30 +1,43 @@
-"use client";
+'use client';
+
 import React, { useState } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Check, X, Sparkles, ChevronRight, ChevronLeft } from 'lucide-react';
+import Image from 'next/image';
 
 interface TierFeatures {
-    "Blog Access": string;
-    "XXX Tokens": string;
-    "Zoom Calls": string;
-    "NFT Cashback": string;
-    "Revenue Split": string;
-    "Sweepstake Tickets": string;
-    "Monthly Cost": string;
-    "Contributors Access": boolean;
-    "Video Library": boolean;
-    "Knowledge Tests": boolean;
-    "Early Features": boolean;
-    "Early Launches": boolean;
+    "No of NFTs": number;
+    "NFT Price": number;
+    "Costs p/m With Kickback": number;
+    "Costs p/m Without Kickback": number;
+    "Profit after 60 Months": boolean | string;
+    "DBW Tokens": number;
     "Airdrops": boolean;
-    "Monthly Giveaways"?: boolean;
-    "More Courses"?: boolean;
+    "Blog Access": string;
+    "Public Blog": boolean;
+    "Library": boolean;
+    "Dictionary": boolean;
+    "Video Library": boolean;
+    "Courses": string;
+    "Knowledge Tests": boolean;
+    "E-Books": boolean;
+    "Zoom Calls": string;
+    "Max Cashback": string;
+    "Minimum Cashback": string;
+    "Cashback Guarantee": boolean;
+    "Revenue Share": string;
+    "Early Access Platform Tokens": boolean;
+    "Early Access New Collections": boolean;
+    "Token Drops": boolean;
+    "Sweepstake Tickets": number;
+    "Contributor Access": boolean;
 }
 
 interface Tier {
     name: string;
     displayName: string;
+    icon: string;
     textColor: string;
     gradientFrom: string;
     gradientTo: string;
@@ -32,22 +45,89 @@ interface Tier {
     features: TierFeatures;
 }
 
+const TIER_COLORS = {
+    1: {
+        gradientFrom: "from-[#d4af37]",
+        gradientTo: "to-[#b3941f]",
+        textColor: "text-white",
+        hoverGradient: "hover:from-[#b3941f] hover:to-[#d4af37]"
+    },
+    2: {
+        gradientFrom: "from-[#00bf63]",
+        gradientTo: "to-[#009e52]",
+        textColor: "text-white",
+        hoverGradient: "hover:from-[#009e52] hover:to-[#00bf63]"
+    },
+    3: {
+        gradientFrom: "from-[#ff8018]",
+        gradientTo: "to-[#e67216]",
+        textColor: "text-white",
+        hoverGradient: "hover:from-[#e67216] hover:to-[#ff8018]"
+    },
+    4: {
+        gradientFrom: "from-[#d4af37]",
+        gradientTo: "to-[#b3941f]",
+        textColor: "text-white",
+        hoverGradient: "hover:from-[#b3941f] hover:to-[#d4af37]"
+    },
+    5: {
+        gradientFrom: "from-[#f6cefc]",
+        gradientTo: "to-[#eab5f1]",
+        textColor: "text-white",
+        hoverGradient: "hover:from-[#eab5f1] hover:to-[#f6cefc]"
+    },
+    6: {
+        gradientFrom: "from-[#BC1A1E]",
+        gradientTo: "to-[#8B1315]",
+        textColor: "text-white",
+        hoverGradient: "hover:from-[#8B1315] hover:to-[#BC1A1E]"
+    },
+    7: {
+        gradientFrom: "from-[#0099CC]",
+        gradientTo: "to-[#007399]",
+        textColor: "text-white",
+        hoverGradient: "hover:from-[#007399] hover:to-[#0099CC]"
+    },
+    8: {
+        gradientFrom: "from-[#2ECC71]",
+        gradientTo: "to-[#27AE60]",
+        textColor: "text-white",
+        hoverGradient: "hover:from-[#27AE60] hover:to-[#2ECC71]"
+    },
+    9: {
+        gradientFrom: "from-[#FFD700]",
+        gradientTo: "to-[#FFC000]",
+        textColor: "text-white",
+        hoverGradient: "hover:from-[#FFC000] hover:to-[#FFD700]"
+    }
+};
+
 const featureOrder: (keyof TierFeatures)[] = [
-    "Video Library",
-    "Blog Access",
-    "Contributors Access",
-    "More Courses",
-    "Knowledge Tests",
-    "Early Features",
-    "Early Launches",
-    "XXX Tokens",
+    "No of NFTs",
+    "NFT Price",
+    "Costs p/m With Kickback",
+    "Costs p/m Without Kickback",
+    "Profit after 60 Months",
+    "DBW Tokens",
     "Airdrops",
-    "Monthly Giveaways",
+    "Blog Access",
+    "Public Blog",
+    "Library",
+    "Dictionary",
+    "Video Library",
+    "Courses",
+    "Knowledge Tests",
+    "E-Books",
     "Zoom Calls",
-    "NFT Cashback",
-    "Revenue Split",
+    "Max Cashback",
+    "Minimum Cashback",
+    "Cashback Guarantee",
+    "Revenue Share",
+    "Early Access Platform Tokens",
+    "Early Access New Collections",
+    "Token Drops",
     "Sweepstake Tickets",
-    "Monthly Cost"
+    "Contributor Access"
 ];
 
 const TierComparison = () => {
@@ -57,170 +137,298 @@ const TierComparison = () => {
         {
             name: "Top Tier",
             displayName: "DBW",
-            textColor: "text-white",
-            gradientFrom: "from-neutral-900",
-            gradientTo: "to-neutral-800",
-            hoverGradient: "hover:from-neutral-800 hover:to-neutral-700",
+            icon: "/tier-icons/DBW-icon.png",
+            ...TIER_COLORS[1],
             features: {
-                "Blog Access": "Tier 1 Blog",
-                "XXX Tokens": "2,400,000",
-                "Zoom Calls": "Weekly",
-                "NFT Cashback": "100%",
-                "Revenue Split": "10%",
-                "Sweepstake Tickets": "64 draws",
-                "Monthly Cost": "Premium",
-                "Contributors Access": true,
-                "Video Library": true,
-                "Knowledge Tests": true,
-                "Early Features": true,
-                "Early Launches": true,
+                "No of NFTs": 25,
+                "NFT Price": 400000,
+                "Costs p/m With Kickback": 160000,
+                "Costs p/m Without Kickback": 0,
+                "Profit after 60 Months": true,
+                "DBW Tokens": 32000,
                 "Airdrops": true,
-                "Monthly Giveaways": false,
-                "More Courses": true
+                "Blog Access": "Tier 1",
+                "Public Blog": true,
+                "Library": true,
+                "Dictionary": true,
+                "Video Library": true,
+                "Courses": "Tier 1",
+                "Knowledge Tests": true,
+                "E-Books": true,
+                "Zoom Calls": "Weekly",
+                "Max Cashback": "100%",
+                "Minimum Cashback": "75%",
+                "Cashback Guarantee": true,
+                "Revenue Share": "10%",
+                "Early Access Platform Tokens": true,
+                "Early Access New Collections": true,
+                "Token Drops": true,
+                "Sweepstake Tickets": 12,
+                "Contributor Access": true
             }
         },
         {
             name: "Rhodium",
             displayName: "Rh",
-            textColor: "text-white",
-            gradientFrom: "from-gray-200",
-            gradientTo: "to-gray-400",
-            hoverGradient: "hover:from-gray-300 hover:to-gray-500",
+            icon: "/tier-icons/Rh-icon.png",
+            ...TIER_COLORS[2],
             features: {
-                "Blog Access": "Tier 2 Blog",
-                "XXX Tokens": "1,200,000",
-                "Zoom Calls": "Every 2 weeks",
-                "NFT Cashback": "95%",
-                "Revenue Split": "15%",
-                "Sweepstake Tickets": "32 draws",
-                "Monthly Cost": "Premium",
-                "Contributors Access": false,
-                "Video Library": true,
-                "Knowledge Tests": true,
-                "Early Features": true,
-                "Early Launches": true,
+                "No of NFTs": 50,
+                "NFT Price": 200000,
+                "Costs p/m With Kickback": 80000,
+                "Costs p/m Without Kickback": 0,
+                "Profit after 60 Months": true,
+                "DBW Tokens": 16000,
                 "Airdrops": true,
-                "More Courses": true
+                "Blog Access": "Tier 2",
+                "Public Blog": true,
+                "Library": true,
+                "Dictionary": true,
+                "Video Library": true,
+                "Courses": "Tier 2",
+                "Knowledge Tests": true,
+                "E-Books": true,
+                "Zoom Calls": "Bi-Weekly",
+                "Max Cashback": "100%",
+                "Minimum Cashback": "75%",
+                "Cashback Guarantee": true,
+                "Revenue Share": "15%",
+                "Early Access Platform Tokens": true,
+                "Early Access New Collections": true,
+                "Token Drops": true,
+                "Sweepstake Tickets": 12,
+                "Contributor Access": false
             }
         },
         {
             name: "Platinum",
             displayName: "Pt",
-            textColor: "text-white",
-            gradientFrom: "from-[#E5E4E2]",
-            gradientTo: "to-[#A9A9A9]",
-            hoverGradient: "hover:from-[#C0C0C0] hover:to-[#808080]",
+            icon: "/tier-icons/Pt-icon.png",
+            ...TIER_COLORS[3],
             features: {
-                "Blog Access": "Tier 3 Blog",
-                "XXX Tokens": "600,000",
-                "Zoom Calls": "Monthly",
-                "NFT Cashback": "90%",
-                "Revenue Split": "20%",
-                "Sweepstake Tickets": "16 draws",
-                "Monthly Cost": "Premium",
-                "Contributors Access": false,
-                "Video Library": true,
-                "Knowledge Tests": true,
-                "Early Features": true,
-                "Early Launches": true,
+                "No of NFTs": 100,
+                "NFT Price": 100000,
+                "Costs p/m With Kickback": 40000,
+                "Costs p/m Without Kickback": 0,
+                "Profit after 60 Months": true,
+                "DBW Tokens": 8000,
                 "Airdrops": true,
-                "More Courses": true
+                "Blog Access": "Tier 3",
+                "Public Blog": true,
+                "Library": true,
+                "Dictionary": true,
+                "Video Library": true,
+                "Courses": "Tier 3",
+                "Knowledge Tests": true,
+                "E-Books": true,
+                "Zoom Calls": "Monthly",
+                "Max Cashback": "100%",
+                "Minimum Cashback": "75%",
+                "Cashback Guarantee": true,
+                "Revenue Share": "20%",
+                "Early Access Platform Tokens": true,
+                "Early Access New Collections": true,
+                "Token Drops": true,
+                "Sweepstake Tickets": 12,
+                "Contributor Access": false
             }
         },
         {
             name: "Gold",
             displayName: "Au",
-            textColor: "text-white",
-            gradientFrom: "from-yellow-500",
-            gradientTo: "to-yellow-600",
-            hoverGradient: "hover:from-yellow-400 hover:to-yellow-500",
+            icon: "/tier-icons/Au-icon.png",
+            ...TIER_COLORS[4],
             features: {
-                "Blog Access": "Tier 4 Blog",
-                "XXX Tokens": "300,000",
-                "Zoom Calls": "Every 2 months",
-                "NFT Cashback": "85%",
-                "Revenue Split": "25%",
-                "Sweepstake Tickets": "8 draws",
-                "Monthly Cost": "Premium",
-                "Contributors Access": false,
-                "Video Library": true,
-                "Knowledge Tests": true,
-                "Early Features": true,
-                "Early Launches": true,
+                "No of NFTs": 200,
+                "NFT Price": 50000,
+                "Costs p/m With Kickback": 20000,
+                "Costs p/m Without Kickback": 0,
+                "Profit after 60 Months": true,
+                "DBW Tokens": 4000,
                 "Airdrops": true,
-                "More Courses": true
+                "Blog Access": "Tier 4",
+                "Public Blog": true,
+                "Library": true,
+                "Dictionary": true,
+                "Video Library": true,
+                "Courses": "Tier 4",
+                "Knowledge Tests": true,
+                "E-Books": true,
+                "Zoom Calls": "Per 2 months",
+                "Max Cashback": "100%",
+                "Minimum Cashback": "75%",
+                "Cashback Guarantee": true,
+                "Revenue Share": "25%",
+                "Early Access Platform Tokens": true,
+                "Early Access New Collections": true,
+                "Token Drops": true,
+                "Sweepstake Tickets": 12,
+                "Contributor Access": false
             }
         },
         {
             name: "Ruthenium",
             displayName: "Ru",
-            textColor: "text-white",
-            gradientFrom: "from-neutral-900",
-            gradientTo: "to-neutral-800",
-            hoverGradient: "hover:from-neutral-800 hover:to-neutral-700",
+            icon: "/tier-icons/Ru-icon.png",
+            ...TIER_COLORS[5],
             features: {
-                "Blog Access": "General Blog",
-                "XXX Tokens": "150,000",
-                "Zoom Calls": "Every 3 months",
-                "NFT Cashback": "80%",
-                "Revenue Split": "30%",
-                "Sweepstake Tickets": "4 draws",
-                "Monthly Cost": "$2/month",
-                "Contributors Access": false,
+                "No of NFTs": 400,
+                "NFT Price": 25000,
+                "Costs p/m With Kickback": 10000,
+                "Costs p/m Without Kickback": 0,
+                "Profit after 60 Months": true,
+                "DBW Tokens": 2000,
+                "Airdrops": true,
+                "Blog Access": "Tier 5",
+                "Public Blog": true,
+                "Library": true,
+                "Dictionary": true,
                 "Video Library": true,
+                "Courses": "Tier 5",
                 "Knowledge Tests": true,
-                "Early Features": true,
-                "Early Launches": true,
-                "Airdrops": false,
-                "Monthly Giveaways": true
+                "E-Books": true,
+                "Zoom Calls": "Per 3 months",
+                "Max Cashback": "100%",
+                "Minimum Cashback": "75%",
+                "Cashback Guarantee": true,
+                "Revenue Share": "30%",
+                "Early Access Platform Tokens": true,
+                "Early Access New Collections": true,
+                "Token Drops": true,
+                "Sweepstake Tickets": 12,
+                "Contributor Access": false
             }
         },
         {
             name: "Iridium",
             displayName: "Ir",
-            textColor: "text-white",
-            gradientFrom: "from-red-700",
-            gradientTo: "to-red-900",
-            hoverGradient: "hover:from-red-600 hover:to-red-800",
+            icon: "/tier-icons/Ir-icon.png",
+            ...TIER_COLORS[6],
             features: {
-                "Blog Access": "General Blog",
-                "XXX Tokens": "15,000",
-                "Zoom Calls": "Every 2 months",
-                "NFT Cashback": "No",
-                "Revenue Split": "No",
-                "Sweepstake Tickets": "No",
-                "Monthly Cost": "$2/month",
-                "Contributors Access": false,
+                "No of NFTs": 800,
+                "NFT Price": 10000,
+                "Costs p/m With Kickback": 4000,
+                "Costs p/m Without Kickback": 0,
+                "Profit after 60 Months": true,
+                "DBW Tokens": 800,
+                "Airdrops": true,
+                "Blog Access": "General",
+                "Public Blog": true,
+                "Library": true,
+                "Dictionary": true,
                 "Video Library": true,
+                "Courses": "General",
                 "Knowledge Tests": true,
-                "Early Features": true,
-                "Early Launches": true,
-                "Airdrops": false,
-                "Monthly Giveaways": true
+                "E-Books": true,
+                "Zoom Calls": "Per 6 months",
+                "Max Cashback": "50%",
+                "Minimum Cashback": "25%",
+                "Cashback Guarantee": true,
+                "Revenue Share": "0%",
+                "Early Access Platform Tokens": true,
+                "Early Access New Collections": true,
+                "Token Drops": true,
+                "Sweepstake Tickets": 0,
+                "Contributor Access": false
             }
         },
         {
             name: "Osmium",
             displayName: "Os",
-            textColor: "text-white",
-            gradientFrom: "from-blue-400",
-            gradientTo: "to-blue-600",
-            hoverGradient: "hover:from-blue-300 hover:to-blue-500",
+            icon: "/tier-icons/Os-icon.png",
+            ...TIER_COLORS[7],
             features: {
-                "Blog Access": "General Blog",
-                "XXX Tokens": "7,500",
-                "Zoom Calls": "Every 3 months",
-                "NFT Cashback": "No",
-                "Revenue Split": "No",
-                "Sweepstake Tickets": "No",
-                "Monthly Cost": "$1/month",
-                "Contributors Access": false,
+                "No of NFTs": 1600,
+                "NFT Price": 5000,
+                "Costs p/m With Kickback": 2000,
+                "Costs p/m Without Kickback": 0,
+                "Profit after 60 Months": "Likely",
+                "DBW Tokens": 400,
+                "Airdrops": true,
+                "Blog Access": "General",
+                "Public Blog": true,
+                "Library": true,
+                "Dictionary": true,
                 "Video Library": true,
+                "Courses": "General",
                 "Knowledge Tests": true,
-                "Early Features": true,
-                "Early Launches": true,
-                "Airdrops": false,
-                "Monthly Giveaways": true
+                "E-Books": true,
+                "Zoom Calls": "Per 6 months",
+                "Max Cashback": "40%",
+                "Minimum Cashback": "20%",
+                "Cashback Guarantee": true,
+                "Revenue Share": "0%",
+                "Early Access Platform Tokens": true,
+                "Early Access New Collections": true,
+                "Token Drops": true,
+                "Sweepstake Tickets": 0,
+                "Contributor Access": false
+            }
+        },
+        {
+            name: "Palladium",
+            displayName: "Pd",
+            icon: "/tier-icons/Pd-icon.png",
+            ...TIER_COLORS[8],
+            features: {
+                "No of NFTs": 3200,
+                "NFT Price": 2500,
+                "Costs p/m With Kickback": 1000,
+                "Costs p/m Without Kickback": 0,
+                "Profit after 60 Months": "Likely",
+                "DBW Tokens": 200,
+                "Airdrops": true,
+                "Blog Access": "General",
+                "Public Blog": true,
+                "Library": true,
+                "Dictionary": true,
+                "Video Library": true,
+                "Courses": "General",
+                "Knowledge Tests": true,
+                "E-Books": true,
+                "Zoom Calls": "Per 6 months",
+                "Max Cashback": "30%",
+                "Minimum Cashback": "15%",
+                "Cashback Guarantee": true,
+                "Revenue Share": "0%",
+                "Early Access Platform Tokens": true,
+                "Early Access New Collections": true,
+                "Token Drops": true,
+                "Sweepstake Tickets": 0,
+                "Contributor Access": false
+            }
+        },
+        {
+            name: "Rhenium",
+            displayName: "Re",
+            icon: "/tier-icons/Re-icon.png",
+            ...TIER_COLORS[9],
+            features: {
+                "No of NFTs": 6400,
+                "NFT Price": 1250,
+                "Costs p/m With Kickback": 50,
+                "Costs p/m Without Kickback": 0,
+                "Profit after 60 Months": "Likely",
+                "DBW Tokens": 100,
+                "Airdrops": true,
+                "Blog Access": "General",
+                "Public Blog": true,
+                "Library": true,
+                "Dictionary": true,
+                "Video Library": true,
+                "Courses": "General",
+                "Knowledge Tests": true,
+                "E-Books": true,
+                "Zoom Calls": "Per 6 months",
+                "Max Cashback": "20%",
+                "Minimum Cashback": "10%",
+                "Cashback Guarantee": true,
+                "Revenue Share": "0%",
+                "Early Access Platform Tokens": true,
+                "Early Access New Collections": true,
+                "Token Drops": true,
+                "Sweepstake Tickets": 0,
+                "Contributor Access": false
             }
         }
     ];
@@ -233,6 +441,18 @@ const TierComparison = () => {
         setActiveTierIndex((prev) => (prev - 1 + tiers.length) % tiers.length);
     };
 
+    const renderCell = (value: any) => {
+        if (typeof value === 'boolean') {
+            return value ?
+                <Check className="mx-auto text-green-500 w-5 h-5" /> :
+                <X className="mx-auto text-red-500 w-5 h-5" />;
+        }
+        if (typeof value === 'number') {
+            return value.toLocaleString();
+        }
+        return value || '-';
+    };
+
     const DesktopTable = () => (
         <div className="hidden md:block overflow-x-auto">
             <Table className="w-full border-collapse min-w-[900px]">
@@ -241,7 +461,16 @@ const TierComparison = () => {
                         <TableHead className="text-white bg-black/20 sticky left-0 z-10">Features</TableHead>
                         {tiers.map((tier) => (
                             <TableHead key={tier.name} className="text-center min-w-[150px]">
-                                <div className="space-y-2">
+                                <div className="space-y-2 flex flex-col items-center">
+                                    <div className="w-16 h-16 mb-2">
+                                        <Image
+                                            src={tier.icon}
+                                            alt={`${tier.name} icon`}
+                                            width={64}
+                                            height={64}
+                                            className="object-contain"
+                                        />
+                                    </div>
                                     <Badge
                                         className={`w-full py-1 ${tier.textColor} bg-gradient-to-r ${tier.gradientFrom} ${tier.gradientTo} transition-all duration-300 ${tier.hoverGradient}`}
                                     >
@@ -259,13 +488,7 @@ const TierComparison = () => {
                             <TableCell className="font-medium text-white bg-black/20 sticky left-0">{feature}</TableCell>
                             {tiers.map((tier) => (
                                 <TableCell key={`${tier.name}-${feature}`} className="text-center">
-                                    {typeof tier.features[feature] === 'boolean' ? (
-                                        tier.features[feature] ?
-                                            <Check className="mx-auto text-green-500" /> :
-                                            <X className="mx-auto text-red-500" />
-                                    ) : (
-                                        <span className="text-gray-200">{tier.features[feature]}</span>
-                                    )}
+                                    {renderCell(tier.features[feature])}
                                 </TableCell>
                             ))}
                         </TableRow>
@@ -290,6 +513,15 @@ const TierComparison = () => {
                     </button>
 
                     <div className="flex flex-col items-center">
+                        <div className="w-16 h-16 mb-2">
+                            <Image
+                                src={activeTier.icon}
+                                alt={`${activeTier.name} icon`}
+                                width={64}
+                                height={64}
+                                className="object-contain"
+                            />
+                        </div>
                         <Badge
                             className={`px-6 py-2 ${activeTier.textColor} bg-gradient-to-r ${activeTier.gradientFrom} ${activeTier.gradientTo} text-lg`}
                         >
@@ -316,23 +548,7 @@ const TierComparison = () => {
                         >
                             <span className="text-white font-medium">{feature}</span>
                             <div className="flex items-center">
-                                {typeof activeTier.features[feature] === 'boolean' ? (
-                                    activeTier.features[feature] ? (
-                                        <div className="flex items-center space-x-2">
-                                            <span className="text-green-500">Yes</span>
-                                            <Check className="text-green-500 w-5 h-5" />
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center space-x-2">
-                                            <span className="text-red-500">No</span>
-                                            <X className="text-red-500 w-5 h-5" />
-                                        </div>
-                                    )
-                                ) : (
-                                    <span className="text-gray-200 font-medium ml-4">
-                                        {activeTier.features[feature]}
-                                    </span>
-                                )}
+                                {renderCell(activeTier.features[feature])}
                             </div>
                         </div>
                     ))}
@@ -356,7 +572,7 @@ const TierComparison = () => {
     };
 
     return (
-        <div className="p-4 bg-gray/50 space-y-4">
+        <div className="p-4 bg-black/50 space-y-4">
             <h2 className="text-3xl font-bold text-white mb-6">Tier Comparison</h2>
             <DesktopTable />
             <MobileView />
