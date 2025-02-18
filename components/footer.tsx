@@ -15,13 +15,15 @@ const Footer = () => {
             { name: 'Shop', href: '#' }
         ],
         membership: [
-            { name: 'Tier 1', href: '#' },
-            { name: 'Tier 2', href: '#' },
-            { name: 'Tier 3', href: '#' },
-            { name: 'Tier 4', href: '#' },
-            { name: 'Tier 5', href: '#' },
-            { name: 'Tier 6', href: '#' },
-            { name: 'Tier 7', href: '#' },
+            { name: 'Tier 1', href: '/membership/tier-1' },
+            { name: 'Tier 2', href: '/membership/tier-2' },
+            { name: 'Tier 3', href: '/membership/tier-3' },
+            { name: 'Tier 4', href: '/membership/tier-4' },
+            { name: 'Tier 5', href: '/membership/tier-5' },
+            { name: 'Tier 6', href: '/membership/tier-6' },
+            { name: 'Tier 7', href: '/membership/tier-7' },
+            { name: 'Tier 8', href: '/membership/tier-8' },
+            { name: 'Tier 9', href: '/membership/tier-9' },
             { name: 'Compare Plans', href: '#' }
         ],
         resources: [
