@@ -21,6 +21,7 @@ import {
     LayoutDashboard
 } from 'lucide-react';
 import { parseAbi } from 'viem';
+import Image from 'next/image';
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
 const TOTAL_TIERS = 7;
@@ -31,71 +32,71 @@ const ERC1155_ABI = parseAbi([
 ]);
 
 // Define membership tiers with routes
+// Define membership tiers with routes
 const MEMBERSHIP_TIERS = [
     {
         id: 1,
-        name: 'Tier 1',
+        name: 'Top Tier Tier-1',
         path: '/dashboard/tier-1',
-        icon: <Gem className="w-5 h-5" />,
-        color: 'from-zinc-400 to-zinc-600'
+        iconPath: '/tier-icons/DBW-icon.png',
+        color: 'from-[#d4af37] via-[#d4af37] to-[#b3941f]'
     },
     {
         id: 2,
-        name: 'Tier 2',
+        name: 'RHODIUM Tier-2',
         path: '/dashboard/tier-2',
-        icon: <Binary className="w-5 h-5" />,
-        color: 'from-blue-400 to-blue-600'
+        iconPath: '/tier-icons/Rh-icon.png',
+        color: 'from-[#00bf63] via-[#00bf63] to-[#009e52]'
     },
     {
         id: 3,
-        name: 'Tier 3',
+        name: 'PLATINUM Tier-3',
         path: '/dashboard/tier-3',
-        icon: <Target className="w-5 h-5" />,
-        color: 'from-green-400 to-green-600'
+        iconPath: '/tier-icons/Pt-icon.png',
+        color: 'from-[#ff8018] via-[#ff8018] to-[#e67216]'
     },
     {
         id: 4,
-        name: 'Tier 4',
+        name: 'GOLD Tier-4',
         path: '/dashboard/tier-4',
-        icon: <Rocket className="w-5 h-5" />,
-        color: 'from-yellow-400 to-yellow-600'
+        iconPath: '/tier-icons/Au-icon.png',
+        color: 'from-[#d4af37] via-[#d4af37] to-[#b3941f]'
     },
     {
         id: 5,
-        name: 'Tier 5',
+        name: 'RUTHENIUM Tier-5',
         path: '/dashboard/tier-5',
-        icon: <Award className="w-5 h-5" />,
-        color: 'from-orange-400 to-orange-600'
+        iconPath: '/tier-icons/Ru-icon.png',
+        color: 'from-[#f6cefc] via-[#f6cefc] to-[#eab5f1]'
     },
     {
         id: 6,
-        name: 'Tier 6',
+        name: 'IRIDIUM Tier-6',
         path: '/dashboard/tier-6',
-        icon: <Diamond className="w-5 h-5" />,
-        color: 'from-purple-400 to-purple-600'
+        iconPath: '/tier-icons/Ir-icon.png',
+        color: 'from-[#BC1A1E] via-[#BC1A1E] to-[#8B1315]'
     },
     {
         id: 7,
-        name: 'Tier 7',
+        name: 'OSMIUM Tier-7',
         path: '/dashboard/tier-7',
-        icon: <Crown className="w-5 h-5" />,
-        color: 'from-red-400 to-red-600'
+        iconPath: '/tier-icons/Os-icon.png',
+        color: 'from-[#0099CC] via-[#0099CC] to-[#007399]'
     },
     {
         id: 8,
-        name: 'Tier 8',
+        name: 'PALLADIUM Tier-8',
         path: '/dashboard/tier-8',
-        icon: <Crown className="w-5 h-5" />,
-        color: 'from-red-400 to-red-600'
+        iconPath: '/tier-icons/Pd-icon.png',
+        color: 'from-[#2ECC71] via-[#2ECC71] to-[#27AE60]'
     },
     {
         id: 9,
-        name: 'Tier 9',
+        name: 'RHENIUM Tier-9',
         path: '/dashboard/tier-9',
-        icon: <Crown className="w-5 h-5" />,
-        color: 'from-red-400 to-red-600'
+        iconPath: '/tier-icons/Re-icon.png',
+        color: 'from-[#FFD700] via-[#FFD700] to-[#FFC000]'
     },
-
     {
         id: 10,
         name: 'Video Library',
@@ -271,7 +272,20 @@ export default function DashboardLayout({
                                     : 'text-gray-400 hover:bg-red-900/10 hover:text-white'
                                     }`}
                             >
-                                <div className="flex-shrink-0">{tier.icon}</div>
+                                <div className="flex-shrink-0">
+                                    {tier.iconPath ? (
+                                        <div className={`w-5 h-5 bg-gradient-to-br ${tier.color} rounded-sm relative`}>
+                                            <Image
+                                                src={tier.iconPath}
+                                                alt={`${tier.name} icon`}
+                                                fill
+                                                className="object-contain p-0.5"
+                                            />
+                                        </div>
+                                    ) : (
+                                        tier.icon
+                                    )}
+                                </div>
                                 {(isSidebarOpen || window?.innerWidth >= 768) && (
                                     <span className={`ml-3 text-sm font-medium whitespace-nowrap ${!isSidebarOpen ? 'md:hidden' : ''}`}>
                                         {tier.name}

@@ -6,18 +6,39 @@ import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import MusicPlayer from "./ui/MusicPlayer";
 import AppKitButton from "./appkit/appkitButton";
-import { useAccount } from "wagmi";
+import { useAccount, useReadContracts } from "wagmi";
+import { parseAbi } from 'viem';
 
 const ADMIN_ADDRESS = "0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37";
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+
+// ERC1155 minimal ABI for balanceOf
+const ERC1155_ABI = parseAbi([
+    'function balanceOf(address account, uint256 id) view returns (uint256)',
+]);
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMembershipOpen, setIsMembershipOpen] = useState(false);
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
-    // Use a mounted flag to ensure client-only code isn’t run during SSR.
     const [mounted, setMounted] = useState(false);
     const { address } = useAccount();
+
+    // Create balance check contracts for all 9 tiers - starting from index 0
+    const balanceChecks = address
+        ? Array.from({ length: 9 }, (_, i) => ({
+            address: CONTRACT_ADDRESS,
+            abi: ERC1155_ABI,
+            functionName: 'balanceOf',
+            args: [address, BigInt(i)] as const, // Changed from i + 1 to i to match AppKitButton
+        }))
+        : [];
+
+    // Read NFT balances for all tiers
+    const { data: nftBalances } = useReadContracts({
+        contracts: balanceChecks,
+    });
 
     useEffect(() => {
         setMounted(true);
@@ -29,19 +50,43 @@ const Navbar = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // Only check admin after the component has mounted
-    const isAdmin =
-        mounted && address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
+    // Add debug logs
+    useEffect(() => {
+        console.log('Debug Info:');
+        console.log('Address:', address);
+        console.log('Contract Address:', CONTRACT_ADDRESS);
+        console.log('Mounted:', mounted);
+        console.log('NFT Balances:', nftBalances);
+    }, [address, mounted, nftBalances]);
+
+    const isAdmin = mounted && address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
+
+    // Check if user owns any NFT from any tier using BigInt constructor
+    const hasAnyNFT = mounted && nftBalances?.some(result => {
+        console.log('Checking balance result:', result);
+        return result.status === 'success' &&
+            result.result !== undefined &&
+            result.result > BigInt(0);
+    });
+
+    // Log hasAnyNFT value
+    useEffect(() => {
+        console.log('Has Any NFT:', hasAnyNFT);
+    }, [hasAnyNFT]);
 
     const navItems = [
         { name: "Home", path: "/" },
-        { name: "Dashboard", path: "/dashboard" },
+        ...(hasAnyNFT ? [{ name: "Dashboard", path: "/dashboard" }] : []),
         {
             name: "More",
             subItems: [
                 { name: "Blog", path: "/blog" },
                 { name: "Education", path: "/education" },
                 { name: "Shop", path: "/shop" },
+                { name: "About Us", path: "/about-us" },
+                { name: "Sale Page", path: "/sales" },
+                { name: "Features", path: "/our-features" },
+                { name: "Contact", path: "/contact" },
             ],
         },
         {
@@ -61,6 +106,7 @@ const Navbar = () => {
         },
         ...(isAdmin ? [{ name: "Admin", path: "/admin/dashboard" }] : []),
     ];
+
 
     return (
         <nav

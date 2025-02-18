@@ -13,9 +13,43 @@ import {
     Star,
     Diamond,
     Gem,
-    CloudLightning
+    CloudLightning,
+    Gift
 } from 'lucide-react';
+import { useAccount } from 'wagmi';
+import { useReadContract } from 'wagmi';
 import Link from 'next/link';
+import { ReferralButton } from '@/components/sales/ReferralButton';
+import Image from 'next/image';
+
+// Contract details
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+if (!CONTRACT_ADDRESS) throw new Error("Contract address not found in environment variables");
+
+// Referral-related contract ABI functions
+const REFERRAL_ABI = [
+    {
+        name: "getReferrer",
+        type: "function",
+        stateMutability: "view",
+        inputs: [{ name: "user", type: "address" }],
+        outputs: [{ name: "referrer", type: "address" }]
+    },
+    {
+        name: "getTotalReferrals",
+        type: "function",
+        stateMutability: "view",
+        inputs: [{ name: "referrer", type: "address" }],
+        outputs: [{ name: "totalReferrals", type: "uint256" }]
+    },
+    {
+        name: "getTotalReferralRewards",
+        type: "function",
+        stateMutability: "view",
+        inputs: [{ name: "referrer", type: "address" }],
+        outputs: [{ name: "totalRewards", type: "uint256" }]
+    }
+];
 
 const MEMBERSHIP_TIERS = [
     {
@@ -24,8 +58,8 @@ const MEMBERSHIP_TIERS = [
         tier: 'Tier 1',
         description: 'The ultimate experience/exclusive access & premium benefits',
         path: '/dashboard/tier-1',
-        color: 'from-[#FFD700] via-[#FFA500] to-[#FF4500]',
-        icon: <Crown className="w-6 h-6" />,
+        color: 'from-[#d4af37] via-[#d4af37] to-[#b3941f]',
+        icon: '/tier-icons/DBW-icon.png',
         highlighted: true,
         subtitle: 'Exclusive Tier'
     },
@@ -35,8 +69,8 @@ const MEMBERSHIP_TIERS = [
         tier: 'Tier 2',
         description: 'Premium access to advanced features and dedicated support',
         path: '/dashboard/tier-2',
-        color: 'from-[#E5E4E2] via-[#C0C0C0] to-[#A9A9A9]',
-        icon: <Diamond className="w-6 h-6" />,
+        color: 'from-[#00bf63] via-[#00bf63] to-[#009e52]',
+        icon: '/tier-icons/Rh-icon.png',
         subtitle: 'Premium Tier'
     },
     {
@@ -45,8 +79,8 @@ const MEMBERSHIP_TIERS = [
         tier: 'Tier 3',
         description: 'Elite membership with enhanced capabilities and priority access',
         path: '/dashboard/tier-3',
-        color: 'from-[#E5E4E2] via-[#C0C0C0] to-[#A9A9A9]',
-        icon: <Star className="w-6 h-6" />,
+        color: 'from-[#ff8018] via-[#ff8018] to-[#e67216]',
+        icon: '/tier-icons/Pt-icon.png',
         subtitle: 'Elite Tier'
     },
     {
@@ -55,8 +89,8 @@ const MEMBERSHIP_TIERS = [
         tier: 'Tier 4',
         description: 'Professional grade features with advanced trading capabilities',
         path: '/dashboard/tier-4',
-        color: 'from-[#FFD700] via-[#FFA500] to-[#FF8C00]',
-        icon: <Shield className="w-6 h-6" />,
+        color: 'from-[#d4af37] via-[#d4af37] to-[#b3941f]',
+        icon: '/tier-icons/Au-icon.png',
         subtitle: 'Pro Tier'
     },
     {
@@ -65,8 +99,8 @@ const MEMBERSHIP_TIERS = [
         tier: 'Tier 5',
         description: 'Advanced tools and features for serious traders',
         path: '/dashboard/tier-5',
-        color: 'from-[#CD7F32] via-[#B87333] to-[#A0522D]',
-        icon: <CloudLightning className="w-6 h-6" />,
+        color: 'from-[#f6cefc] via-[#f6cefc] to-[#eab5f1]',
+        icon: '/tier-icons/Ru-icon.png',
         subtitle: 'Advanced Tier'
     },
     {
@@ -75,8 +109,8 @@ const MEMBERSHIP_TIERS = [
         tier: 'Tier 6',
         description: 'Perfect starting point for your DBW journey',
         path: '/dashboard/tier-6',
-        color: 'from-[#C0C0C0] via-[#A9A9A9] to-[#808080]',
-        icon: <Rocket className="w-6 h-6" />,
+        color: 'from-[#BC1A1E] via-[#BC1A1E] to-[#8B1315]',
+        icon: '/tier-icons/Ir-icon.png',
         subtitle: 'Starter Tier'
     },
     {
@@ -85,14 +119,60 @@ const MEMBERSHIP_TIERS = [
         tier: 'Tier 7',
         description: 'Essential features to begin your DBW experience',
         path: '/dashboard/tier-7',
-        color: 'from-[#CD7F32] via-[#B87333] to-[#A0522D]',
-        icon: <Gem className="w-6 h-6" />,
+        color: 'from-[#0099CC] via-[#0099CC] to-[#007399]',
+        icon: '/tier-icons/Os-icon.png',
         subtitle: 'Entry Tier'
+    },
+    {
+        id: 8,
+        name: 'PALLADIUM',
+        tier: 'Tier 8',
+        description: 'Basic access to fundamental DBW features + more',
+        path: '/dashboard/tier-8',
+        color: 'from-[#2ECC71] via-[#2ECC71] to-[#27AE60]',
+        icon: '/tier-icons/Pd-icon.png',
+        subtitle: 'Advanced Tier'
+    },
+    {
+        id: 9,
+        name: 'RHENIUM',
+        tier: 'Tier 9',
+        description: 'Basic access to fundamental DBW features',
+        path: '/dashboard/tier-9',
+        color: 'from-[#FFD700] via-[#FFD700] to-[#FFC000]',
+        icon: '/tier-icons/Re-icon.png',
+        subtitle: 'Basic Tier'
     }
 ];
 
-
 export default function DashboardPage() {
+    // Get user's connected wallet address
+    const { address, isConnected } = useAccount();
+
+    // Read contract for referral data
+    const { data: totalReferralsData } = useReadContract({
+        address: CONTRACT_ADDRESS,
+        abi: REFERRAL_ABI,
+        functionName: 'getTotalReferrals',
+        args: isConnected ? [address] : ['0x0000000000000000000000000000000000000000'],
+    });
+
+    const { data: totalRewardsData } = useReadContract({
+        address: CONTRACT_ADDRESS,
+        abi: REFERRAL_ABI,
+        functionName: 'getTotalReferralRewards',
+        args: isConnected ? [address] : ['0x0000000000000000000000000000000000000000'],
+    });
+
+    // Convert BigInt to readable format
+    const totalReferrals = isConnected && totalReferralsData
+        ? Number(totalReferralsData)
+        : 0;
+
+    const totalRewards = isConnected && totalRewardsData
+        ? Number(totalRewardsData) / 1e18 // Assuming rewards are in wei
+        : 0;
+
     return (
         <div className="space-y-6">
             {/* Hero Section */}
@@ -165,22 +245,59 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
+                {/* Affiliate Rewards Card */}
                 <div className="group relative bg-black/40 backdrop-blur-sm border border-red-900/30 rounded-xl p-4 hover:border-red-600/50 transition-all duration-300 hover:shadow-lg hover:shadow-red-900/20">
                     <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-gray-400 font-medium">FLR Rewards</h3>
+                        <h3 className="text-gray-400 font-medium">Affiliate Rewards</h3>
                         <div className="text-red-600 group-hover:scale-110 transition-transform">
-                            <Trophy className="w-5 h-5" />
+                            <Gift className="w-5 h-5" />
                         </div>
                     </div>
-                    <p className="text-2xl font-bold text-white">0.00 FLR</p>
-                    <div className="flex items-center justify-between mt-3">
-                        <p className="text-sm text-gray-500">24h Change</p>
-                        <p className="text-sm text-emerald-500">+0.00</p>
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-500">Total Referrals</span>
+                            <span className="text-lg font-semibold text-white">
+                                {isConnected ? totalReferrals : '-'}
+                            </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-500">Total Rewards</span>
+                            <span className="text-lg font-semibold text-white">
+                                {isConnected ? `${totalRewards.toFixed(2)} FLR` : '-'}
+                            </span>
+                        </div>
+                    </div>
+                    <div className="mt-3">
+                        <div className="flex items-center justify-between mb-2">
+                            <p className="text-sm text-gray-500">Recent Referrals</p>
+                            <Link
+                                href="/referrals"
+                                className="text-xs text-red-600 hover:text-red-500 transition-colors"
+                            >
+                                View All
+                            </Link>
+                        </div>
+                        {!isConnected ? (
+                            <p className="text-xs text-gray-500 text-center">
+                                Connect wallet to see referrals
+                            </p>
+                        ) : totalReferrals === 0 ? (
+                            <p className="text-xs text-gray-500 text-center">No referrals yet</p>
+                        ) : (
+                            <p className="text-xs text-gray-500 text-center">
+                                You have {totalReferrals} referral(s)
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>
 
-            {/* Membership Tiers - Keep the rest the same */}
+            {/* Affiliate Rewards Section */}
+            <div className="mb-6 flex items-center justify-between">
+                <ReferralButton />
+            </div>
+
+            {/* Membership Tiers */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold">Membership Tiers</h2>
@@ -199,12 +316,17 @@ export default function DashboardPage() {
                             <div className="absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl blur-xl">
                                 <div className={`w-full h-full bg-gradient-to-r ${tier.color} opacity-20`} />
                             </div>
-                            <div className={`relative bg-black/40 backdrop-blur-sm border border-red-900/30 rounded-xl p-4 hover:border-red-600/50 transition-all duration-300 ${tier.highlighted ? 'ring-2 ring-[#FFD700]/50' : ''
-                                }`}>
+                            <div className={`relative bg-black/40 backdrop-blur-sm border rounded-xl p-4 transition-all duration-300 ${tier.highlighted ? 'ring-2 ring-[#FFD700]/50' : ''
+                                } ${tier.color.replace('from-', 'border-').replace('to-', 'hover:border-')}`}>
                                 <div className="flex items-center justify-between mb-3">
                                     <div className="flex items-center space-x-3">
-                                        <div className={`p-2 rounded-lg bg-gradient-to-br ${tier.color} text-white`}>
-                                            {tier.icon}
+                                        <div className={`p-2 rounded-lg bg-gradient-to-br ${tier.color} text-white relative w-12 h-12`}>
+                                            <Image
+                                                src={tier.icon}
+                                                alt={`${tier.name} icon`}
+                                                fill
+                                                className="object-contain"
+                                            />
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500 font-medium">{tier.tier}</p>

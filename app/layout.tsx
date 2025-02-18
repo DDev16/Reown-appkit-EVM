@@ -8,6 +8,7 @@ import Footer from "@/components/footer";
 import "aos/dist/aos.css";
 import Particles from "@/components/ui/Particles";
 import ThreeParticleCursor from "@/components/ui/ThreeParticleCursor";
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,6 +29,8 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ContextProvider cookies={cookies}>
+          <Toaster />
+
           <Navbar />
           <main className="pt-14">{children}</main>
           <Footer />

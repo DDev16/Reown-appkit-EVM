@@ -16,7 +16,7 @@ const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string
 if (!CONTRACT_ADDRESS) throw new Error("Contract address not found in environment variables");
 
 const TIER_8 = 7; // Updated to Tier 7
-
+// Updated ABI to include referrer
 const CONTRACT_ABI = [
     {
         name: "mint",
@@ -24,7 +24,8 @@ const CONTRACT_ABI = [
         stateMutability: "payable",
         inputs: [
             { name: "tier", type: "uint256" },
-            { name: "amount", type: "uint256" }
+            { name: "amount", type: "uint256" },
+            { name: "_referrer", type: "address" }
         ],
         outputs: []
     },
@@ -74,6 +75,7 @@ const benefits = [
 const Tier8Page = () => {
     const [isMinting, setIsMinting] = useState(false);
     const [hasShownConfetti, setHasShownConfetti] = useState(false);
+    const [referrerAddress, setReferrerAddress] = useState<string | null>(null);
 
     // Contract reads
     const { data: supplyData } = useReadContract({
@@ -99,7 +101,16 @@ const Tier8Page = () => {
             hash,
         });
 
-    // Confetti effect function with blue/osmium colors
+
+    // Check for referral code on component mount
+    useEffect(() => {
+        // Check localStorage for referral code
+        const storedReferralCode = localStorage.getItem('referralCode');
+        if (storedReferralCode) {
+            setReferrerAddress(storedReferralCode);
+        }
+    }, []);
+
     // Confetti effect function with Palladium colors
     const fireConfetti = () => {
         const duration = 3000;
@@ -165,7 +176,7 @@ const Tier8Page = () => {
     }, [isConfirmed, hasShownConfetti]);
 
 
-    // Handle mint
+    // Handle mint with optional referrer
     const handleMint = async () => {
         if (isMinting) return;
 
@@ -177,11 +188,16 @@ const Tier8Page = () => {
 
             const price = BigInt(priceData.toString());
 
+            // Mint with referrer if available, otherwise use zero address
             await writeContract({
                 address: CONTRACT_ADDRESS,
                 abi: CONTRACT_ABI,
                 functionName: 'mint',
-                args: [TIER_8, 1],
+                args: [
+                    TIER_8,
+                    1,
+                    referrerAddress || '0x0000000000000000000000000000000000000000'
+                ],
                 value: price
             });
         } catch (err) {
@@ -249,6 +265,11 @@ const Tier8Page = () => {
                                 <p className="text-lg text-gray-400">
                                     Start your DeFi education journey with our most affordable membership
                                 </p>
+                                {referrerAddress && (
+                                    <div className="fixed bottom-4 right-4 bg-black/50 border border-[#2ECC71] rounded-lg p-2 text-sm text-white">
+                                        Referral Active: {referrerAddress.slice(0, 6)}...{referrerAddress.slice(-4)}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Price / Supply & Mint Button */}

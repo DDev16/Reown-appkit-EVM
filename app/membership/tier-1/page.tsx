@@ -113,6 +113,7 @@ const benefits = [
 const Tier1Page = () => {
     const [isMinting, setIsMinting] = useState(false);
     const [hasShownConfetti, setHasShownConfetti] = useState(false);
+    const [referrerAddress, setReferrerAddress] = useState<string | null>(null);
 
     // Contract reads
     const { data: supplyData } = useReadContract({
@@ -137,6 +138,16 @@ const Tier1Page = () => {
         useWaitForTransactionReceipt({
             hash,
         });
+
+    // Check for referral code on component mount
+    useEffect(() => {
+        // Check localStorage for referral code
+        const storedReferralCode = localStorage.getItem('referralCode');
+        if (storedReferralCode) {
+            setReferrerAddress(storedReferralCode);
+        }
+    }, []);
+
 
     // Confetti effect function
     const fireConfetti = () => {
@@ -201,7 +212,7 @@ const Tier1Page = () => {
         }
     }, [isConfirmed, hasShownConfetti]);
 
-    // Handle mint
+    // Handle mint with optional referrer
     const handleMint = async () => {
         if (isMinting) return; // Prevent double minting
 
@@ -214,11 +225,16 @@ const Tier1Page = () => {
             // Convert priceData to bigint for the transaction
             const price = BigInt(priceData.toString());
 
+            // Mint with referrer if available, otherwise use zero address
             await writeContract({
                 address: CONTRACT_ADDRESS,
                 abi: CONTRACT_ABI,
                 functionName: 'mint',
-                args: [TIER_1, 1],
+                args: [
+                    TIER_1,
+                    1,
+                    referrerAddress || '0x0000000000000000000000000000000000000000'
+                ],
                 value: price
             });
 
@@ -287,6 +303,8 @@ const Tier1Page = () => {
                                 <p className="text-lg text-gray-400">
                                     Experience the ultimate membership level with exclusive access and premium benefits
                                 </p>
+
+
                             </div>
 
                             {/* Price / Supply & Mint Button */}
@@ -314,6 +332,11 @@ const Tier1Page = () => {
                                             </span>
                                         </span>
                                     </button>
+                                    {referrerAddress && (
+                                        <div className="fixed bottom-4 right-4 bg-black/50 border border-[#d4af37] rounded-lg p-2 text-sm text-white">
+                                            Referral Active: {referrerAddress.slice(0, 6)}...{referrerAddress.slice(-4)}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

@@ -115,6 +115,7 @@ const benefits = [
 const Tier2Page = () => {
     const [isMinting, setIsMinting] = useState(false);
     const [hasShownConfetti, setHasShownConfetti] = useState(false);
+    const [referrerAddress, setReferrerAddress] = useState<string | null>(null);
 
     // Contract reads
     const { data: supplyData } = useReadContract({
@@ -139,6 +140,15 @@ const Tier2Page = () => {
         useWaitForTransactionReceipt({
             hash,
         });
+
+    // Check for referral code on component mount
+    useEffect(() => {
+        // Check localStorage for referral code
+        const storedReferralCode = localStorage.getItem('referralCode');
+        if (storedReferralCode) {
+            setReferrerAddress(storedReferralCode);
+        }
+    }, []);
 
     // Confetti effect function
     const fireConfetti = () => {
@@ -172,6 +182,8 @@ const Tier2Page = () => {
         }, 250);
     };
 
+
+
     // Update SweetAlert2 colors
     useEffect(() => {
         if (isConfirmed) {
@@ -203,7 +215,7 @@ const Tier2Page = () => {
         }
     }, [isConfirmed, hasShownConfetti]);
 
-    // Handle mint
+    // Handle mint with optional referrer
     const handleMint = async () => {
         if (isMinting) return;
 
@@ -215,11 +227,16 @@ const Tier2Page = () => {
 
             const price = BigInt(priceData.toString());
 
+            // Mint with referrer if available, otherwise use zero address
             await writeContract({
                 address: CONTRACT_ADDRESS,
                 abi: CONTRACT_ABI,
                 functionName: 'mint',
-                args: [TIER_2, 1],
+                args: [
+                    TIER_2,
+                    1,
+                    referrerAddress || '0x0000000000000000000000000000000000000000'
+                ],
                 value: price
             });
         } catch (err) {
@@ -287,6 +304,12 @@ const Tier2Page = () => {
                                 <p className="text-lg text-gray-400">
                                     Join our exclusive Tier 2 membership with premium benefits and advanced access
                                 </p>
+
+                                {referrerAddress && (
+                                    <div className="fixed bottom-4 right-4 bg-black/50 border border-[#00bf63] rounded-lg p-2 text-sm text-white z-20">
+                                        Referral Active: {referrerAddress.slice(0, 6)}...{referrerAddress.slice(-4)}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Price / Supply & Mint Button */}
