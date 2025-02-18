@@ -81,7 +81,6 @@ const Navbar = () => {
             name: "More",
             subItems: [
                 { name: "Blog", path: "/blog" },
-                { name: "Education", path: "/education" },
                 { name: "Shop", path: "/shop" },
                 { name: "About Us", path: "/about-us" },
                 { name: "Sale Page", path: "/sales" },

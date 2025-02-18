@@ -345,9 +345,7 @@ export default function DashboardPage() {
                                     {tier.description}
                                 </p>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm text-gray-500">
-                                        0% Completed
-                                    </span>
+
                                     <span className="flex items-center text-sm text-red-600 group-hover:text-red-500 transition-colors">
                                         Access Content
                                         <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
