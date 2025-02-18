@@ -280,7 +280,9 @@ const Tier9Page = () => {
                                         Price: <span className="text-[#FFD700]">{formatPrice()} FLR</span>
                                     </p>
                                     <p className="text-gray-300 text-base font-semibold">
-                                        Supply: <span className="text-[#FFD700]">{formatSupply()}</span>
+                                        {/* Supply: <span className="text-[#FFD700]">{formatSupply()}</span> */}
+                                        Supply: <span className="text-[#FFD700]">0/6400</span>
+
                                     </p>
                                 </div>
                                 <div className="relative">
