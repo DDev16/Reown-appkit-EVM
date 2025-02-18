@@ -233,7 +233,7 @@ const Tier6Page = () => {
 
     // Format supply and price data
     const formatSupply = () => {
-        if (!supplyData || !Array.isArray(supplyData)) return "0/25";
+        if (!supplyData || !Array.isArray(supplyData)) return "0/800";
         const [current, max] = supplyData as [bigint, bigint];
         return `${current.toString()}/${max.toString()}`;
     };
