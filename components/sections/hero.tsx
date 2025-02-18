@@ -11,6 +11,7 @@ const Hero: React.FC = () => {
     const bullHeadRef = useRef<HTMLDivElement>(null);
     const [isMobile, setIsMobile] = useState(false);
     const router = useRouter();
+
     useEffect(() => {
         // Initialize AOS for scroll animations
         AOS.init({
@@ -20,14 +21,8 @@ const Hero: React.FC = () => {
             disable: 'phone'
         });
 
-
-
-        const handleStartLearning = () => {
-            router.push('/learn');
-        };
-
-        const handleViewMembership = () => {
-            router.push('/membership');
+        const handleNavigation = () => {
+            router.push('/membership/tier-1');
         };
 
         // Function to check if the device is mobile based on width
@@ -60,10 +55,9 @@ const Hero: React.FC = () => {
             window.removeEventListener('resize', checkMobile);
             window.removeEventListener('scroll', handleScroll);
         };
-    }, [isMobile]); // Re-run the effect if isMobile changes
+    }, [isMobile, router]); // Added router to dependencies
 
     return (
-        // Outer container with overflow-hidden to clip the background to the hero section
         <div className="relative min-h-screen bg-[#242223] overflow-hidden">
             <div
                 ref={backgroundRef}
@@ -118,13 +112,19 @@ const Hero: React.FC = () => {
                                 data-aos-delay="200"
                                 data-aos-duration="600"
                             >
-                                <button className="group inline-flex items-center px-8 py-4 rounded-lg text-lg font-medium text-white bg-[#BC1A1E] hover:bg-[#BC1A1E]/90 transition-colors">
+                                <button
+                                    onClick={() => router.push('/membership/tier-1')}
+                                    className="group inline-flex items-center px-8 py-4 rounded-lg text-lg font-medium text-white bg-[#BC1A1E] hover:bg-[#BC1A1E]/90 transition-colors"
+                                >
                                     <span className="flex items-center">
                                         Start Learning
                                         <ArrowRight className="ml-2 h-5 w-5" />
                                     </span>
                                 </button>
-                                <button className="inline-flex items-center px-8 py-4 rounded-lg text-lg font-medium text-white bg-transparent border border-[#BC1A1E]/30 hover:border-[#BC1A1E] transition-colors">
+                                <button
+                                    onClick={() => router.push('/membership/tier-1')}
+                                    className="inline-flex items-center px-8 py-4 rounded-lg text-lg font-medium text-white bg-transparent border border-[#BC1A1E]/30 hover:border-[#BC1A1E] transition-colors"
+                                >
                                     View Membership
                                 </button>
                             </div>
@@ -154,13 +154,19 @@ const Hero: React.FC = () => {
                             data-aos-delay="200"
                             data-aos-duration="600"
                         >
-                            <button className="group inline-flex items-center px-8 py-4 rounded-lg text-lg font-medium text-white bg-[#BC1A1E] hover:bg-[#BC1A1E]/90 transition-colors">
+                            <button
+                                onClick={() => router.push('/membership/tier-1')}
+                                className="group inline-flex items-center px-8 py-4 rounded-lg text-lg font-medium text-white bg-[#BC1A1E] hover:bg-[#BC1A1E]/90 transition-colors"
+                            >
                                 <span className="flex items-center">
                                     Start Learning
                                     <ArrowRight className="ml-2 h-5 w-5" />
                                 </span>
                             </button>
-                            <button className="inline-flex items-center px-8 py-4 rounded-lg text-lg font-medium text-white bg-transparent border border-[#BC1A1E]/30 hover:border-[#BC1A1E] transition-colors">
+                            <button
+                                onClick={() => router.push('/membership/tier-1')}
+                                className="inline-flex items-center px-8 py-4 rounded-lg text-lg font-medium text-white bg-transparent border border-[#BC1A1E]/30 hover:border-[#BC1A1E] transition-colors"
+                            >
                                 View Membership
                             </button>
                         </div>

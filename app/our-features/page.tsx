@@ -36,7 +36,7 @@ const featureDetails = {
         ],
         technicalDetails: {
             heading: "Technical Architecture",
-            content: "Powered by ERC-20 token integration, our platform uses smart contract logic to dynamically gate and update educational content. Each learning module is cryptographically linked to specific token holdings, ensuring a secure and personalized learning experience."
+            content: "Powered by ERC-721 token integration, our platform uses smart contract logic to dynamically gate and update educational content. Each learning module is cryptographically linked to specific token holdings, ensuring a secure and personalized learning experience."
         }
     },
     "secure-platform": {
@@ -74,8 +74,8 @@ const featureDetails = {
                 content: "Our advanced airdrop system goes beyond traditional token distributions. We've created a sophisticated, merit-based reward ecosystem that recognizes and incentivizes meaningful platform engagement."
             },
             {
-                heading: "Exclusive NFT Collections",
-                content: "Members can earn unique, limited-edition NFTs that represent more than just digital art. These NFTs serve as status symbols, provide additional platform benefits, and can be valuable assets in the broader Web3 ecosystem."
+                heading: "Refferal Rewards",
+                content: "Earn rewards by inviting friends, family, and colleagues to join our platform. Our referral system provides instant incentives for every new user you bring to the DeFi learning community."
             },
             {
                 heading: "Community-Driven Incentives",
@@ -135,7 +135,7 @@ const featureDetails = {
             },
             {
                 heading: "Regular Community Events",
-                content: "From virtual hackathons to AMAs (Ask Me Anything) with blockchain pioneers, our community events provide continuous learning and networking opportunities that extend beyond traditional educational platforms."
+                content: "Participate in webinars, AMAs, and live Q&A sessions with blockchain experts. Our community events provide direct access to industry insights, market analyses, and exclusive DeFi knowledge."
             }
         ],
         technicalDetails: {
@@ -161,7 +161,7 @@ const featureDetails = {
             },
             {
                 heading: "Personalized Content Curation",
-                content: "Leveraging AI and your platform engagement, our system curates content specifically tailored to your learning journey and interests. Stay informed without information overload."
+                content: "We personalize each tiers content to the users interest and expertise level. This ensures that you receive the most relevant, high-quality information tailored to your specific interests and expertise level."
             }
         ],
         technicalDetails: {
@@ -191,49 +191,90 @@ const FeatureDetailPage = () => {
     };
 
     return (
-        <div className="text-white min-h-screen">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div className="flex items-center justify-between mb-12">
-                    <button
-                        onClick={handlePrevFeature}
-                        className="text-gray-400 hover:text-white"
-                    >
-                        <ChevronLeft className="w-8 h-8" />
-                    </button>
-                    <div className="flex items-center space-x-4">
-                        {feature.icon}
-                        <h1 className="text-4xl font-bold">{feature.title}</h1>
+        <div className="min-h-screen bg-gradient-to-b from-[#1A1A1A] to-black text-white">
+            {/* Header Section */}
+            <div className="border-b border-[#BC1A1E]/20">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <div className="flex items-center justify-between">
+                        <button
+                            onClick={handlePrevFeature}
+                            className="text-gray-400 hover:text-white transition-colors"
+                        >
+                            <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <div className="flex items-center space-x-4">
+                            {feature.icon}
+                            <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                                {feature.title}
+                            </h1>
+                        </div>
+                        <button
+                            onClick={handleNextFeature}
+                            className="text-gray-400 hover:text-white transition-colors"
+                        >
+                            <ArrowRight className="w-6 h-6" />
+                        </button>
                     </div>
-                    <button
-                        onClick={handleNextFeature}
-                        className="text-gray-400 hover:text-white"
-                    >
-                        <ArrowRight className="w-8 h-8" />
-                    </button>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                {/* Overview Section */}
+                <div className="mb-16">
+                    <h2 className="text-2xl font-semibold text-[#FF4B51] mb-8">Overview</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {feature.sections.slice(0, 2).map((section, index) => (
+                            <div key={index} className="space-y-4">
+                                <h3 className="text-xl font-medium text-white">
+                                    {section.heading}
+                                </h3>
+                                <p className="text-gray-300 leading-relaxed">
+                                    {section.content}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-                {feature.sections.map((section, index) => (
-                    <div key={index} className="mb-12 bg-[#1A1A1A] p-6 rounded-xl border border-[#BC1A1E]/20">
-                        <h2 className="text-2xl font-semibold text-[#FF4B51] mb-4">{section.heading}</h2>
-                        <p className="text-gray-300 leading-relaxed">{section.content}</p>
+                {/* Features Section */}
+                <div className="mb-16">
+                    <h2 className="text-2xl font-semibold text-[#FF4B51] mb-8">Key Features</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {feature.sections.slice(2).map((section, index) => (
+                            <div key={index} className="space-y-4">
+                                <h3 className="text-xl font-medium text-white">
+                                    {section.heading}
+                                </h3>
+                                <p className="text-gray-300 leading-relaxed">
+                                    {section.content}
+                                </p>
+                            </div>
+                        ))}
                     </div>
-                ))}
-
-                <div className="bg-[#1A1A1A] p-6 rounded-xl border border-[#BC1A1E]/20">
-                    <h2 className="text-2xl font-semibold text-[#FF4B51] mb-4">
-                        {feature.technicalDetails.heading}
-                    </h2>
-                    <p className="text-gray-300 leading-relaxed">
-                        {feature.technicalDetails.content}
-                    </p>
                 </div>
 
-                <div className="mt-12 text-center">
+                {/* Technical Section */}
+                <div className="mb-16">
+                    <h2 className="text-2xl font-semibold text-[#FF4B51] mb-8">Technical Specifications</h2>
+                    <div className="bg-black/50 p-8 rounded-lg border border-[#BC1A1E]/20">
+                        <h3 className="text-xl font-medium text-white mb-4">
+                            {feature.technicalDetails.heading}
+                        </h3>
+                        <p className="text-gray-300 leading-relaxed">
+                            {feature.technicalDetails.content}
+                        </p>
+                    </div>
+                </div>
+
+                {/* CTA Section */}
+                <div className="text-center">
                     <Link
                         href="#"
-                        className="inline-block bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] text-white font-bold py-3 px-8 rounded-xl hover:scale-105 transition-all"
+                        className="inline-flex items-center space-x-2 bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] text-white font-semibold py-4 px-8 rounded-lg hover:from-[#FF4B51] hover:to-[#BC1A1E] transition-all duration-300"
                     >
-                        Explore More
+                        <span>Get Started</span>
+                        <ArrowRight className="w-5 h-5" />
                     </Link>
                 </div>
             </div>
