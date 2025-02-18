@@ -9,10 +9,10 @@ const Footer = () => {
 
     const navigation = {
         platform: [
-            { name: 'About Us', href: '#' },
-            { name: 'Features', href: '#' },
-            { name: 'Blog', href: '#' },
-            { name: 'Shop', href: '#' }
+            { name: 'About Us', href: '/about-us' },
+            { name: 'Features', href: '/our-features' },
+            { name: 'Blog', href: '/blog' },
+            { name: 'Shop', href: '/shop' }
         ],
         membership: [
             { name: 'Tier 1', href: '/membership/tier-1' },
@@ -30,7 +30,7 @@ const Footer = () => {
             { name: 'Documentation', href: '#' },
             { name: 'Whitepaper', href: '#' },
             { name: 'FAQs', href: '#' },
-            { name: 'Support', href: '#' }
+            { name: 'Support', href: '/contact' }
         ],
         legal: [
             { name: 'Privacy Policy', href: '#' },
@@ -60,13 +60,13 @@ const Footer = () => {
                             </p>
                             {/* Social Links */}
                             <div className="flex space-x-4">
-                                <a href="#" className="text-gray-400 hover:text-[#BC1A1E] transition-colors">
+                                <a href="https://x.com/XRP_FLR_SGB" className="text-gray-400 hover:text-[#BC1A1E] transition-colors">
                                     <FaTwitter className="h-5 w-5 sm:h-6 sm:w-6" />
                                 </a>
                                 <a href="#" className="text-gray-400 hover:text-[#BC1A1E] transition-colors">
                                     <FaDiscord className="h-5 w-5 sm:h-6 sm:w-6" />
                                 </a>
-                                <a href="#" className="text-gray-400 hover:text-[#BC1A1E] transition-colors">
+                                <a href="https://www.youtube.com/@DEFIBULLWORLD" className="text-gray-400 hover:text-[#BC1A1E] transition-colors">
                                     <FaYoutube className="h-5 w-5 sm:h-6 sm:w-6" />
                                 </a>
                             </div>
