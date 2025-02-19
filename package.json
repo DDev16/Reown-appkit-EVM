@@ -39,7 +39,8 @@
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.173.0",
     "viem": "^2.22.9",
-    "wagmi": "^2.12.7"
+    "wagmi": "^2.12.7",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/aos": "^3.0.7",

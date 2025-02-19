@@ -7,10 +7,14 @@ import {
     Users,
     Newspaper,
     ArrowRight,
-    ChevronLeft
+    ChevronLeft,
+    Circle,
+    Menu,
+    X
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
 
 const featureDetails = {
     "token-gated-education": {
@@ -171,111 +175,216 @@ const featureDetails = {
     }
 };
 
+
 const FeatureDetailPage = () => {
     const [currentFeature, setCurrentFeature] = useState<keyof typeof featureDetails>("token-gated-education");
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const feature = featureDetails[currentFeature];
+    const features = Object.keys(featureDetails) as Array<keyof typeof featureDetails>;
+    const currentIndex = features.indexOf(currentFeature);
+
+    const handleFeatureChange = (featureKey: keyof typeof featureDetails) => {
+        setIsTransitioning(true);
+        setIsMobileMenuOpen(false);
+        setTimeout(() => {
+            setCurrentFeature(featureKey);
+            setIsTransitioning(false);
+        }, 300);
+    };
 
     const handleNextFeature = () => {
-        const features = Object.keys(featureDetails) as Array<keyof typeof featureDetails>;
-        const currentIndex = features.indexOf(currentFeature);
         const nextIndex = (currentIndex + 1) % features.length;
-        setCurrentFeature(features[nextIndex]);
+        handleFeatureChange(features[nextIndex]);
     };
 
     const handlePrevFeature = () => {
-        const features = Object.keys(featureDetails) as Array<keyof typeof featureDetails>;
-        const currentIndex = features.indexOf(currentFeature);
         const prevIndex = (currentIndex - 1 + features.length) % features.length;
-        setCurrentFeature(features[prevIndex]);
+        handleFeatureChange(features[prevIndex]);
     };
+
+    // Close mobile menu on resize if screen becomes larger
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 1024) {
+                setIsMobileMenuOpen(false);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-[#1A1A1A] to-black text-white">
-            {/* Header Section */}
-            <div className="border-b border-[#BC1A1E]/20">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="flex items-center justify-between">
+            {/* Feature Navigation Bar */}
+            <div className="bg-black/40 backdrop-blur-sm sticky top-0 z-50 border-b border-[#BC1A1E]/20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16">
+                        {/* Mobile menu button */}
                         <button
-                            onClick={handlePrevFeature}
-                            className="text-gray-400 hover:text-white transition-colors"
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="lg:hidden text-gray-400 hover:text-white p-2"
                         >
-                            <ChevronLeft className="w-6 h-6" />
+                            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>
-                        <div className="flex items-center space-x-4">
-                            {feature.icon}
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                                {feature.title}
-                            </h1>
+
+                        {/* Desktop Navigation */}
+                        <div className="hidden lg:flex flex-1 items-center justify-start space-x-8">
+                            {features.map((featureKey) => (
+                                <button
+                                    key={featureKey}
+                                    onClick={() => handleFeatureChange(featureKey)}
+                                    className={`flex items-center space-x-2 py-4 border-b-2 transition-all duration-300 ${currentFeature === featureKey
+                                            ? 'border-[#FF4B51] text-white'
+                                            : 'border-transparent text-gray-400 hover:text-white'
+                                        }`}
+                                >
+                                    {featureDetails[featureKey].icon}
+                                    <span className="text-sm font-medium">
+                                        {featureDetails[featureKey].title}
+                                    </span>
+                                </button>
+                            ))}
                         </div>
-                        <button
-                            onClick={handleNextFeature}
-                            className="text-gray-400 hover:text-white transition-colors"
-                        >
-                            <ArrowRight className="w-6 h-6" />
-                        </button>
+                    </div>
+                </div>
+
+                {/* Mobile Navigation Menu */}
+                <div className={`lg:hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+                    }`}>
+                    <div className="px-4 py-2 space-y-2 bg-black/60 backdrop-blur-sm">
+                        {features.map((featureKey) => (
+                            <button
+                                key={featureKey}
+                                onClick={() => handleFeatureChange(featureKey)}
+                                className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 ${currentFeature === featureKey
+                                        ? 'bg-[#BC1A1E]/10 text-white'
+                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                    }`}
+                            >
+                                {featureDetails[featureKey].icon}
+                                <span className="text-sm font-medium">
+                                    {featureDetails[featureKey].title}
+                                </span>
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                {/* Overview Section */}
-                <div className="mb-16">
-                    <h2 className="text-2xl font-semibold text-[#FF4B51] mb-8">Overview</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {feature.sections.slice(0, 2).map((section, index) => (
-                            <div key={index} className="space-y-4">
-                                <h3 className="text-xl font-medium text-white">
-                                    {section.heading}
-                                </h3>
-                                <p className="text-gray-300 leading-relaxed">
-                                    {section.content}
-                                </p>
+            <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+                {/* Hero Section */}
+                <div className="relative bg-black/50 border-b border-[#BC1A1E]/20">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
+                        <div className="flex items-center justify-between">
+                            <button
+                                onClick={handlePrevFeature}
+                                className="text-gray-400 hover:text-white transition-colors p-2 rounded-full hover:bg-white/5"
+                            >
+                                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                            </button>
+                            <div className="text-center space-y-4 px-2">
+                                <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4">
+                                    {feature.icon}
+                                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                                        {feature.title}
+                                    </h1>
+                                </div>
+                                <div className="flex items-center justify-center space-x-2">
+                                    {features.map((_, index) => (
+                                        <Circle
+                                            key={index}
+                                            className={`w-1.5 h-1.5 sm:w-2 sm:h-2 ${index === currentIndex
+                                                    ? 'fill-[#FF4B51] text-[#FF4B51]'
+                                                    : 'fill-gray-600 text-gray-600'
+                                                }`}
+                                        />
+                                    ))}
+                                </div>
                             </div>
-                        ))}
+                            <button
+                                onClick={handleNextFeature}
+                                className="text-gray-400 hover:text-white transition-colors p-2 rounded-full hover:bg-white/5"
+                            >
+                                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                {/* Features Section */}
-                <div className="mb-16">
-                    <h2 className="text-2xl font-semibold text-[#FF4B51] mb-8">Key Features</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {feature.sections.slice(2).map((section, index) => (
-                            <div key={index} className="space-y-4">
-                                <h3 className="text-xl font-medium text-white">
-                                    {section.heading}
-                                </h3>
-                                <p className="text-gray-300 leading-relaxed">
-                                    {section.content}
-                                </p>
-                            </div>
-                        ))}
+                {/* Content Sections */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16 space-y-12 lg:space-y-20">
+                    {/* Overview Grid */}
+                    <div>
+                        <h2 className="text-xl sm:text-2xl font-semibold text-[#FF4B51] mb-6 lg:mb-12 flex items-center">
+                            <span className="mr-2">Overview</span>
+                            <div className="flex-1 h-px bg-gradient-to-r from-[#FF4B51]/50 to-transparent ml-4" />
+                        </h2>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+                            {feature.sections.slice(0, 2).map((section, index) => (
+                                <div key={index} className="space-y-4 lg:space-y-6">
+                                    <h3 className="text-xl lg:text-2xl font-medium text-white flex items-center">
+                                        <span className="text-[#FF4B51] mr-2">{String(index + 1).padStart(2, '0')}</span>
+                                        {section.heading}
+                                    </h3>
+                                    <p className="text-gray-300 leading-relaxed text-base lg:text-lg">
+                                        {section.content}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
 
-                {/* Technical Section */}
-                <div className="mb-16">
-                    <h2 className="text-2xl font-semibold text-[#FF4B51] mb-8">Technical Specifications</h2>
-                    <div className="bg-black/50 p-8 rounded-lg border border-[#BC1A1E]/20">
-                        <h3 className="text-xl font-medium text-white mb-4">
-                            {feature.technicalDetails.heading}
-                        </h3>
-                        <p className="text-gray-300 leading-relaxed">
-                            {feature.technicalDetails.content}
-                        </p>
+                    {/* Features Grid */}
+                    <div>
+                        <h2 className="text-xl sm:text-2xl font-semibold text-[#FF4B51] mb-6 lg:mb-12 flex items-center">
+                            <span className="mr-2">Key Features</span>
+                            <div className="flex-1 h-px bg-gradient-to-r from-[#FF4B51]/50 to-transparent ml-4" />
+                        </h2>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+                            {feature.sections.slice(2).map((section, index) => (
+                                <div key={index} className="space-y-4 lg:space-y-6">
+                                    <h3 className="text-xl lg:text-2xl font-medium text-white flex items-center">
+                                        <span className="text-[#FF4B51] mr-2">{String(index + 3).padStart(2, '0')}</span>
+                                        {section.heading}
+                                    </h3>
+                                    <p className="text-gray-300 leading-relaxed text-base lg:text-lg">
+                                        {section.content}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
 
-                {/* CTA Section */}
-                <div className="text-center">
-                    <Link
-                        href="#"
-                        className="inline-flex items-center space-x-2 bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] text-white font-semibold py-4 px-8 rounded-lg hover:from-[#FF4B51] hover:to-[#BC1A1E] transition-all duration-300"
-                    >
-                        <span>Get Started</span>
-                        <ArrowRight className="w-5 h-5" />
-                    </Link>
+                    {/* Technical Details */}
+                    <div>
+                        <h2 className="text-xl sm:text-2xl font-semibold text-[#FF4B51] mb-6 lg:mb-12 flex items-center">
+                            <span className="mr-2">Technical Specifications</span>
+                            <div className="flex-1 h-px bg-gradient-to-r from-[#FF4B51]/50 to-transparent ml-4" />
+                        </h2>
+                        <div className="bg-black/50 p-6 sm:p-8 lg:p-12 rounded-lg border border-[#BC1A1E]/20 backdrop-blur-sm">
+                            <h3 className="text-xl lg:text-2xl font-medium text-white mb-4 lg:mb-6">
+                                {feature.technicalDetails.heading}
+                            </h3>
+                            <p className="text-gray-300 leading-relaxed text-base lg:text-lg">
+                                {feature.technicalDetails.content}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* CTA Section */}
+                    <div className="text-center pt-4">
+                        <Link
+                            href="#"
+                            className="inline-flex items-center space-x-3 bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-lg hover:from-[#FF4B51] hover:to-[#BC1A1E] transition-all duration-300 group"
+                        >
+                            <span className="text-base sm:text-lg">Start Exploring</span>
+                            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
