@@ -117,7 +117,7 @@ const Hero: React.FC = () => {
                                     className="group inline-flex items-center px-8 py-4 rounded-lg text-lg font-medium text-white bg-[#BC1A1E] hover:bg-[#BC1A1E]/90 transition-colors"
                                 >
                                     <span className="flex items-center">
-                                        Start Learning
+                                        Start Learning & Earning
                                         <ArrowRight className="ml-2 h-5 w-5" />
                                     </span>
                                 </button>
