@@ -69,7 +69,7 @@ const ExcelDisplay: React.FC = () => {
     return (
         <div className="w-full bg-black rounded-lg shadow-lg border border-red-800">
             <div className="p-4 md:p-6 border-b border-red-800">
-                <h2 className="text-xl md:text-2xl font-bold text-red-500">Excel Data Display</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-red-500">Compare Data Display</h2>
             </div>
 
             {/* Desktop Table View */}
