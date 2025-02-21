@@ -10,6 +10,7 @@ import {
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'viem';
 import TierNavbar from '@/components/ui/tier-navbar';
+import CONTRACT_ABI from '@/lib/contract-abi.json';
 
 // Contract details
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
@@ -17,37 +18,6 @@ if (!CONTRACT_ADDRESS) throw new Error("Contract address not found in environmen
 
 const TIER_4 = 3; // Updated to Tier 4
 
-// Updated ABI to include referrer
-const CONTRACT_ABI = [
-    {
-        name: "mint",
-        type: "function",
-        stateMutability: "payable",
-        inputs: [
-            { name: "tier", type: "uint256" },
-            { name: "amount", type: "uint256" },
-            { name: "_referrer", type: "address" }
-        ],
-        outputs: []
-    },
-    {
-        name: "getTierSupply",
-        type: "function",
-        stateMutability: "view",
-        inputs: [{ name: "tier", type: "uint256" }],
-        outputs: [
-            { name: "current", type: "uint256" },
-            { name: "max", type: "uint256" }
-        ]
-    },
-    {
-        name: "getTierPrice",
-        type: "function",
-        stateMutability: "view",
-        inputs: [{ name: "tier", type: "uint256" }],
-        outputs: [{ name: "price", type: "uint256" }]
-    }
-];
 
 // Updated benefits for Tier 4 (Gold)
 const benefits = [
@@ -185,19 +155,35 @@ const Tier4Page = () => {
 
     // Watch for successful mint and trigger confetti
     useEffect(() => {
+        if (hash) {
+            console.log("Transaction hash:", hash);
+        }
+
+        if (error) {
+            console.error("Transaction error:", error);
+            setIsMinting(false);
+            Swal.fire({
+                title: 'Transaction Failed',
+                text: error.message || 'Transaction failed. Please try again.',
+                icon: 'error',
+                confirmButtonColor: '#d4af37',
+                background: '#1a1a1a',
+                color: '#ffffff'
+            });
+        }
+
         if (isConfirmed) {
             setIsMinting(false);
             if (!hasShownConfetti) {
                 fireConfetti();
                 setHasShownConfetti(true);
 
-                // Show success message with SweetAlert2
                 Swal.fire({
-                    title: 'Congratulations on your DBW Gold Tier NFT! 🎉',
-                    text: 'Now that you own one, sign up for an account to access your token gated education page where only users who own Tier-4 NFT have access to!',
+                    title: 'Congratulations on your Tier-1 DBW NFT! 🎉',
+                    text: 'Now that you own a DBW NFT, You can access your token gated education dashboard where only users who own DBW NFTs have access to!',
                     icon: 'success',
-                    confirmButtonText: 'Sign Up Now',
-                    confirmButtonColor: '#DAA520', // Gold color for the button
+                    confirmButtonText: 'Click here to access your dashboard!',
+                    confirmButtonColor: '#d4af37',
                     background: '#1a1a1a',
                     color: '#ffffff',
                     showClass: {
@@ -206,45 +192,73 @@ const Tier4Page = () => {
                     hideClass: {
                         popup: 'animate__animated animate__fadeOutDown animate__faster'
                     }
-                }).then((result: SweetAlertResult) => {
+                }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = '/signup';
+                        window.location.href = '/dashboard';
                     }
                 });
             }
         }
-    }, [isConfirmed, hasShownConfetti]);
+    }, [hash, error, isConfirmed, hasShownConfetti]);
 
-    // Handle mint with optional referrer
+    // Updated handleMint function with proper error typing
     const handleMint = async () => {
         if (isMinting) return;
 
         try {
             setIsMinting(true);
+
             if (!priceData) {
                 throw new Error("Price data not available");
             }
 
+            // Convert priceData to bigint for the transaction
             const price = BigInt(priceData.toString());
 
-            // Mint with referrer if available, otherwise use zero address
+            // Ensure referrerAddress is a valid address or zero address
+            const referrer = referrerAddress && /^0x[a-fA-F0-9]{40}$/.test(referrerAddress)
+                ? referrerAddress
+                : '0x0000000000000000000000000000000000000000';
+
+            console.log('Minting with params:', {
+                tier: TIER_4,
+                amount: 1,
+                referrer,
+                price: price.toString()
+            });
+
+            // Prepare the contract call
             await writeContract({
                 address: CONTRACT_ADDRESS,
                 abi: CONTRACT_ABI,
                 functionName: 'mint',
                 args: [
-                    TIER_4,
-                    1,
-                    referrerAddress || '0x0000000000000000000000000000000000000000'
+                    BigInt(TIER_4), // tier
+                    BigInt(1),      // amount
+                    referrer        // referrer address
                 ],
                 value: price
             });
-        } catch (err) {
+
+        } catch (err: unknown) {
             console.error('Minting error:', err);
+
+            // Extract error message safely
+            const errorMessage = err instanceof Error ? err.message :
+                typeof err === 'object' && err && 'message' in err ? String(err.message) :
+                    'Failed to mint NFT. Please try again.';
+
+            Swal.fire({
+                title: 'Minting Failed',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonColor: '#d4af37',
+                background: '#1a1a1a',
+                color: '#ffffff'
+            });
             setIsMinting(false);
         }
     };
-
     // Format supply and price data
     const formatSupply = () => {
         if (!supplyData || !Array.isArray(supplyData)) return "0/200";

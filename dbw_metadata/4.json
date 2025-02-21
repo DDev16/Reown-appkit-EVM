@@ -1,12 +1,12 @@
 {
     "name": "Defi Bull World NFT - Tier 4",
     "description": "Valuable membership tier with great educational resources and perks.",
-    "image": "ipfs://bafybeielwh6nxnwpzlznzkbcvfy74mvl2heey3l53urvgfva5hfsk34o7i/4.png",
+    "image": "ipfs://bafybeiacmu3lq6awex6zla7jcuoghalkctzv7yyqx6cnsvm3kn4jz3arfm/4.png",
     "external_url": "https://www.defibullworld.com",
     "attributes": [
       { "trait_type": "Tier", "value": 4 },
       { "trait_type": "Metal", "value": "Gold" },
-      { "trait_type": "Token Allocation", "value": "300,000 XXX" },
+      { "trait_type": "Token Allocation", "value": "4,000" },
       { "trait_type": "Video Library Access", "value": "Yes" },
       { "trait_type": "Blog Access", "value": "Tier 4 Blog" },
       { "trait_type": "Access to More Courses", "value": "Yes" },

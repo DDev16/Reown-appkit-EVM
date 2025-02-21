@@ -1,14 +1,13 @@
-"use client";
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import * as XLSX from 'xlsx';
-import _ from 'lodash';
 
-type ExcelRow = (string | number | null)[];
+type TableRow = (string | number | null)[];
+type TableData = TableRow[];
 
-const ExcelDisplay: React.FC = () => {
-    const [data, setData] = useState<ExcelRow[]>([]);
-    const [headers, setHeaders] = useState<string[]>([]);
-    const [loading, setLoading] = useState(true);
+const ComparisonTable: React.FC = () => {
+    const [data, setData] = useState<TableData>([]);
+    const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -19,16 +18,11 @@ const ExcelDisplay: React.FC = () => {
                     throw new Error('Failed to fetch data');
                 }
                 const jsonData = await response.json();
-
-                if (jsonData.length > 0) {
-                    const headerRow = jsonData[0].map((header: any) => String(header));
-                    setHeaders(headerRow);
-                    setData(jsonData.slice(1));
-                }
+                setData(jsonData);
                 setLoading(false);
             } catch (err) {
-                console.error('Error fetching Excel data:', err);
-                setError(err instanceof Error ? err.message : 'An error occurred loading the data');
+                console.error('Error fetching data:', err);
+                setError(err instanceof Error ? err.message : 'Failed to load data');
                 setLoading(false);
             }
         };
@@ -36,110 +30,94 @@ const ExcelDisplay: React.FC = () => {
         fetchData();
     }, []);
 
+    const formatCellValue = (value: string | number | null, rowHeader: string): string => {
+        if (value === null || value === undefined) return '0';
+
+        if (rowHeader === "Costs p/m Without Kickback") {
+            return typeof value === 'number' ?
+                new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2
+                }).format(value) : value.toString();
+        }
+
+        if (rowHeader === "Max cashback in FLR" ||
+            rowHeader === "Minimum cashback in FLR" ||
+            rowHeader === "50% of Company assets" ||
+            rowHeader === "35% profit share pool") {
+            if (value === 0) return '0.00%';
+            return typeof value === 'number' ? `${(value * 100).toFixed(2)}%` : value.toString();
+        }
+
+        if (typeof value === 'number') {
+            if (value === 0) return '0';
+            return value.toString().includes('.') ?
+                `${(value * 100).toFixed(2)}%` :
+                value.toLocaleString();
+        }
+        return value.toString();
+    };
+
     if (loading) {
         return (
-            <div className="w-full p-4 md:p-6 bg-black rounded-lg shadow-lg">
-                <div className="flex items-center justify-center text-red-500">
-                    <svg className="animate-spin h-6 w-6 md:h-8 md:w-8 mr-2" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    <span className="text-sm md:text-base">Loading data...</span>
-                </div>
+            <div className="flex items-center justify-center h-64 bg-black text-red-500">
+                <div className="text-lg">Loading comparison data...</div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="w-full p-4 md:p-6 bg-black rounded-lg shadow-lg border border-red-800">
-                <div className="text-red-500 flex items-center text-sm md:text-base">
-                    <svg className="w-5 h-5 md:w-6 md:h-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {error}
-                </div>
+            <div className="flex items-center justify-center h-64 bg-black text-red-500">
+                <div className="text-lg">Error: {error}</div>
             </div>
         );
     }
 
-    // Create unique rows for mobile view based on the first column
-    const uniqueMobileData = _.uniqBy(data, (row) => row[0]?.toString());
+    const tierNames = data[0]?.slice(1) || [];
+
+    // Filter out empty rows and get visible row count
+    const visibleRows = data.slice(1).filter(row => row[0]);
 
     return (
-        <div className="w-full bg-black rounded-lg shadow-lg border border-red-800">
-            <div className="p-4 md:p-6 border-b border-red-800">
-                <h2 className="text-xl md:text-2xl font-bold text-red-500">Compare Data Display</h2>
-            </div>
-
-            {/* Desktop Table View */}
-            <div className="hidden md:block">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-red-800">
-                        <thead>
-                            <tr>
-                                {headers.map((header, index) => (
-                                    <th
-                                        key={index}
-                                        scope="col"
-                                        className="px-6 py-4 text-left text-sm font-bold text-red-500 uppercase tracking-wider bg-black sticky top-0 border-b border-red-800"
-                                    >
-                                        {header}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-red-800">
-                            {data.map((row, rowIndex) => (
-                                <tr
-                                    key={rowIndex}
-                                    className={`
-                                        ${rowIndex % 2 === 0 ? 'bg-black' : 'bg-[#1A1A1A]'}
-                                        hover:bg-red-900/30 transition-colors duration-150 ease-in-out
-                                    `}
-                                >
-                                    {headers.map((_, colIndex) => (
-                                        <td
-                                            key={colIndex}
-                                            className="px-6 py-4 text-sm text-gray-300 border-b border-red-800"
-                                        >
-                                            {row[colIndex]?.toString() ?? ''}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {/* Mobile Card View - Using uniqueMobileData */}
-            <div className="md:hidden">
-                <div className="grid gap-4 p-4">
-                    {uniqueMobileData.map((row, rowIndex) => (
-                        <div
-                            key={rowIndex}
+        <div className="w-full overflow-x-auto bg-black p-6 rounded-lg border border-red-800">
+            <table className="min-w-full bg-black">
+                <thead>
+                    <tr>
+                        <th className="p-4 text-left text-sm font-bold text-red-500 border-b border-red-800/50 uppercase bg-black">
+                            NFT Tiers
+                        </th>
+                        {tierNames.map((tier, index) => (
+                            <th key={index} className="p-4 text-center text-sm font-bold text-red-500 border-b border-red-800/50 uppercase bg-black">
+                                {String(tier)}
+                            </th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody>
+                    {visibleRows.map((row: TableRow, visibleIndex: number) => (
+                        <tr
+                            key={visibleIndex}
                             className={`
-                                bg-[#1A1A1A] rounded-lg p-4 border border-red-800
-                                hover:bg-red-900/30 transition-colors duration-150 ease-in-out
+                                ${visibleIndex % 2 === 0 ? 'bg-black' : 'bg-[#1A1A1A] '}
+                                hover:bg-red-600/20 transition-colors duration-150 ease-in-out
                             `}
                         >
-                            {headers.map((header, colIndex) => (
-                                <div key={colIndex} className="mb-2 last:mb-0">
-                                    <div className="text-red-500 text-xs font-bold uppercase mb-1">
-                                        {header}
-                                    </div>
-                                    <div className="text-gray-300 text-sm">
-                                        {row[colIndex]?.toString() ?? ''}
-                                    </div>
-                                </div>
+                            <td className="p-4 text-sm text-red-400 font-medium">
+                                {String(row[0])}
+                            </td>
+                            {row.slice(1).map((cell, cellIndex) => (
+                                <td key={cellIndex} className="p-4 text-sm text-center text-gray-300">
+                                    {formatCellValue(cell, String(row[0]))}
+                                </td>
                             ))}
-                        </div>
+                        </tr>
                     ))}
-                </div>
-            </div>
+                </tbody>
+            </table>
         </div>
     );
 };
 
-export default ExcelDisplay;
+export default ComparisonTable;

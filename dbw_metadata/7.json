@@ -1,0 +1,25 @@
+{
+    "name": "Defi Bull World NFT - Tier 7",
+    "description": "Entry-level membership with minimal benefits.",
+    "image": "ipfs://bafybeiacmu3lq6awex6zla7jcuoghalkctzv7yyqx6cnsvm3kn4jz3arfm/7.png",
+    "external_url": "https://www.defibullworld.com",
+    "attributes": [
+      { "trait_type": "Tier", "value": 7 },
+      { "trait_type": "Metal", "value": "Osmium" },
+      { "trait_type": "Token Allocation", "value": "400" },
+      { "trait_type": "Video Library Access", "value": "Yes" },
+      { "trait_type": "Blog Access", "value": "General Blog" },
+      { "trait_type": "Monthly Giveaways", "value": "Yes" },
+      { "trait_type": "Monthly Knowledge Tests", "value": "Yes" },
+      { "trait_type": "Early Access to Features", "value": "Yes" },
+      { "trait_type": "Early Access to Launches", "value": "Yes" },
+      { "trait_type": "Airdrops", "value": "No" },
+      { "trait_type": "Zoom Calls Frequency", "value": "Every 3 months" },
+      { "trait_type": "Cashback", "value": "None" },
+      { "trait_type": "Revenue Split", "value": "None" },
+      { "trait_type": "Sweepstake Tickets", "value": 0 },
+      { "trait_type": "Education Duration", "value": "60+ months" },
+      { "trait_type": "Membership Cost", "value": "1 USD/month" }
+    ]
+  }
+  

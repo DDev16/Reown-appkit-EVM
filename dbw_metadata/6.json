@@ -1,12 +1,12 @@
 {
     "name": "Defi Bull World NFT - Tier 6",
     "description": "Basic membership with essential benefits.",
-    "image": "ipfs://bafybeielwh6nxnwpzlznzkbcvfy74mvl2heey3l53urvgfva5hfsk34o7i/6.png",
+    "image": "ipfs://bafybeiacmu3lq6awex6zla7jcuoghalkctzv7yyqx6cnsvm3kn4jz3arfm/6.png",
     "external_url": "https://www.defibullworld.com",
     "attributes": [
       { "trait_type": "Tier", "value": 6 },
       { "trait_type": "Metal", "value": "Iridium" },
-      { "trait_type": "Token Allocation", "value": "15,000 XXX" },
+      { "trait_type": "Token Allocation", "value": "800" },
       { "trait_type": "Video Library Access", "value": "Yes" },
       { "trait_type": "Blog Access", "value": "General Blog" },
       { "trait_type": "Monthly Giveaways", "value": "Yes" },

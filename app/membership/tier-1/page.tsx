@@ -10,42 +10,13 @@ import {
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'viem';
 import TierNavbar from '@/components/ui/tier-navbar';
+import CONTRACT_ABI from '@/lib/contract-abi.json';
 
 // Contract details
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
 if (!CONTRACT_ADDRESS) throw new Error("Contract address not found in environment variables");
 const TIER_1 = 0;
 
-// ABI for the required functions
-const CONTRACT_ABI = [
-    {
-        name: "mint",
-        type: "function",
-        stateMutability: "payable",
-        inputs: [
-            { name: "tier", type: "uint256" },
-            { name: "amount", type: "uint256" }
-        ],
-        outputs: []
-    },
-    {
-        name: "getTierSupply",
-        type: "function",
-        stateMutability: "view",
-        inputs: [{ name: "tier", type: "uint256" }],
-        outputs: [
-            { name: "current", type: "uint256" },
-            { name: "max", type: "uint256" }
-        ]
-    },
-    {
-        name: "getTierPrice",
-        type: "function",
-        stateMutability: "view",
-        inputs: [{ name: "tier", type: "uint256" }],
-        outputs: [{ name: "price", type: "uint256" }]
-    }
-];
 
 const benefits = [
     {
@@ -183,6 +154,23 @@ const Tier1Page = () => {
 
     // Watch for successful mint and trigger confetti
     useEffect(() => {
+        if (hash) {
+            console.log("Transaction hash:", hash);
+        }
+
+        if (error) {
+            console.error("Transaction error:", error);
+            setIsMinting(false);
+            Swal.fire({
+                title: 'Transaction Failed',
+                text: error.message || 'Transaction failed. Please try again.',
+                icon: 'error',
+                confirmButtonColor: '#d4af37',
+                background: '#1a1a1a',
+                color: '#ffffff'
+            });
+        }
+
         if (isConfirmed) {
             setIsMinting(false);
             if (!hasShownConfetti) {
@@ -203,21 +191,22 @@ const Tier1Page = () => {
                     hideClass: {
                         popup: 'animate__animated animate__fadeOutDown animate__faster'
                     }
-                }).then((result: SweetAlertResult) => {
+                }).then((result) => {
                     if (result.isConfirmed) {
                         window.location.href = '/dashboard';
                     }
                 });
             }
         }
-    }, [isConfirmed, hasShownConfetti]);
+    }, [hash, error, isConfirmed, hasShownConfetti]);
 
-    // Handle mint with optional referrer
+    // Updated handleMint function with proper error typing
     const handleMint = async () => {
-        if (isMinting) return; // Prevent double minting
+        if (isMinting) return;
 
         try {
             setIsMinting(true);
+
             if (!priceData) {
                 throw new Error("Price data not available");
             }
@@ -225,21 +214,47 @@ const Tier1Page = () => {
             // Convert priceData to bigint for the transaction
             const price = BigInt(priceData.toString());
 
-            // Mint with referrer if available, otherwise use zero address
+            // Ensure referrerAddress is a valid address or zero address
+            const referrer = referrerAddress && /^0x[a-fA-F0-9]{40}$/.test(referrerAddress)
+                ? referrerAddress
+                : '0x0000000000000000000000000000000000000000';
+
+            console.log('Minting with params:', {
+                tier: TIER_1,
+                amount: 1,
+                referrer,
+                price: price.toString()
+            });
+
+            // Prepare the contract call
             await writeContract({
                 address: CONTRACT_ADDRESS,
                 abi: CONTRACT_ABI,
                 functionName: 'mint',
                 args: [
-                    TIER_1,
-                    1,
-                    referrerAddress || '0x0000000000000000000000000000000000000000'
+                    BigInt(TIER_1), // tier
+                    BigInt(1),      // amount
+                    referrer        // referrer address
                 ],
                 value: price
             });
 
-        } catch (err) {
+        } catch (err: unknown) {
             console.error('Minting error:', err);
+
+            // Extract error message safely
+            const errorMessage = err instanceof Error ? err.message :
+                typeof err === 'object' && err && 'message' in err ? String(err.message) :
+                    'Failed to mint NFT. Please try again.';
+
+            Swal.fire({
+                title: 'Minting Failed',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonColor: '#d4af37',
+                background: '#1a1a1a',
+                color: '#ffffff'
+            });
             setIsMinting(false);
         }
     };
