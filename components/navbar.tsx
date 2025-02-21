@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import MusicPlayer from "./ui/MusicPlayer";
 import AppKitButton from "./appkit/appkitButton";
+import { Separator } from "@/components/ui/separator";
 import { useAccount, useReadContracts } from "wagmi";
 import { parseAbi } from 'viem';
 
@@ -16,6 +17,18 @@ const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string
 const ERC1155_ABI = parseAbi([
     'function balanceOf(address account, uint256 id) view returns (uint256)',
 ]);
+
+// Define interfaces for navigation items
+interface SubNavItem {
+    name: string;
+    path: string;
+}
+
+interface NavItem {
+    name: string;
+    path?: string;
+    subItems?: SubNavItem[];
+}
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -74,7 +87,7 @@ const Navbar = () => {
         console.log('Has Any NFT:', hasAnyNFT);
     }, [hasAnyNFT]);
 
-    const navItems = [
+    const navItems: NavItem[] = [
         { name: "Home", path: "/" },
         ...(hasAnyNFT ? [{ name: "Dashboard", path: "/dashboard" }] : []),
         {
@@ -87,7 +100,7 @@ const Navbar = () => {
                 { name: "Contributors", path: "/contributors" },
                 { name: "Features", path: "/our-features" },
                 { name: "Contact", path: "/contact" },
-
+                { name: "Contributor Application", path: "/contributor-apply" },
             ],
         },
         {
@@ -108,6 +121,41 @@ const Navbar = () => {
         ...(isAdmin ? [{ name: "Admin", path: "/admin/dashboard" }] : []),
     ];
 
+    // Reusable submenu rendering function
+    const renderSubMenu = (item: NavItem, mobile = false) => {
+        const subItems = item.subItems || [];
+        return (
+            <ul className={`${mobile ? 'pl-4' : 'absolute left-0 mt-2 w-48'} bg-[#242223] border border-[#BC1A1E]/20 rounded-lg shadow-lg z-[9999]`}>
+                {subItems.map((subItem, index) => (
+                    <li key={subItem.name} className="relative group">
+                        <Link
+                            href={subItem.path}
+                            className="group/link block px-4 py-2 text-gray-300 hover:text-white hover:bg-[#BC1A1E]/10 transition-colors flex items-center justify-between"
+                        >
+                            <span>{subItem.name}</span>
+                            <div className="relative w-4 h-4 overflow-hidden">
+                                <ArrowRight
+                                    className="absolute top-0 left-0 text-gray-500 
+                                        transition-all duration-300 
+                                        transform 
+                                        opacity-0 group-hover:opacity-100 
+                                        group-hover:-translate-x-[-1] 
+                                        group-hover:text-white"
+                                    size={16}
+                                />
+                            </div>
+                        </Link>
+                        {index < subItems.length - 1 && (
+                            <Separator
+                                className={`${mobile ? 'mx-2' : 'mx-1'} bg-[#BC1A1E]/30`}
+                                orientation="horizontal"
+                            />
+                        )}
+                    </li>
+                ))}
+            </ul>
+        );
+    };
 
     return (
         <nav
@@ -174,25 +222,12 @@ const Navbar = () => {
                                     <div className="absolute left-0 h-4 w-full" />
                                     {(item.name === "Membership"
                                         ? isMembershipOpen
-                                        : isMoreOpen) && (
-                                            <ul className="absolute left-0 mt-2 w-48 bg-[#242223] border border-[#BC1A1E]/20 rounded-lg shadow-lg z-[9999]">
-                                                {item.subItems.map((subItem) => (
-                                                    <li key={subItem.name}>
-                                                        <Link
-                                                            href={subItem.path}
-                                                            className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-[#BC1A1E]/10 transition-colors"
-                                                        >
-                                                            {subItem.name}
-                                                        </Link>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
+                                        : isMoreOpen) && renderSubMenu(item)}
                                 </div>
                             ) : (
                                 <Link
                                     key={item.name}
-                                    href={item.path}
+                                    href={item.path || "/"}
                                     className="text-gray-300 hover:text-white hover:bg-[#BC1A1E]/10 px-4 py-2 rounded-lg text-sm font-medium transition-colors relative group"
                                 >
                                     {item.name}
@@ -258,32 +293,12 @@ const Navbar = () => {
                                 </button>
                                 {(item.name === "Membership"
                                     ? isMembershipOpen
-                                    : isMoreOpen) && (
-                                        <div className="pl-4">
-                                            {item.subItems.map((subItem) => (
-                                                <Link
-                                                    key={subItem.name}
-                                                    href={subItem.path}
-                                                    className="text-gray-300 hover:text-white hover:bg-[#BC1A1E]/10 block px-4 py-2 rounded-lg text-base font-medium transition-colors"
-                                                    onClick={() => {
-                                                        setIsMenuOpen(false);
-                                                        if (item.name === "Membership") {
-                                                            setIsMembershipOpen(false);
-                                                        } else if (item.name === "More") {
-                                                            setIsMoreOpen(false);
-                                                        }
-                                                    }}
-                                                >
-                                                    {subItem.name}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    )}
+                                    : isMoreOpen) && renderSubMenu(item, true)}
                             </div>
                         ) : (
                             <Link
                                 key={item.name}
-                                href={item.path}
+                                href={item.path || "/"}
                                 className="text-gray-300 hover:text-white hover:bg-[#BC1A1E]/10 block px-4 py-2 rounded-lg text-base font-medium transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
