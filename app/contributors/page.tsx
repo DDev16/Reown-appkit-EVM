@@ -192,8 +192,8 @@ const Contributors: React.FC = () => {
                         Join Our Community
                     </h1>
                     <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
-                        We're building the future of decentralized technology, and we want you to be part of it.
-                        Whether you're a seasoned developer or an innovative thinker, there's a place for you.
+                        We&apos;re building the future of decentralized technology, and we want you to be part of it.
+                        Whether you&apos;re a seasoned developer or an innovative thinker, there&apos;s a place for you.
                     </p>
                 </div>
 

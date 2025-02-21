@@ -54,7 +54,7 @@ const ApplyPage: React.FC = () => {
                         Join Our Innovation Frontier
                     </h1>
                     <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
-                        We're not just building technology—we're crafting the future of decentralized systems.
+                        We&apos;re not just building technology—we&apos;re crafting the future of decentralized systems.
                         Your unique skills could be the missing piece in our revolutionary ecosystem.
                     </p>
                 </div>
@@ -95,7 +95,7 @@ const ApplyPage: React.FC = () => {
                                 </h3>
                             </div>
                             <p className="text-zinc-400 group-hover:text-zinc-200 transition-colors">
-                                An environment that encourages personal growth, innovation, and pushing the boundaries of what's possible.
+                                An environment that encourages personal growth, innovation, and pushing the boundaries of what&apos;s possible.
                             </p>
                         </div>
                     </div>
