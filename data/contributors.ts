@@ -9,6 +9,7 @@ export interface Contributor {
         twitter?: string;
         discord?: string;
     };
+    tier: 1 | 2; // tier 1: can apply for contributor role, tier 2: partial contributor
 }
 
 export const contributors: Contributor[] = [
@@ -22,7 +23,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 1
     },
     {
         name: "This Could Be You",
@@ -34,7 +36,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 1
     },
     {
         name: "This Could Be You",
@@ -46,7 +49,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 1
     },
     {
         name: "This Could Be You",
@@ -58,7 +62,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 1
     },
     {
         name: "This Could Be You",
@@ -70,7 +75,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 1
     },
     {
         name: "This Could Be You",
@@ -82,7 +88,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 1
     },
     {
         name: "This Could Be You",
@@ -94,7 +101,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 1
     },
     {
         name: "This Could Be You",
@@ -106,7 +114,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 1
     },
     {
         name: "This Could Be You",
@@ -118,7 +127,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 2
     },
     {
         name: "This Could Be You",
@@ -130,7 +140,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 2
     },
     {
         name: "This Could Be You",
@@ -142,7 +153,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 2
     },
     {
         name: "This Could Be You",
@@ -154,7 +166,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 2
     },
     {
         name: "This Could Be You",
@@ -166,7 +179,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 2
     },
     {
         name: "This Could Be You",
@@ -178,7 +192,8 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 2
     },
     {
         name: "This Could Be You",
@@ -190,6 +205,7 @@ export const contributors: Contributor[] = [
             linkedin: "/contributors-apply",
             twitter: "/contributors-apply",
             discord: "/contributors-apply"
-        }
+        },
+        tier: 2
     }
 ];

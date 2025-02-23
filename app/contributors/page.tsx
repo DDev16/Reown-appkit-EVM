@@ -138,7 +138,7 @@ const ContributorCard: React.FC<{ contributor: Contributor }> = ({ contributor }
 
                     {/* Bio */}
                     <p
-                        className="text-zinc-400 text-xs mb-3 line-clamp-4 transition-all duration-300 group-hover:-translate-y-3 group-hover:opacity-100 opacity-80 flex-grow"
+                        className="text-zinc-400 text-xs mb-3 transition-all duration-300 group-hover:-translate-y-3 group-hover:opacity-100 opacity-80 flex-grow whitespace-pre-wrap"
                         style={{
                             transform: 'translateZ(110px)',
                             transition: 'transform 0.3s ease-out, opacity 0.3s ease-out'
@@ -146,6 +146,30 @@ const ContributorCard: React.FC<{ contributor: Contributor }> = ({ contributor }
                     >
                         {contributor.bio}
                     </p>
+
+                    {/* Tier-Based Action/Label */}
+                    {contributor.tier === 1 ? (
+                        <a
+                            href="/contributors-apply"
+                            className="text-green-500 text-sm font-medium mb-3 inline-block transition-all duration-300 group-hover:-translate-y-3"
+                            style={{
+                                transform: 'translateZ(115px)',
+                                transition: 'transform 0.3s ease-out, color 0.3s ease-out'
+                            }}
+                        >
+                            Tier 1 Contributor
+                        </a>
+                    ) : contributor.tier === 2 ? (
+                        <p
+                            className="text-blue-500 text-sm font-medium mb-3 inline-block transition-all duration-300 group-hover:-translate-y-3"
+                            style={{
+                                transform: 'translateZ(115px)',
+                                transition: 'transform 0.3s ease-out, color 0.3s ease-out'
+                            }}
+                        >
+                            Tier 2 Contributor
+                        </p>
+                    ) : null}
 
                     {/* Social Links */}
                     <div
