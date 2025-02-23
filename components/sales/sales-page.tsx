@@ -218,7 +218,7 @@ const SalesPageContent = () => {
 export const SalesPage = () => {
     return (
         <div className="min-h-screen bg-transparent">
-            <ReferralHandler />
+            {/* <ReferralHandler /> */}
             <SalesPageContent />
         </div>
     );
