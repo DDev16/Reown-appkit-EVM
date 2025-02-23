@@ -30,7 +30,6 @@ const ComparisonTable: React.FC = () => {
         fetchData();
     }, []);
 
-    // Updated return type to React.ReactNode to allow JSX elements
     const formatCellValue = (value: string | number | null, rowHeader: string): React.ReactNode => {
         if (value === null || value === undefined) return '0';
 
@@ -43,6 +42,16 @@ const ComparisonTable: React.FC = () => {
             if (normalizedValue === 'no') {
                 return <span className="text-red-500">✖</span>;
             }
+        }
+
+        // Remove commas for specific rows
+        if (rowHeader === "Free Draws" ||
+            rowHeader.includes("Monthly Sweepstake") ||
+            rowHeader === "DBW" ||
+            rowHeader.trim() === "Free Draws") {
+            return typeof value === 'string'
+                ? value.replace(/,/g, '')
+                : value.toString();
         }
 
         if (rowHeader === "Costs p/m Without Kickback" ||
