@@ -248,25 +248,7 @@ const ContactPage = () => {
                             </div>
                         </div>
 
-                        <div className="bg-black/40 backdrop-blur-sm p-8 rounded-2xl border border-[#BC1A1E]/20">
-                            <h2 className="text-2xl font-semibold text-white mb-6">
-                                Support Hours
-                            </h2>
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center py-2 border-b border-[#BC1A1E]/10">
-                                    <span className="text-gray-400">Monday - Friday</span>
-                                    <span className="text-white font-medium">9:00 AM - 6:00 PM EST</span>
-                                </div>
-                                <div className="flex justify-between items-center py-2 border-b border-[#BC1A1E]/10">
-                                    <span className="text-gray-400">Saturday</span>
-                                    <span className="text-white font-medium">10:00 AM - 4:00 PM EST</span>
-                                </div>
-                                <div className="flex justify-between items-center py-2">
-                                    <span className="text-gray-400">Sunday</span>
-                                    <span className="text-white font-medium">Closed</span>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </div>
