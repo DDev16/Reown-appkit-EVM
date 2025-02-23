@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import useSWR from "swr";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowUpRight, ArrowDownRight, RefreshCw, AlertCircle, TrendingUp } from "lucide-react";
@@ -11,7 +11,9 @@ import "aos/dist/aos.css";
 
 const fetcher = (url: string): Promise<any> => fetch(url).then((res) => res.json());
 
-export default function FtsPrice({ quantity = 1 }: { quantity?: number }) {
+export default function FtsPrice() {
+    const quantity = 1;
+
     useEffect(() => {
         AOS.init({
             duration: 1000,
