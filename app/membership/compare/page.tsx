@@ -30,16 +30,31 @@ const ComparisonTable: React.FC = () => {
         fetchData();
     }, []);
 
-    const formatCellValue = (value: string | number | null, rowHeader: string): string => {
+    // Updated return type to React.ReactNode to allow JSX elements
+    const formatCellValue = (value: string | number | null, rowHeader: string): React.ReactNode => {
         if (value === null || value === undefined) return '0';
 
-        if (rowHeader === "Costs p/m Without Kickback") {
-            return typeof value === 'number' ?
-                new Intl.NumberFormat('en-US', {
+        // Check for yes/no values first
+        if (typeof value === 'string') {
+            const normalizedValue = value.trim().toLowerCase();
+            if (normalizedValue === 'yes') {
+                return <span className="text-green-500">✔</span>;
+            }
+            if (normalizedValue === 'no') {
+                return <span className="text-red-500">✖</span>;
+            }
+        }
+
+        if (rowHeader === "Costs p/m Without Kickback" ||
+            rowHeader === "Total price in USD"
+        ) {
+            return typeof value === 'number'
+                ? new Intl.NumberFormat('en-US', {
                     style: 'currency',
                     currency: 'USD',
                     minimumFractionDigits: 2
-                }).format(value) : value.toString();
+                }).format(value)
+                : value.toString();
         }
 
         if (rowHeader === "Max cashback in FLR" ||
@@ -47,14 +62,16 @@ const ComparisonTable: React.FC = () => {
             rowHeader === "50% of Company assets" ||
             rowHeader === "35% profit share pool") {
             if (value === 0) return '0.00%';
-            return typeof value === 'number' ? `${(value * 100).toFixed(2)}%` : value.toString();
+            return typeof value === 'number'
+                ? `${(value * 100).toFixed(2)}%`
+                : value.toString();
         }
 
         if (typeof value === 'number') {
             if (value === 0) return '0';
-            return value.toString().includes('.') ?
-                `${(value * 100).toFixed(2)}%` :
-                value.toLocaleString();
+            return value.toString().includes('.')
+                ? `${(value * 100).toFixed(2)}%`
+                : value.toLocaleString();
         }
         return value.toString();
     };
@@ -76,8 +93,6 @@ const ComparisonTable: React.FC = () => {
     }
 
     const tierNames = data[0]?.slice(1) || [];
-
-    // Filter out empty rows and get visible row count
     const visibleRows = data.slice(1).filter(row => row[0]);
 
     return (
@@ -85,11 +100,11 @@ const ComparisonTable: React.FC = () => {
             <table className="min-w-full bg-black">
                 <thead>
                     <tr>
-                        <th className="p-4 text-left text-sm font-bold text-red-500 border-b border-red-800/50 uppercase bg-black">
+                        <th className="p-4 text-left text-sm font-bold text-green-500 border-b border-red-800/50 uppercase bg-black">
                             NFT Tiers
                         </th>
                         {tierNames.map((tier, index) => (
-                            <th key={index} className="p-4 text-center text-sm font-bold text-red-500 border-b border-red-800/50 uppercase bg-black">
+                            <th key={index} className="p-4 text-center text-sm font-bold text-green-500 border-b border-red-800/50 uppercase bg-black">
                                 {String(tier)}
                             </th>
                         ))}
@@ -100,11 +115,11 @@ const ComparisonTable: React.FC = () => {
                         <tr
                             key={visibleIndex}
                             className={`
-                                ${visibleIndex % 2 === 0 ? 'bg-black' : 'bg-[#1A1A1A] '}
+                                ${visibleIndex % 2 === 0 ? 'bg-black' : 'bg-[#1A1A1A]'}
                                 hover:bg-red-600/20 transition-colors duration-150 ease-in-out
                             `}
                         >
-                            <td className="p-4 text-sm text-red-400 font-medium">
+                            <td className="p-4 text-sm text-green-400 font-medium">
                                 {String(row[0])}
                             </td>
                             {row.slice(1).map((cell, cellIndex) => (
