@@ -20,73 +20,87 @@ const TIER_1 = 0;
 
 const benefits = [
     {
-        title: "Access to the video Library",
-        icon: <Play />,
-        description: "Exclusive access to our comprehensive video library of educational content",
+        title: "Limited Edition NFT",
+        icon: <Crown />,
+        description: "only 25 Top Tier NFTs. Dynamic FLR pricing, $9,600 USD total value.",
     },
     {
-        title: "Access to the tier 1 Blog",
-        icon: <BookOpen />,
-        description: "Premium blog content with deep insights and analysis",
-    },
-    {
-        title: "Access to contributors of DBW",
-        icon: <Users />,
-        description: "Direct access to industry experts and DBW contributors",
-    },
-    {
-        title: "Monthly knowledge tests",
-        icon: <Award />,
-        description: "Regular assessments to track your learning progress",
-    },
-    {
-        title: "Early access to new features",
-        icon: <Rocket />,
-        description: "Be the first to try new platform features",
-    },
-    {
-        title: "Early access to new launches",
-        icon: <ArrowUpRight />,
-        description: "Priority access to new product launches",
-    },
-    {
-        title: "2,400,000 XXX Tokens",
+        title: "Monthly Cost Structure",
         icon: <Coins />,
-        description: "Substantial token allocation for top tier members",
+        description: "$160/month standard cost, reducible to $0 with kickback system. Guaranteed profit after 60 months.",
     },
     {
-        title: "Airdrops and native token drops",
-        icon: <Gift />,
-        description: "Regular token drops and special rewards",
+        title: "NFT Cashback Program",
+        icon: <ChartBar />,
+        description: "75-100% guaranteed cashback in FLR, monthly payouts with partial guarantee.",
     },
     {
-        title: "Zoom calls every week",
+        title: "Revenue Share",
+        icon: <ChartBar />,
+        description: "10% share from 50% of company assets, distributed monthly.",
+    },
+    {
+        title: "Token Package",
+        icon: <Coins />,
+        description: "32,000 DBW, 30,000 TDB, 30,000 DRKET, 24,000 DBWF, 24,000 DBWL tokens.",
+    },
+    {
+        title: "Video Education",
+        icon: <Play />,
+        description: "Access to comprehensive video library and Tier 1 courses.",
+    },
+    {
+        title: "Learning Resources",
+        icon: <BookOpen />,
+        description: "Access to Tier 1 blog, public blog, library, dictionary, and e-books.",
+    },
+    {
+        title: "Weekly Meetings",
         icon: <Video />,
-        description: "Weekly virtual meetings with the community",
+        description: "Weekly Zoom calls with community and direct contributor access.",
     },
     {
-        title: "Up to 100% cashback of NFT price!",
-        icon: <ChartBar />,
-        description: "Potential for full NFT price reimbursement",
+        title: "Assessment Program",
+        icon: <Award />,
+        description: "Regular knowledge tests to track your educational progress.",
     },
     {
-        title: "10% of Company revenue split!",
-        icon: <ChartBar />,
-        description: "Share in company success with revenue splitting",
+        title: "Platform Benefits",
+        icon: <Rocket />,
+        description: "Early access to platform tokens and new collections.",
     },
     {
-        title: "Free sweepstake tickets for 64 draws!",
+        title: "FLR Sweepstakes",
         icon: <Ticket />,
-        description: "Multiple chances to win with free draw entries",
+        description: "Bi-weekly sweepstakes with dashboard tickets, 12 free draws included.",
     },
+    {
+        title: "Token Sweepstakes",
+        icon: <Ticket />,
+        description: "6 monthly entries each for DBW, TDB, DRKET, NFTC, DBWF, DBWL sweepstakes.",
+    },
+    {
+        title: "Sweepstake Pool Share",
+        icon: <ChartBar />,
+        description: "10% share from 35% of sweepstake pools.",
+    },
+    {
+        title: "Income Opportunities",
+        icon: <Coins />,
+        description: "7-12 different income streams available.",
+    },
+    {
+        title: "Additional Benefits",
+        icon: <Gift />,
+        description: "Regular airdrops, exclusive giveaways, and special events.",
+    }
 ];
-
 const Tier1Page = () => {
     const [isMinting, setIsMinting] = useState(false);
     const [hasShownConfetti, setHasShownConfetti] = useState(false);
     const [referrerAddress, setReferrerAddress] = useState<string | null>(null);
 
-    // Contract reads
+    // Contract reads for supply and price
     const { data: supplyData } = useReadContract({
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
@@ -94,10 +108,19 @@ const Tier1Page = () => {
         args: [TIER_1],
     });
 
-    const { data: priceData } = useReadContract({
+    // Get USD price
+    const { data: usdPriceData } = useReadContract({
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
-        functionName: 'getTierPrice',
+        functionName: 'getTierUSDPrice',
+        args: [TIER_1],
+    });
+
+    // Get current FLR price
+    const { data: flrPriceData } = useReadContract({
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'getTierFlarePrice',
         args: [TIER_1],
     });
 
@@ -200,19 +223,19 @@ const Tier1Page = () => {
         }
     }, [hash, error, isConfirmed, hasShownConfetti]);
 
-    // Updated handleMint function with proper error typing
+    // Updated handleMint function
     const handleMint = async () => {
         if (isMinting) return;
 
         try {
             setIsMinting(true);
 
-            if (!priceData) {
+            if (!flrPriceData) {
                 throw new Error("Price data not available");
             }
 
-            // Convert priceData to bigint for the transaction
-            const price = BigInt(priceData.toString());
+            // Convert flrPriceData to BigInt
+            const price = BigInt(flrPriceData.toString());
 
             // Ensure referrerAddress is a valid address or zero address
             const referrer = referrerAddress && /^0x[a-fA-F0-9]{40}$/.test(referrerAddress)
@@ -226,23 +249,20 @@ const Tier1Page = () => {
                 price: price.toString()
             });
 
-            // Prepare the contract call
             await writeContract({
                 address: CONTRACT_ADDRESS,
                 abi: CONTRACT_ABI,
                 functionName: 'mint',
                 args: [
-                    BigInt(TIER_1), // tier
-                    BigInt(1),      // amount
-                    referrer        // referrer address
+                    BigInt(TIER_1),    // tier
+                    BigInt(1),         // amount
+                    referrer          // referrer address
                 ],
-                value: price
+                value: price          // Properly formatted as BigInt
             });
 
         } catch (err: unknown) {
             console.error('Minting error:', err);
-
-            // Extract error message safely
             const errorMessage = err instanceof Error ? err.message :
                 typeof err === 'object' && err && 'message' in err ? String(err.message) :
                     'Failed to mint NFT. Please try again.';
@@ -266,10 +286,18 @@ const Tier1Page = () => {
         return `${current.toString()}/${max.toString()}`;
     };
 
-    const formatPrice = () => {
-        if (!priceData) return "400,000";
-        return (Number(priceData) / 1e18).toLocaleString();
+    const formatPrices = () => {
+        if (!usdPriceData || !flrPriceData) return { usd: "0.00", flr: "0.00" };
+
+        const usdPrice = Number(usdPriceData) / 100; // Convert cents to dollars
+        const flrPrice = Number(flrPriceData) / 1e18; // Convert wei to FLR
+
+        return {
+            usd: usdPrice.toFixed(2),
+            flr: flrPrice.toLocaleString(undefined, { maximumFractionDigits: 6 })
+        };
     };
+
 
     // Animation observer effect
     useEffect(() => {
@@ -303,30 +331,31 @@ const Tier1Page = () => {
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#d4af37]/10 to-transparent"></div>
 
                 {/* Main content container */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-4 lg:px-5 relative z-10 flex flex-col justify-center py-8">
-                    <div className="grid lg:grid-cols-2 gap-4 items-center">
+                <div className="max-w-8xl mx-auto px-4 sm:px-4 lg:px-5 relative z-10 flex flex-col justify-center py-8">
+                    {/* Centered Header & Description */}
+                    <div className="text-center mb-8">
+                        <div className="flex flex-col items-center gap-2 mb-2">
+                            <Crown className="w-16 h-16 text-[#d4af37]" />
+                            <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+                                Top Tier NFT
+                            </h1>
+                        </div>
+                        <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                            Experience the ultimate membership level with exclusive access and premium benefits
+                        </p>
+                    </div>
+
+                    <div className="grid lg:grid-cols-2 gap-4 items-start">
                         {/* Left Side – NFT & Content */}
                         <div className="space-y-4">
-                            {/* Header & Description */}
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                    <Crown className="w-10 h-10 text-[#d4af37]" />
-                                    <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-                                        Top Tier NFT
-                                    </h1>
-                                </div>
-                                <p className="text-lg text-gray-400">
-                                    Experience the ultimate membership level with exclusive access and premium benefits
-                                </p>
-
-
-                            </div>
-
                             {/* Price / Supply & Mint Button */}
                             <div className="flex items-center justify-center space-y-2 flex-wrap gap-8">
                                 <div className="px-4 py-2 bg-black border border-[#d4af37] rounded-xl text-center shadow-lg shadow-[#d4af37]/50">
                                     <p className="text-gray-300 text-base font-semibold">
-                                        Price: <span className="text-[#d4af37]">{formatPrice()} FLR</span>
+                                        Price: <span className="text-[#d4af37]">${formatPrices().usd} USD</span>
+                                    </p>
+                                    <p className="text-gray-300 text-base font-semibold">
+                                        Current: <span className="text-[#d4af37]">{formatPrices().flr} FLR</span>
                                     </p>
                                     <p className="text-gray-300 text-base font-semibold">
                                         Supply: <span className="text-[#d4af37]">{formatSupply()}</span>
@@ -347,8 +376,9 @@ const Tier1Page = () => {
                                             </span>
                                         </span>
                                     </button>
+
                                     {referrerAddress && (
-                                        <div className="fixed bottom-4 right-4 bg-black/50 border border-[#d4af37] rounded-lg p-2 text-sm text-white">
+                                        <div className="fixed bottom-4 right-4 bg-black z-20 border border-[#d4af37] rounded-lg p-2 text-sm text-white">
                                             Referral Active: {referrerAddress.slice(0, 6)}...{referrerAddress.slice(-4)}
                                         </div>
                                     )}
@@ -356,10 +386,10 @@ const Tier1Page = () => {
                             </div>
 
                             {/* NFT Image */}
-                            <div className="relative group">
+                            <div className="relative group max-w-lg mx-auto">
                                 <div className="absolute -inset-3 bg-gradient-to-br from-[#d4af37] via-[#b3941f] to-[#d4af37]/50 rounded-2xl opacity-75 group-hover:opacity-100 blur-2xl transition-all duration-500"></div>
                                 <div className="relative bg-gradient-to-br from-black/80 to-black p-1 rounded-2xl">
-                                    <div className="relative aspect-square w-full overflow-hidden rounded-xl">
+                                    <div className="relative aspect-square w-full max-w-lg overflow-hidden rounded-xl">
                                         <div
                                             className="absolute inset-0 opacity-30"
                                             style={{
@@ -373,7 +403,7 @@ const Tier1Page = () => {
                                                 src="/nfts/TopTier.png"
                                                 alt="Top Tier NFT"
                                                 fill
-                                                sizes="(min-width: 1024px) 40vw, 70vw"
+                                                sizes="(min-width: 1024px) 32rem, 100vw"
                                                 className="object-contain p-2"
                                                 priority
                                             />
@@ -387,7 +417,7 @@ const Tier1Page = () => {
                         <div className="space-y-2 overflow-auto">
                             <h2 className="text-2xl font-bold text-center">Exclusive Benefits</h2>
                             {/* Responsive Benefits Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                                 {benefits.map((benefit, index) => (
                                     <div
                                         key={index}
@@ -407,7 +437,7 @@ const Tier1Page = () => {
                             </div>
 
                             {/* Education Banner */}
-                            <div className="p-4 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#b3941f] relative overflow-hidden">
+                            <div className="p-4 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#d4af37] relative overflow-hidden">
                                 <div
                                     className="absolute inset-0 opacity-10"
                                     style={{
@@ -418,13 +448,24 @@ const Tier1Page = () => {
                                 ></div>
                                 <div className="relative flex items-center justify-between">
                                     <div>
-                                        <h2 className="text-2xl font-bold mb-1">60+ Months of Education!</h2>
-                                        <p className="text-white/80 text-xs">
+                                        <h2 className="text-2xl text-black font-bold mb-1">60+ Months of Education!</h2>
+                                        <p className="text-black/80 text-xs">
                                             Comprehensive educational content spanning over 5 years
                                         </p>
                                     </div>
-                                    <BookOpen className="w-12 h-12 text-white/90" />
+                                    <BookOpen className="w-12 h-12 text-black/90" />
                                 </div>
+                            </div>
+
+                            {/* Compare Membership Button */}
+                            <div className="mt-4 text-center">
+                                <a
+                                    href="/membership/compare"
+                                    className="inline-flex items-center px-6 py-3 bg-black border border-[#d4af37] text-[#d4af37] rounded-xl hover:bg-[#d4af37]/10 transition-all duration-300 group"
+                                >
+                                    <span className="mr-2">Find Out More Details</span>
+                                    <ArrowUpRight className="w-5 h-5 group-hover:rotate-45 transition-transform duration-300" />
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -450,5 +491,4 @@ const Tier1Page = () => {
         </div>
     );
 };
-
 export default Tier1Page;

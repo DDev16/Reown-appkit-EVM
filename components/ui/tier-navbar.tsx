@@ -78,6 +78,14 @@ const tierItems = [
         bgColor: 'bg-[#FFD700]',
         hoverClass: 'hover:bg-[#FFD700] hover:bg-opacity-80',
         borderColor: 'border-[#FFD700]'
+    },
+    {
+        name: 'Tier 10',
+        path: '/membership/tier-10',
+        icon: <Image src="/tier-icons/Ag-icon.png" alt="Tier 10" width={28} height={28} />,
+        bgColor: 'bg-[#f453f3]',
+        hoverClass: 'hover:bg-[#f453f3] hover:bg-opacity-80',
+        borderColor: 'border-[#f453f3]'
     }
 ];
 

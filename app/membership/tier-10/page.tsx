@@ -10,34 +10,33 @@ import {
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'viem';
 import TierNavbar from '@/components/ui/tier-navbar';
-import CONTRACT_ABI from '@/lib/contract-abi.json';
+import CONTRACT_ABI from '@/lib/contract-abi.json'
 
 // Contract details
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
 if (!CONTRACT_ADDRESS) throw new Error("Contract address not found in environment variables");
 
-const TIER_6 = 5; // Updated to Tier 6
-
+const TIER_9 = 8;
 const benefits = [
     {
-        title: "Perfect starting NFT",
+        title: "Basic Access NFT",
         icon: <Crown />,
-        description: "800 Iridium Tier NFTs. Dynamic FLR pricing, $300 USD value.",
+        description: "12800 Palladium Tier NFTs. Dynamic FLR pricing, $75 USD value.",
     },
     {
         title: "Monthly Cost Structure",
         icon: <Coins />,
-        description: "$5/month standard cost, reducible to $0 with kickback system. Guaranteed profit after 60 months.",
+        description: "$0.32/month standard cost, reducible to $0 with kickback system. Guaranteed profit after 60 months.",
     },
     {
         title: "NFT Cashback Program",
         icon: <ChartBar />,
-        description: "22.5-30% guaranteed cashback in FLR, monthly payouts with partial guarantee.",
+        description: "7.50-10% guaranteed cashback in FLR, quarterly payouts with partial guarantee.",
     },
     {
         title: "Token Package",
         icon: <Coins />,
-        description: "800 DBW, 938 TDB, 938 DRKET tokens.",
+        description: "50 DBW tokens with regular airdrops.",
     },
     {
         title: "Educational Resources",
@@ -76,18 +75,17 @@ const benefits = [
     }
 ];
 
-const Tier6Page = () => {
+const Tier9Page = () => {
     const [isMinting, setIsMinting] = useState(false);
     const [hasShownConfetti, setHasShownConfetti] = useState(false);
     const [referrerAddress, setReferrerAddress] = useState<string | null>(null);
-
 
     // Contract reads for supply and price
     const { data: supplyData } = useReadContract({
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'getTierSupply',
-        args: [TIER_6],
+        args: [TIER_9],
     });
 
     // Get USD price
@@ -95,7 +93,7 @@ const Tier6Page = () => {
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'getTierUSDPrice',
-        args: [TIER_6],
+        args: [TIER_9],
     });
 
     // Get current FLR price
@@ -103,7 +101,7 @@ const Tier6Page = () => {
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'getTierFlarePrice',
-        args: [TIER_6],
+        args: [TIER_9],
     });
 
     // Contract write for minting
@@ -125,7 +123,7 @@ const Tier6Page = () => {
     }, []);
 
 
-    // Confetti effect function with updated red colors
+    // Confetti effect function with Rhenium colors
     const fireConfetti = () => {
         const duration = 3000;
         const animationEnd = Date.now() + duration;
@@ -146,13 +144,13 @@ const Tier6Page = () => {
                 ...defaults,
                 particleCount,
                 origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-                colors: ['#BC1A1E', '#FF4B51', '#FF6B6E', '#FFFFFF'],
+                colors: ['#F453F3', '#FFC000', '#F453F3', '#FFC000'], // Rhenium themed colors
             });
             confetti({
                 ...defaults,
                 particleCount,
                 origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-                colors: ['#BC1A1E', '#FF4B51', '#FF6B6E', '#FFFFFF'],
+                colors: ['#F453F3', '#FFC000', '#F453F3', '#FFC000'], // Rhenium themed colors
             });
         }, 250);
     };
@@ -225,7 +223,7 @@ const Tier6Page = () => {
                 : '0x0000000000000000000000000000000000000000';
 
             console.log('Minting with params:', {
-                tier: TIER_6,
+                tier: TIER_9,
                 amount: 1,
                 referrer,
                 price: price.toString()
@@ -236,7 +234,7 @@ const Tier6Page = () => {
                 abi: CONTRACT_ABI,
                 functionName: 'mint',
                 args: [
-                    BigInt(TIER_6),    // tier
+                    BigInt(TIER_9),    // tier
                     BigInt(1),         // amount
                     referrer          // referrer address
                 ],
@@ -279,7 +277,6 @@ const Tier6Page = () => {
             flr: flrPrice.toLocaleString(undefined, { maximumFractionDigits: 6 })
         };
     };
-
     // Animation observer effect
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
@@ -308,21 +305,21 @@ const Tier6Page = () => {
             <TierNavbar />
             <div className="relative min-h-screen">
                 {/* Background Gradients */}
-                <div className="absolute inset-0 bg-gradient-radial from-[#BC1A1E]/20 via-transparent to-transparent opacity-40"></div>
-                <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#BC1A1E]/10 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-radial from-[#F453F3]/20 via-transparent to-transparent opacity-40"></div>
+                <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#F453F3]/10 to-transparent"></div>
 
                 {/* Main content container */}
                 <div className="max-w-8xl mx-auto px-4 sm:px-4 lg:px-5 relative z-10 flex flex-col justify-center py-8">
                     {/* Centered Header & Description */}
                     <div className="text-center mb-8">
                         <div className="flex flex-col items-center gap-2 mb-2">
-                            <Crown className="w-16 h-16 text-[#BC1A1E]" />
+                            <Crown className="w-16 h-16 text-[#F453F3]" />
                             <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-                                Iridium Tier NFT
+                                Silver Tier NFT
                             </h1>
                         </div>
                         <p className="text-xl text-gray-400 max-w-6xl mx-auto">
-                            Begin your education journey with our accessible entry-level membership
+                            Start your DeFi education journey with our cheapest membership
                         </p>
                     </div>
 
@@ -331,27 +328,27 @@ const Tier6Page = () => {
                         <div className="space-y-4">
                             {/* Price / Supply & Mint Button */}
                             <div className="flex items-center justify-center space-y-2 flex-wrap gap-8">
-                                <div className="px-4 py-2 bg-black border border-[#BC1A1E] rounded-xl text-center shadow-lg shadow-[#BC1A1E]/50">
+                                <div className="px-4 py-2 bg-black border border-[#F453F3] rounded-xl text-center shadow-lg shadow-[#F453F3]/50">
                                     <p className="text-gray-300 text-base font-semibold">
-                                        Price: <span className="text-[#BC1A1E]">${formatPrices().usd} USD</span>
+                                        Price: <span className="text-[#F453F3]">${formatPrices().usd} USD</span>
                                     </p>
                                     <p className="text-gray-300 text-base font-semibold">
-                                        Current: <span className="text-[#BC1A1E]">{formatPrices().flr} FLR</span>
+                                        Current: <span className="text-[#F453F3]">{formatPrices().flr} FLR</span>
                                     </p>
                                     <p className="text-gray-300 text-base font-semibold">
-                                        Supply: <span className="text-[#BC1A1E]">{formatSupply()}</span>
+                                        Supply: <span className="text-[#F453F3]">{formatSupply()}</span>
                                     </p>
                                 </div>
                                 <div className="relative">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-[#BC1A1E] via-[#BC1A1E] to-[#BC1A1E] rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all duration-500"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-r from-[#F453F3] via-[#F453F3] to-[#F453F3] rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all duration-500"></div>
                                     <button
                                         onClick={handleMint}
                                         disabled={isMinting || isConfirming || isConfirmed}
-                                        className="relative px-6 py-2 bg-black rounded-xl group transition-all duration-300 hover:shadow-2xl hover:shadow-[#BC1A1E]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="relative px-6 py-2 bg-black rounded-xl group transition-all duration-300 hover:shadow-2xl hover:shadow-[#F453F3]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-[#BC1A1E] to-[#BC1A1E] opacity-0 group-hover:opacity-20 rounded-xl transition-opacity duration-300"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-[#F453F3] to-[#F453F3] opacity-0 group-hover:opacity-20 rounded-xl transition-opacity duration-300"></div>
                                         <span className="relative flex items-center gap-2">
-                                            <Sparkles className="w-5 h-5 text-[#BC1A1E] group-hover:scale-110 transition-transform duration-300" />
+                                            <Sparkles className="w-5 h-5 text-[#F453F3] group-hover:scale-110 transition-transform duration-300" />
                                             <span className="text-base font-semibold text-white">
                                                 {getMintButtonText()}
                                             </span>
@@ -359,7 +356,7 @@ const Tier6Page = () => {
                                     </button>
 
                                     {referrerAddress && (
-                                        <div className="fixed bottom-4 right-4 bg-black z-20 border border-[#BC1A1E] rounded-lg p-2 text-sm text-white">
+                                        <div className="fixed bottom-4 right-4 bg-black z-20 border border-[#F453F3] rounded-lg p-2 text-sm text-white">
                                             Referral Active: {referrerAddress.slice(0, 6)}...{referrerAddress.slice(-4)}
                                         </div>
                                     )}
@@ -368,21 +365,21 @@ const Tier6Page = () => {
 
                             {/* NFT Image */}
                             <div className="relative group max-w-lg mx-auto">
-                                <div className="absolute -inset-3 bg-gradient-to-br from-[#BC1A1E] via-[#BC1A1E] to-[#BC1A1E]/50 rounded-2xl opacity-75 group-hover:opacity-100 blur-2xl transition-all duration-500"></div>
+                                <div className="absolute -inset-3 bg-gradient-to-br from-[#F453F3] via-[#F453F3] to-[#F453F3]/50 rounded-2xl opacity-75 group-hover:opacity-100 blur-2xl transition-all duration-500"></div>
                                 <div className="relative bg-gradient-to-br from-black/80 to-black p-1 rounded-2xl">
                                     <div className="relative aspect-square w-full max-w-lg overflow-hidden rounded-xl">
                                         <div
                                             className="absolute inset-0 opacity-30"
                                             style={{
                                                 backgroundImage:
-                                                    "radial-gradient(circle at 2px 2px, rgba(188, 26, 30, 0.4) 2px, transparent 0)",
+                                                    "radial-gradient(circle at 2px 2px, rgba(46, 204, 113, 0.4) 2px, transparent 0)",
                                                 backgroundSize: "24px 24px",
                                             }}
                                         ></div>
                                         <div className="relative w-full h-full rounded-xl transform group-hover:scale-[1.02] transition-transform duration-500">
                                             <Image
-                                                src="/nfts/Iridium.png"
-                                                alt="Iridium Tier NFT"
+                                                src="/nfts/Silver.png"
+                                                alt="Silver Tier NFT"
                                                 fill
                                                 sizes="(min-width: 1024px) 32rem, 100vw"
                                                 className="object-contain p-2"
@@ -398,16 +395,16 @@ const Tier6Page = () => {
                         <div className="space-y-2 overflow-auto">
                             <h2 className="text-2xl font-bold text-center">Exclusive Benefits</h2>
                             {/* Responsive Benefits Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
                                 {benefits.map((benefit, index) => (
                                     <div
                                         key={index}
-                                        className="benefit-card opacity-0 group relative p-4 rounded-xl bg-gradient-to-br from-gray-900 to-black border border-[#BC1A1E]/20 hover:border-[#BC1A1E]/40 transition-all duration-300"
+                                        className="benefit-card opacity-0 group relative p-4 rounded-xl bg-gradient-to-br from-gray-900 to-black border border-[#F453F3]/20 hover:border-[#F453F3]/40 transition-all duration-300"
                                         style={{ animationDelay: `${index * 100}ms` }}
                                     >
-                                        <div className="absolute -inset-[1px] bg-gradient-to-r from-[#BC1A1E] via-[#BC1A1E] to-[#BC1A1E] rounded-xl opacity-0 group-hover:opacity-30 blur-sm transition-opacity duration-500"></div>
+                                        <div className="absolute -inset-[1px] bg-gradient-to-r from-[#F453F3] via-[#F453F3] to-[#F453F3] rounded-xl opacity-0 group-hover:opacity-30 blur-sm transition-opacity duration-500"></div>
                                         <div className="relative">
-                                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#BC1A1E] to-[#BC1A1E] p-2 mb-2">
+                                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#F453F3] to-[#F453F3] p-2 mb-2">
                                                 <div className="w-full h-full text-white">{benefit.icon}</div>
                                             </div>
                                             <h3 className="text-lg font-semibold mb-1">{benefit.title}</h3>
@@ -418,7 +415,7 @@ const Tier6Page = () => {
                             </div>
 
                             {/* Education Banner */}
-                            <div className="p-4 rounded-xl bg-gradient-to-r from-[#BC1A1E] to-[#BC1A1E] relative overflow-hidden">
+                            <div className="p-4 rounded-xl bg-gradient-to-r from-[#F453F3] to-[#F453F3] relative overflow-hidden">
                                 <div
                                     className="absolute inset-0 opacity-10"
                                     style={{
@@ -442,7 +439,7 @@ const Tier6Page = () => {
                             <div className="mt-4 text-center">
                                 <a
                                     href="/membership/compare"
-                                    className="inline-flex items-center px-6 py-3 bg-black border border-[#BC1A1E] text-[#BC1A1E] rounded-xl hover:bg-[#BC1A1E]/10 transition-all duration-300 group"
+                                    className="inline-flex items-center px-6 py-3 bg-black border border-[#F453F3] text-[#F453F3] rounded-xl hover:bg-[#F453F3]/10 transition-all duration-300 group"
                                 >
                                     <span className="mr-2">Find Out More Details</span>
                                     <ArrowUpRight className="w-5 h-5 group-hover:rotate-45 transition-transform duration-300" />
@@ -473,4 +470,4 @@ const Tier6Page = () => {
     );
 };
 
-export default Tier6Page;
+export default Tier9Page;

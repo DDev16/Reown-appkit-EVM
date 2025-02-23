@@ -100,7 +100,8 @@ const Navbar = () => {
                 { name: "Contributors", path: "/contributors" },
                 { name: "Features", path: "/our-features" },
                 { name: "Contact", path: "/contact" },
-                { name: "Contributor Application", path: "/contributor-apply" },
+                { name: "Contributor Application", path: "/contributors-apply" },
+                { name: "Flare/USD Price", path: "/flare-usd-price" },
             ],
         },
         {
@@ -115,6 +116,7 @@ const Navbar = () => {
                 { name: "Tier 7", path: "/membership/tier-7" },
                 { name: "Tier 8", path: "/membership/tier-8" },
                 { name: "Tier 9", path: "/membership/tier-9" },
+                { name: "Tier 10", path: "/membership/tier-10" },
                 { name: "Compare", path: "/membership/compare" },
             ],
         },

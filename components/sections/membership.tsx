@@ -119,6 +119,16 @@ const MembershipTiers = () => {
             color: "from-[#FFD700] via-[#FFD700] to-[#FFC000]", // Updated to bright yellow
             highlighted: false,
             path: "/membership/tier-9"
+        },
+        {
+            name: "Silver",
+            subtitle: "Ultra Basic Tier",
+            description: "Ultra Basic access to fundamental DBW features",
+            Tier: "Tier 10",
+            iconPath: "/tier-icons/Ag-icon.png",
+            color: "from-[#F453F3] via-[#F453F3] to-[#F453F3]",
+            highlighted: false,
+            path: "/membership/tier-10"
         }
     ];
 
@@ -126,7 +136,7 @@ const MembershipTiers = () => {
         router.push(path);
     };
 
-    const renderTierCard = (tier: Tier, index: number): ReactElement => (
+    const renderTierCard = (tier: Tier, index: number, isThirdRow: boolean = false): ReactElement => (
         <div
             key={index}
             className="group relative w-full"
@@ -156,25 +166,43 @@ const MembershipTiers = () => {
                 )}
 
                 <div className="relative z-10 space-y-4">
-                    {/* Icon and Title */}
-                    <div className="flex items-center gap-4">
-                        <div className={`w-16 h-16 flex items-center justify-center relative bg-gradient-to-r ${tier.color} rounded-sm`}>
-                            <Image
-                                src={tier.iconPath}
-                                alt={`${tier.name} icon`}
-                                width={58}
-                                height={58}
-                                className="object-contain rounded-sm"
-                            />
+                    {/* Conditional Icon Placement */}
+                    {isThirdRow ? (
+                        <div className="flex flex-col items-center justify-center w-full mb-4">
+                            <div className={`w-16 h-16 flex items-center justify-center relative bg-gradient-to-r ${tier.color} rounded-sm`}>
+                                <Image
+                                    src={tier.iconPath}
+                                    alt={`${tier.name} icon`}
+                                    width={48}
+                                    height={48}
+                                    className="object-contain rounded-sm"
+                                />
+                            </div>
+                            <div className="text-center mt-2">
+                                <h3 className="text-2xl font-bold text-white">{tier.name}</h3>
+                                <p className="text-gray-400 text-sm">{tier.subtitle}</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="text-2xl font-bold text-white">{tier.name}</h3>
-                            <p className="text-gray-400 text-sm">{tier.subtitle}</p>
+                    ) : (
+                        <div className="flex items-center gap-4">
+                            <div className={`w-16 h-16 flex items-center justify-center relative bg-gradient-to-r ${tier.color} rounded-sm`}>
+                                <Image
+                                    src={tier.iconPath}
+                                    alt={`${tier.name} icon`}
+                                    width={48}
+                                    height={48}
+                                    className="object-contain rounded-sm"
+                                />
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-bold text-white">{tier.name}</h3>
+                                <p className="text-gray-400 text-sm">{tier.subtitle}</p>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Description */}
-                    <p className={`text-sm ${tier.highlighted ? 'text-white/90' : 'text-gray-400'}`}>
+                    <p className={`text-sm text-center ${tier.highlighted ? 'text-white/90' : 'text-gray-400'}`}>
                         {tier.description}
                     </p>
 
@@ -255,9 +283,9 @@ const MembershipTiers = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1600px] mx-auto">
                         {tiers.slice(2, 5).map((tier, index) => renderTierCard(tier, index + 2))}
                     </div>
-                    {/* Third Row - 4 cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-[1600px] mx-auto">
-                        {tiers.slice(5, 9).map((tier, index) => renderTierCard(tier, index + 5))}
+                    {/* Third Row - 5 cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-8 max-w-[1800px] mx-auto">
+                        {tiers.slice(5, 10).map((tier, index) => renderTierCard(tier, index + 5, true))}
                     </div>
                 </div>
             </div>
@@ -279,7 +307,7 @@ const MembershipTiers = () => {
                     animation: flow-2 10s ease-in-out infinite;
                 }
             `}</style>
-        </section>
+        </section >
     );
 };
 

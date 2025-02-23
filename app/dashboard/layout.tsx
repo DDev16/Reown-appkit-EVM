@@ -24,7 +24,7 @@ import { parseAbi } from 'viem';
 import Image from 'next/image';
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
-const TOTAL_TIERS = 7;
+const TOTAL_TIERS = 9;
 
 // ERC1155 minimal ABI for balanceOf
 const ERC1155_ABI = parseAbi([

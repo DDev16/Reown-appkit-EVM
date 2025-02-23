@@ -216,6 +216,19 @@
 		"inputs": [
 			{
 				"indexed": false,
+				"internalType": "address",
+				"name": "newFtso",
+				"type": "address"
+			}
+		],
+		"name": "FTSOUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
 				"internalType": "uint64",
 				"name": "version",
 				"type": "uint64"
@@ -256,6 +269,18 @@
 				"internalType": "address",
 				"name": "referrer",
 				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "usdPrice",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "flrAmount",
+				"type": "uint256"
 			}
 		],
 		"name": "MembershipMinted",
@@ -291,12 +316,12 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256",
-				"name": "newPrice",
-				"type": "uint256"
+				"internalType": "string",
+				"name": "newURI",
+				"type": "string"
 			}
 		],
-		"name": "TierPriceUpdated",
+		"name": "TierURIUpdated",
 		"type": "event"
 	},
 	{
@@ -310,12 +335,12 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "string",
-				"name": "newURI",
-				"type": "string"
+				"internalType": "uint256",
+				"name": "newUSDPrice",
+				"type": "uint256"
 			}
 		],
-		"name": "TierURIUpdated",
+		"name": "TierUSDPriceUpdated",
 		"type": "event"
 	},
 	{
@@ -446,6 +471,19 @@
 	{
 		"inputs": [],
 		"name": "TIER_1",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "TIER_10",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -654,6 +692,61 @@
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "ftso",
+		"outputs": [
+			{
+				"internalType": "contract IFtso",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getCurrentFlarePriceRaw",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "decimals",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "usdPrice",
+				"type": "uint256"
+			}
+		],
+		"name": "getFlareAmount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -680,7 +773,7 @@
 				"type": "uint256"
 			}
 		],
-		"name": "getTierPrice",
+		"name": "getTierFlarePrice",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -709,6 +802,25 @@
 			{
 				"internalType": "uint256",
 				"name": "max",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tier",
+				"type": "uint256"
+			}
+		],
+		"name": "getTierUSDPrice",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
 				"type": "uint256"
 			}
 		],
@@ -759,6 +871,11 @@
 			{
 				"internalType": "address",
 				"name": "_partnerWallet",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_ftso",
 				"type": "address"
 			}
 		],
@@ -1038,6 +1155,19 @@
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "_newFtso",
+				"type": "address"
+			}
+		],
+		"name": "setFTSO",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "_newPartnerWallet",
 				"type": "address"
 			}
@@ -1068,12 +1198,12 @@
 				"type": "uint256"
 			},
 			{
-				"internalType": "uint256",
-				"name": "newPrice",
-				"type": "uint256"
+				"internalType": "string",
+				"name": "newUri",
+				"type": "string"
 			}
 		],
-		"name": "setTierPrice",
+		"name": "setTierURI",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -1086,12 +1216,12 @@
 				"type": "uint256"
 			},
 			{
-				"internalType": "string",
-				"name": "newUri",
-				"type": "string"
+				"internalType": "uint256",
+				"name": "newUSDPrice",
+				"type": "uint256"
 			}
 		],
-		"name": "setTierURI",
+		"name": "setTierUSDPrice",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -1132,16 +1262,26 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "usdCents",
 				"type": "uint256"
 			}
 		],
-		"name": "tierPrices",
+		"name": "testPriceConversion",
 		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "flarePriceRaw",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "flareAmount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "explanation",
+				"type": "string"
 			}
 		],
 		"stateMutability": "view",
@@ -1161,6 +1301,25 @@
 				"internalType": "string",
 				"name": "",
 				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "tierUSDPrices",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
