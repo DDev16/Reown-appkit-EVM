@@ -24,6 +24,7 @@ const Footer = () => {
             { name: 'Tier 7', href: '/membership/tier-7' },
             { name: 'Tier 8', href: '/membership/tier-8' },
             { name: 'Tier 9', href: '/membership/tier-9' },
+            { name: 'Tier 10', href: '/membership/tier-10' },
             { name: 'Compare Plans', href: '#' }
         ],
         resources: [
