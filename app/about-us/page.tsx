@@ -105,7 +105,7 @@ const AboutUsPage = () => {
             {/* Main Content */}
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 {/* Hero Section */}
-                <div className="text-center mb-16" data-aos="fade-down">
+                <div className="text-center mb-20" data-aos="fade-down">
                     <div className="inline-block relative">
                         <div className="absolute -inset-1 bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] rounded-lg blur opacity-30" />
                         <h1 className="relative text-5xl font-bold text-white mb-4 py-2">
