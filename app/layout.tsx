@@ -9,6 +9,7 @@ import "aos/dist/aos.css";
 import Particles from "@/components/ui/Particles";
 import ThreeParticleCursor from "@/components/ui/ThreeParticleCursor";
 import { Toaster } from "@/components/ui/toaster"
+import Chatbot from '@/components/ai/chatbot';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,12 +31,12 @@ export default async function RootLayout({
       <body className={inter.className}>
         <ContextProvider cookies={cookies}>
           <Toaster />
-
           <Navbar />
           <main className="pt-14">{children}</main>
           <Footer />
           <Particles />
           <ThreeParticleCursor />
+          <Chatbot /> {/* Added Chatbot component */}
         </ContextProvider>
       </body>
     </html>
