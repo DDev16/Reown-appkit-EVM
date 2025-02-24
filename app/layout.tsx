@@ -9,7 +9,6 @@ import "aos/dist/aos.css";
 import Particles from "@/components/ui/Particles";
 import ThreeParticleCursor from "@/components/ui/ThreeParticleCursor";
 import { Toaster } from "@/components/ui/toaster"
-import Chatbot from '@/components/ai/chatbot';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,7 +35,6 @@ export default async function RootLayout({
           <Footer />
           <Particles />
           <ThreeParticleCursor />
-          <Chatbot /> {/* Added Chatbot component */}
         </ContextProvider>
       </body>
     </html>
