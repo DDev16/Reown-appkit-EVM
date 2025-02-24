@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowUpRight, ArrowDownRight, RefreshCw, AlertCircle, TrendingUp } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import TradingViewChart from "@/components/chart/TradingViewChart";
 
 const fetcher = (url: string): Promise<any> => fetch(url).then((res) => res.json());
 
@@ -197,6 +198,8 @@ export default function FtsPrice() {
                         </div>
                     </Card>
 
+
+
                     {/* Market Data Cards */}
                     {[
                         {
@@ -239,6 +242,11 @@ export default function FtsPrice() {
                 </div>
             </div>
 
+            {/* Add the TradingView chart here */}
+            <div className="mt-10">
+                <TradingViewChart />
+
+            </div>
             {/* Custom Animations */}
             <style jsx>{`
                 @keyframes flow-1 {
