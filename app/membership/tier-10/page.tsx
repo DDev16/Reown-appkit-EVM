@@ -16,7 +16,7 @@ import CONTRACT_ABI from '@/lib/contract-abi.json'
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
 if (!CONTRACT_ADDRESS) throw new Error("Contract address not found in environment variables");
 
-const TIER_9 = 8;
+const TIER_10 = 9;
 const benefits = [
     {
         title: "Basic Access NFT",
@@ -85,7 +85,7 @@ const Tier9Page = () => {
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'getTierSupply',
-        args: [TIER_9],
+        args: [TIER_10],
     });
 
     // Get USD price
@@ -93,7 +93,7 @@ const Tier9Page = () => {
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'getTierUSDPrice',
-        args: [TIER_9],
+        args: [TIER_10],
     });
 
     // Get current FLR price
@@ -101,7 +101,7 @@ const Tier9Page = () => {
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'getTierFlarePrice',
-        args: [TIER_9],
+        args: [TIER_10],
     });
 
     // Contract write for minting
@@ -223,7 +223,7 @@ const Tier9Page = () => {
                 : '0x0000000000000000000000000000000000000000';
 
             console.log('Minting with params:', {
-                tier: TIER_9,
+                tier: TIER_10,
                 amount: 1,
                 referrer,
                 price: price.toString()
@@ -234,7 +234,7 @@ const Tier9Page = () => {
                 abi: CONTRACT_ABI,
                 functionName: 'mint',
                 args: [
-                    BigInt(TIER_9),    // tier
+                    BigInt(TIER_10),    // tier
                     BigInt(1),         // amount
                     referrer          // referrer address
                 ],
