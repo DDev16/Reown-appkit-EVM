@@ -310,3 +310,14 @@ body {
   75% { transform: translateX(2px) translateY(-1px); }
   100% { transform: translateX(0) translateY(0); }
 }
+
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

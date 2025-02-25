@@ -219,9 +219,6 @@ const SalesPageContent = () => {
                             </Link>
                         </div>
 
-                        <div className="mb-6">
-                            <ReferralButton />
-                        </div>
 
                     </div>
                 </SectionWrapper>

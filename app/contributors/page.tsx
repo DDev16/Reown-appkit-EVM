@@ -2,9 +2,9 @@
 import React, { useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { FaGithub, FaLinkedin, FaTwitter, FaDiscord } from 'react-icons/fa';
-import { Contributor, contributors } from '@/data/contributors';
+import { Creator, creators } from '@/data/creators';
 
-const ContributorCard: React.FC<{ contributor: Contributor }> = ({ contributor }) => {
+const CreatorCard: React.FC<{ creator: Creator }> = ({ creator }) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const [transform, setTransform] = useState({
         rotateX: 0,
@@ -96,16 +96,16 @@ const ContributorCard: React.FC<{ contributor: Contributor }> = ({ contributor }
                         }}
                     >
                         <div
-                            className="w-28 h-28 rounded-full overflow-hidden border-4 border-red-500/50 group-hover:border-red-500 transition-all duration-300"
+                            className="w-28 h-28 rounded-full overflow-hidden border-4 border-red-500/50 group-hover:border-red-500 transition-all duration-300 bg-zinc-800 flex items-center justify-center"
                             style={{
                                 transform: 'translateZ(70px)',
                                 transition: 'transform 0.3s ease-out'
                             }}
                         >
                             <img
-                                src={contributor.image}
-                                alt={contributor.name}
-                                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+                                src={creator.image}
+                                alt={creator.name}
+                                className="w-1/2 h-1/2 object-cover object-center grayscale group-hover:grayscale-0 transition-all duration-300"
                                 style={{
                                     transform: 'translateZ(80px)',
                                     transition: 'transform 0.3s ease-out'
@@ -122,10 +122,10 @@ const ContributorCard: React.FC<{ contributor: Contributor }> = ({ contributor }
                             transition: 'transform 0.3s ease-out, color 0.3s ease-out'
                         }}
                     >
-                        {contributor.name}
+                        {creator.name}
                     </h3>
 
-                    {/* Role */}
+                    {/* Content Type */}
                     <p
                         className="text-red-500 font-medium mb-2 text-sm transition-all duration-300 group-hover:-translate-y-3 group-hover:text-red-400 line-clamp-1"
                         style={{
@@ -133,7 +133,7 @@ const ContributorCard: React.FC<{ contributor: Contributor }> = ({ contributor }
                             transition: 'transform 0.3s ease-out, color 0.3s ease-out'
                         }}
                     >
-                        {contributor.role}
+                        {creator.contentType}
                     </p>
 
                     {/* Bio */}
@@ -144,22 +144,22 @@ const ContributorCard: React.FC<{ contributor: Contributor }> = ({ contributor }
                             transition: 'transform 0.3s ease-out, opacity 0.3s ease-out'
                         }}
                     >
-                        {contributor.bio}
+                        {creator.bio}
                     </p>
 
-                    {/* Tier-Based Action/Label */}
-                    {contributor.tier === 1 ? (
+                    {/* Specialization Label */}
+                    {creator.specialization === "DeFi Analytics" ? (
                         <a
-                            href="/contributors-apply"
+                            href="/creators-apply"
                             className="text-green-500 text-sm font-medium mb-3 inline-block transition-all duration-300 group-hover:-translate-y-3"
                             style={{
                                 transform: 'translateZ(115px)',
                                 transition: 'transform 0.3s ease-out, color 0.3s ease-out'
                             }}
                         >
-                            Tier 1 Contributor
+                            DeFi Analytics Expert
                         </a>
-                    ) : contributor.tier === 2 ? (
+                    ) : creator.specialization === "DeFi Education" ? (
                         <p
                             className="text-blue-500 text-sm font-medium mb-3 inline-block transition-all duration-300 group-hover:-translate-y-3"
                             style={{
@@ -167,9 +167,19 @@ const ContributorCard: React.FC<{ contributor: Contributor }> = ({ contributor }
                                 transition: 'transform 0.3s ease-out, color 0.3s ease-out'
                             }}
                         >
-                            Tier 2 Contributor
+                            DeFi Educator
                         </p>
-                    ) : null}
+                    ) : (
+                        <p
+                            className="text-purple-500 text-sm font-medium mb-3 inline-block transition-all duration-300 group-hover:-translate-y-3"
+                            style={{
+                                transform: 'translateZ(115px)',
+                                transition: 'transform 0.3s ease-out, color 0.3s ease-out'
+                            }}
+                        >
+                            {creator.specialization}
+                        </p>
+                    )}
 
                     {/* Social Links */}
                     <div
@@ -179,13 +189,13 @@ const ContributorCard: React.FC<{ contributor: Contributor }> = ({ contributor }
                             transition: 'transform 0.3s ease-out'
                         }}
                     >
-                        {Object.entries(contributor.socials).map(([platform, link]) => {
+                        {Object.entries(creator.socials).map(([platform, link]) => {
                             const IconComponent = socialIcons[platform as keyof typeof socialIcons];
 
                             return link && IconComponent ? (
                                 <a
                                     key={platform}
-                                    href={link}
+                                    href={link.toString()}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-zinc-300 hover:text-red-500 transition-colors group/icon"
@@ -207,26 +217,26 @@ const ContributorCard: React.FC<{ contributor: Contributor }> = ({ contributor }
     );
 };
 
-const Contributors: React.FC = () => {
+const ContentCreators: React.FC = () => {
     return (
         <div className="min-h-screen text-white py-16 px-4 ">
             <div className="container mx-auto">
                 <div className="text-center mb-16">
                     <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">
-                        Join Our Community
+                        DeFi Content Creators
                     </h1>
                     <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
-                        We&apos;re building the future of decentralized technology, and we want you to be part of it.
-                        Whether you&apos;re a seasoned developer or an innovative thinker, there&apos;s a place for you.
+                        Meet our network of talented content creators who specialize in DeFi education, analysis, and insights.
+                        From writers and analysts to video producers and educators, these creators help our community understand the complex world of decentralized finance.
                     </p>
                 </div>
 
-                {/* Contributors Grid */}
+                {/* Content Creators Grid */}
                 <div className="flex flex-wrap justify-center gap-6">
-                    {contributors.map((contributor, index) => (
-                        <ContributorCard
-                            key={`${contributor.name}-${index}`}
-                            contributor={contributor}
+                    {creators.map((creator: Creator, index: number) => (
+                        <CreatorCard
+                            key={`${creator.name}-${index}`}
+                            creator={creator}
                         />
                     ))}
                 </div>
@@ -234,10 +244,10 @@ const Contributors: React.FC = () => {
                 {/* Call to Action */}
                 <div className="text-center mt-16">
                     <a
-                        href="/contributors-apply"
+                        href="/creators-apply"
                         className="inline-flex items-center px-8 py-3 bg-red-500 text-white rounded-full font-bold hover:bg-red-600 transition-colors group"
                     >
-                        Become a Contributor
+                        Become a Content Creator
                         <ArrowUpRight
                             className="ml-2 group-hover:rotate-45 transition-transform"
                         />
@@ -248,4 +258,4 @@ const Contributors: React.FC = () => {
     );
 };
 
-export default Contributors;
+export default ContentCreators;
