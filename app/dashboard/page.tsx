@@ -197,7 +197,7 @@ export default function DashboardPage() {
                     <div className="flex items-center justify-between mt-3">
                         <p className="text-sm text-gray-500">Tiers</p>
                         <Link
-                            href="/dashboard/memberships/"
+                            href="/dashboard/wallet/"
                             className="text-xs text-red-600 hover:text-red-500 transition-colors"
                         >
                             View All
@@ -214,12 +214,12 @@ export default function DashboardPage() {
                                             <div className="flex items-center gap-1">
                                                 {tierInfo && (
                                                     <div className={`w-2 h-2 rounded-full ${TIER_NAMES[Number(tierData.tier) as keyof typeof TIER_NAMES] === 'SILVER'
-                                                            ? 'bg-pink-500'
-                                                            : TIER_NAMES[Number(tierData.tier) as keyof typeof TIER_NAMES] === 'RHENIUM'
-                                                                ? 'bg-yellow-500'
-                                                                : TIER_NAMES[Number(tierData.tier) as keyof typeof TIER_NAMES] === 'IRIDIUM'
-                                                                    ? 'bg-red-600'
-                                                                    : tierInfo.color.replace('from-', 'bg-').split(' ')[0]
+                                                        ? 'bg-pink-500'
+                                                        : TIER_NAMES[Number(tierData.tier) as keyof typeof TIER_NAMES] === 'RHENIUM'
+                                                            ? 'bg-yellow-500'
+                                                            : TIER_NAMES[Number(tierData.tier) as keyof typeof TIER_NAMES] === 'IRIDIUM'
+                                                                ? 'bg-red-600'
+                                                                : tierInfo.color.replace('from-', 'bg-').split(' ')[0]
                                                         }`} />
                                                 )}
                                                 <span className="text-gray-300">
@@ -361,10 +361,9 @@ export default function DashboardPage() {
             {/* Membership Tiers */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold">Membership Tiers</h2>
-                    <button className="text-sm text-red-600 hover:text-red-500 transition-colors">
-                        View All
-                    </button>
+                    <h2 className="text-2xl font-bold text-center w-full">Membership Tiers</h2>
+
+
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -399,12 +398,12 @@ export default function DashboardPage() {
                                     <div className="flex items-center justify-between mb-3">
                                         <div className="flex items-center space-x-3">
                                             <div className={`p-2 rounded-lg bg-gradient-to-br ${tier.name === 'SILVER'
-                                                    ? 'from-pink-500 to-fuchsia-600'
-                                                    : tier.name === 'RHENIUM'
-                                                        ? 'from-yellow-400 to-yellow-600'
-                                                        : tier.name === 'IRIDIUM'
-                                                            ? 'from-red-500 to-red-700'
-                                                            : tier.color
+                                                ? 'from-pink-500 to-fuchsia-600'
+                                                : tier.name === 'RHENIUM'
+                                                    ? 'from-yellow-400 to-yellow-600'
+                                                    : tier.name === 'IRIDIUM'
+                                                        ? 'from-red-500 to-red-700'
+                                                        : tier.color
                                                 } text-white relative w-12 h-12`}>
                                                 <Image
                                                     src={tier.icon}
