@@ -310,6 +310,68 @@
 		"inputs": [
 			{
 				"indexed": true,
+				"internalType": "address",
+				"name": "referrer",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "buyer",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tier",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "referralAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "referralPercentage",
+				"type": "uint256"
+			}
+		],
+		"name": "ReferralPayment",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "referrer",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "totalAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "ReferralRewardsClaimed",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
 				"internalType": "uint256",
 				"name": "tier",
 				"type": "uint256"
@@ -470,7 +532,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "TIER_1",
+		"name": "GOLD",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -483,7 +545,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "TIER_10",
+		"name": "IRIDIUM",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -496,7 +558,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "TIER_2",
+		"name": "OSMIUM",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -509,7 +571,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "TIER_3",
+		"name": "PALLADIUM",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -522,7 +584,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "TIER_4",
+		"name": "PLATINUM",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -535,7 +597,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "TIER_5",
+		"name": "RHENIUM",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -548,7 +610,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "TIER_6",
+		"name": "RHODIUM",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -561,7 +623,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "TIER_7",
+		"name": "RUTHENIUM",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -574,7 +636,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "TIER_8",
+		"name": "SILVER",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -587,7 +649,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "TIER_9",
+		"name": "TOP_TIER",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -754,12 +816,118 @@
 				"type": "address"
 			}
 		],
+		"name": "getHighestTier",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getReferralHistory",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "users",
+				"type": "address[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "amounts",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "timestamps",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "tiers",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getReferralStats",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "totalReferrals",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "totalEarned",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "lastReferralTime",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
 		"name": "getReferrer",
 		"outputs": [
 			{
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tier",
+				"type": "uint256"
+			}
+		],
+		"name": "getTierBalance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -833,6 +1001,25 @@
 				"internalType": "address",
 				"name": "user",
 				"type": "address"
+			}
+		],
+		"name": "getTotalReferralRewards",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
 			},
 			{
 				"internalType": "uint256",
@@ -846,6 +1033,112 @@
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getUserOwnershipInfo",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "tier",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "mintTimestamp",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct MembershipNFT.TierOwnership[]",
+				"name": "ownedTiers",
+				"type": "tuple[]"
+			},
+			{
+				"internalType": "uint256",
+				"name": "highestTier",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "totalNFTs",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getUserTiers",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "tier",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "mintTimestamp",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct MembershipNFT.TierOwnership[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tier",
+				"type": "uint256"
+			}
+		],
+		"name": "hasTier",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -1023,6 +1316,35 @@
 				"internalType": "bytes32",
 				"name": "",
 				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "referralStats",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "totalReferrals",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "totalEarned",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "lastReferralTime",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",

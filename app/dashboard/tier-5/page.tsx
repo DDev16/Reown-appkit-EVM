@@ -10,8 +10,7 @@ import CONTRACT_ABI from '@/lib/contract-abi.json';
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
 if (!CONTRACT_ADDRESS) throw new Error("Contract address not found in environment variables");
 
-// Based on the contract, TOP_TIER = 0 and other tiers follow in sequence
-const TIER_1 = 0; // TOP_TIER in the contract
+const TIER_5 = 4;
 
 export default function Tier1Page() {
     const [isAuthorized, setIsAuthorized] = useState(false);
@@ -25,7 +24,7 @@ export default function Tier1Page() {
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'balanceOf',
-        args: [address!, TIER_1],
+        args: [address!, TIER_5],
         query: {
             enabled: true,
         },
@@ -33,7 +32,7 @@ export default function Tier1Page() {
 
     useEffect(() => {
         if (tierBalance !== undefined) {
-            // User is authorized if they have at least 1 token of TIER_1
+            // User is authorized if they have at least 1 token of TIER_5
             setIsAuthorized(Number(tierBalance) > 0);
             setIsLoading(false);
         }
@@ -57,14 +56,14 @@ export default function Tier1Page() {
                     <Lock className="w-16 h-16 mx-auto text-red-600" />
                     <h2 className="text-2xl font-bold">Access Required</h2>
                     <p className="text-gray-400">
-                        You need to hold the Tier 1 token to access this content
+                        You need to hold the Tier 5 token to access this content
                     </p>
                     <div className="space-y-2">
                         <button className="px-6 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
-                            Purchase Tier 1 Membership
+                            Purchase Tier 5 Membership
                         </button>
                         <p className="text-sm text-gray-500">
-                            Already own a Tier 1 NFT? Make sure it&apos;s in your connected wallet.
+                            Already own a Tier 5 NFT? Make sure it&apos;s in your connected wallet.
                         </p>
                     </div>
                 </div>
@@ -75,7 +74,7 @@ export default function Tier1Page() {
     return (
         <div className="space-y-6">
             <div className="border-b border-red-900/30 pb-6">
-                <h1 className="text-3xl font-bold">Tier 1 - Foundation</h1>
+                <h1 className="text-3xl font-bold">Tier 5 - Foundation</h1>
                 <p className="text-gray-400 mt-2">
                     Master the fundamentals of trading and market analysis with our comprehensive beginner-friendly content.
                 </p>

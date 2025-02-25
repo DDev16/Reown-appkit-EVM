@@ -4,11 +4,23 @@ import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import dictionary from "@/data/dictionary.json";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Share2, Copy, Star, Search, Moon, Sun, Info, Filter } from "lucide-react";
 import debounce from "lodash/debounce";
 
 // Define types for our dictionary
 type Dictionary = typeof dictionary;
 type DictionaryTerm = keyof Dictionary;
+
+// Get random term for "Term of the Day" feature
+const getRandomTerm = (terms: DictionaryTerm[]): DictionaryTerm => {
+    const randomIndex = Math.floor(Math.random() * terms.length);
+    return terms[randomIndex];
+};
 
 interface TermCardProps {
     term: DictionaryTerm;
@@ -31,49 +43,47 @@ const TermCard: React.FC<TermCardProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="bg-white shadow-md rounded-lg p-6 mb-4 hover:shadow-lg transition-all duration-200"
         >
-            <div className="flex justify-between items-start">
-                <h2 className="text-2xl font-semibold text-gray-800">
-                    {highlightText(term.toString(), searchTerm)}
-                </h2>
-                <button
-                    onClick={() => onToggleFavorite(term)}
-                    className="text-gray-400 hover:text-yellow-500 transition-colors"
-                    aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-                >
-                    <svg
-                        className={`w-6 h-6 ${isFavorite ? "text-yellow-500 fill-current" : ""}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+            <Card className="overflow-hidden border-0 bg-white dark:bg-black shadow-md hover:shadow-lg transition-all duration-200">
+                <CardHeader className="pb-2 flex flex-row justify-between items-center border-b border-gray-100 dark:border-gray-800">
+                    <div>
+                        <CardTitle className="text-2xl font-semibold text-gray-900 dark:text-white">
+                            {highlightText(term.toString(), searchTerm)}
+                        </CardTitle>
+                    </div>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onToggleFavorite(term)}
+                        aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                        className="hover:bg-red-50 dark:hover:bg-red-900 dark:hover:bg-opacity-20"
                     >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
-                        />
-                    </svg>
-                </button>
-            </div>
-            <p className="text-gray-700 mt-3 leading-relaxed">
-                {highlightText(definition, searchTerm)}
-            </p>
-            <div className="mt-4 flex gap-2">
-                <button
-                    className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
-                    onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${term}: ${definition.substring(0, 100)}...`)}`, '_blank')}
-                >
-                    Share
-                </button>
-                <button
-                    className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
-                    onClick={() => navigator.clipboard.writeText(`${term}: ${definition}`)}
-                >
-                    Copy
-                </button>
-            </div>
+                        <Star className={`w-5 h-5 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-400 dark:text-gray-500"}`} />
+                    </Button>
+                </CardHeader>
+                <CardContent className="pt-4">
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                        {highlightText(definition, searchTerm)}
+                    </p>
+                </CardContent>
+                <CardFooter className="flex justify-between border-t border-gray-100 dark:border-gray-800 pt-3 pb-3">
+                    <div className="flex gap-1 text-sm text-gray-500 dark:text-gray-400">
+                        <Info className="w-4 h-4" />
+                        <span>Updated: Jan 2025</span>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="flex gap-1 items-center text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
+                            onClick={() => navigator.clipboard.writeText(`${term}: ${definition}`)}
+                        >
+                            <Copy className="w-4 h-4" />
+                            <span className="text-sm">Copy</span>
+                        </Button>
+                    </div>
+                </CardFooter>
+            </Card>
         </motion.div>
     );
 };
@@ -86,7 +96,7 @@ const highlightText = (text: string, query: string): React.ReactNode => {
         <>
             {parts.map((part, i) =>
                 part.toLowerCase() === query.toLowerCase() ? (
-                    <mark key={i} className="bg-yellow-200 rounded px-1">
+                    <mark key={i} className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded px-1 py-0.5">
                         {part}
                     </mark>
                 ) : (
@@ -97,9 +107,34 @@ const highlightText = (text: string, query: string): React.ReactNode => {
     );
 };
 
+const FeaturedTermCard: React.FC<{ term: DictionaryTerm, definition: string }> = ({ term, definition }) => {
+    return (
+        <Card className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-950 dark:to-black border-0 shadow-md mb-6">
+            <CardHeader>
+                <div className="flex justify-between items-center mb-2">
+                    <Badge className="bg-red-600 hover:bg-red-700 text-white">Term of the Day</Badge>
+                </div>
+                <CardTitle className="text-2xl font-bold text-red-800 dark:text-red-400">{term}</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="text-gray-700 dark:text-gray-300">{definition.length > 150 ? `${definition.substring(0, 150)}...` : definition}</p>
+            </CardContent>
+            <CardFooter>
+                <Button
+                    variant="outline"
+                    className="text-red-600 dark:text-red-400 border-red-200 dark:border-red-900 hover:bg-red-50 dark:hover:bg-red-950"
+                >
+                    Learn More
+                </Button>
+            </CardFooter>
+        </Card>
+    );
+};
+
 const DictionaryPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState<string>("");
-    const [filter, setFilter] = useState<"all" | "favorites">("all");
+    const [inputValue, setInputValue] = useState<string>("");
+    const [activeTab, setActiveTab] = useState<string>("all");
     const [favorites, setFavorites] = useState<DictionaryTerm[]>(() => {
         if (typeof window !== 'undefined') {
             const stored = localStorage.getItem("favorites");
@@ -115,6 +150,22 @@ const DictionaryPage: React.FC = () => {
         return [];
     });
     const [showAlert, setShowAlert] = useState<boolean>(false);
+    const [alertMessage, setAlertMessage] = useState<string>("");
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem("darkMode") === "true";
+        }
+        return false;
+    });
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        // Simulate loading time
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 600);
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         localStorage.setItem("favorites", JSON.stringify(favorites));
@@ -124,15 +175,26 @@ const DictionaryPage: React.FC = () => {
         localStorage.setItem("recentSearches", JSON.stringify(recentSearches));
     }, [recentSearches]);
 
+    useEffect(() => {
+        localStorage.setItem("darkMode", isDarkMode.toString());
+        if (isDarkMode) {
+            document.documentElement.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+        }
+    }, [isDarkMode]);
+
     const sortedTerms = useMemo(() =>
         Object.keys(dictionary).sort((a, b) => a.localeCompare(b)) as DictionaryTerm[],
         []
     );
 
+    const featuredTerm = useMemo(() => getRandomTerm(sortedTerms), [sortedTerms]);
+
     const filteredTerms = useMemo(() => {
         let terms = sortedTerms;
 
-        if (filter === "favorites") {
+        if (activeTab === "favorites") {
             terms = terms.filter(term => favorites.includes(term));
         }
 
@@ -144,34 +206,47 @@ const DictionaryPage: React.FC = () => {
         }
 
         return terms;
-    }, [sortedTerms, searchTerm, filter, favorites]);
+    }, [sortedTerms, searchTerm, activeTab, favorites]);
 
-    const debouncedSearch = debounce((value: string) => {
+    const debouncedSearch = useMemo(() => debounce((value: string) => {
         setSearchTerm(value);
         if (value && !recentSearches.includes(value)) {
             setRecentSearches(prev => [value, ...prev].slice(0, 5));
         }
-    }, 300);
+    }, 500), [recentSearches]);
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        setSearchTerm(value);
+        setInputValue(value);
         debouncedSearch(value);
     };
 
     const toggleFavorite = (term: DictionaryTerm) => {
         setFavorites(prev => {
-            const newFavorites = prev.includes(term)
+            const isFavorite = prev.includes(term);
+            const newFavorites = isFavorite
                 ? prev.filter(t => t !== term)
                 : [...prev, term];
+
+            setAlertMessage(isFavorite ? "Removed from favorites" : "Added to favorites");
             setShowAlert(true);
             setTimeout(() => setShowAlert(false), 2000);
+
             return newFavorites;
         });
     };
 
+    const toggleDarkMode = () => {
+        setIsDarkMode(prev => !prev);
+    };
+
+    const handleClearSearch = () => {
+        setInputValue("");
+        setSearchTerm("");
+    };
+
     return (
-        <main className="min-h-screen bg-gray-50 py-10 px-4">
+        <div className={`min-h-screen transition-colors duration-200 ${isDarkMode ? "dark bg-black text-white" : "bg-gray-50 text-gray-900"}`}>
             <AnimatePresence>
                 {showAlert && (
                     <motion.div
@@ -180,117 +255,169 @@ const DictionaryPage: React.FC = () => {
                         exit={{ opacity: 0 }}
                         className="fixed top-4 right-4 z-50"
                     >
-                        <Alert>
-                            <AlertDescription>
-                                {favorites.includes(searchTerm as DictionaryTerm)
-                                    ? "Added to favorites!"
-                                    : "Removed from favorites"}
+                        <Alert className="bg-red-50 border-red-200 dark:bg-red-900 dark:border-red-800">
+                            <AlertDescription className="text-red-800 dark:text-red-200">
+                                {alertMessage}
                             </AlertDescription>
                         </Alert>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            <div className="max-w-4xl mx-auto">
-                <header className="mb-8">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-2">
-                        Crypto Dictionary
-                    </h1>
-                    <p className="text-gray-600">
-                        Browse and search through our comprehensive dictionary of crypto terms.
-                    </p>
-                </header>
-
-                <div className="mb-8 space-y-4">
-                    <div className="relative">
-                        <input
-                            type="text"
-                            placeholder="Search terms or definitions..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-                            aria-label="Search terms"
-                        />
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg
-                                className="w-5 h-5 text-gray-500"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 1116.65 2a7.5 7.5 0 010 14.65z"
-                                />
-                            </svg>
-                        </div>
-                    </div>
-
-                    {recentSearches.length > 0 && (
-                        <div className="flex gap-2 text-sm">
-                            <span className="text-gray-500">Recent:</span>
-                            {recentSearches.map(term => (
-                                <button
-                                    key={term}
-                                    onClick={() => setSearchTerm(term)}
-                                    className="text-blue-600 hover:text-blue-800"
+            <main className="max-w-7xl mx-auto px-4 pt-8 pb-16 sm:px-6 lg:px-8">
+                <div className="max-w-5xl mx-auto">
+                    <section className="mb-10">
+                        <div className="mb-8 flex justify-between items-center">
+                            <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white flex items-center">
+                                <span className="text-red-600 dark:text-red-500">Crypto</span>
+                                <span>Dictionary</span>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={toggleDarkMode}
+                                    className="ml-4"
+                                    aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
                                 >
-                                    {term}
-                                </button>
-                            ))}
+                                    {isDarkMode ? (
+                                        <Sun className="h-5 w-5 text-red-400" />
+                                    ) : (
+                                        <Moon className="h-5 w-5 text-red-600" />
+                                    )}
+                                </Button>
+                            </h1>
                         </div>
-                    )}
 
-                    <div className="flex gap-4">
-                        <button
-                            onClick={() => setFilter("all")}
-                            className={`px-4 py-2 rounded-lg transition-colors ${filter === "all"
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-white text-gray-700 hover:bg-gray-100"
-                                }`}
-                        >
-                            All Terms
-                        </button>
-                        <button
-                            onClick={() => setFilter("favorites")}
-                            className={`px-4 py-2 rounded-lg transition-colors ${filter === "favorites"
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-white text-gray-700 hover:bg-gray-100"
-                                }`}
-                        >
-                            Favorites ({favorites.length})
-                        </button>
-                    </div>
-                </div>
-
-                <section>
-                    {filteredTerms.length > 0 ? (
-                        <div className="space-y-4">
-                            {filteredTerms.map((term) => (
-                                <TermCard
-                                    key={term}
-                                    term={term}
-                                    definition={dictionary[term]}
-                                    searchTerm={searchTerm}
-                                    isFavorite={favorites.includes(term)}
-                                    onToggleFavorite={toggleFavorite}
+                        <div className="relative">
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                                </div>
+                                <Input
+                                    type="text"
+                                    placeholder="Search terms or definitions..."
+                                    className="pl-10 py-6 text-lg shadow-sm border-gray-200 dark:border-gray-800 dark:bg-gray-900 dark:text-white w-full"
+                                    onChange={handleSearchChange}
+                                    value={inputValue}
+                                    aria-label="Search terms"
                                 />
-                            ))}
+                                {inputValue && (
+                                    <button
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                        onClick={handleClearSearch}
+                                        aria-label="Clear search"
+                                    >
+                                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
+
+                            {recentSearches.length > 0 && (
+                                <div className="mt-2 flex items-center text-sm">
+                                    <span className="text-gray-500 dark:text-gray-400 mr-2">Recent:</span>
+                                    <div className="flex flex-wrap gap-2">
+                                        {recentSearches.map(term => (
+                                            <Badge
+                                                key={term}
+                                                variant="outline"
+                                                className="cursor-pointer hover:bg-red-50 dark:hover:bg-red-900 dark:hover:bg-opacity-20 border-gray-200 dark:border-gray-800"
+                                                onClick={() => setSearchTerm(term)}
+                                            >
+                                                {term}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </section>
+
+                    {isLoading ? (
+                        <div className="flex justify-center py-20">
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
                         </div>
                     ) : (
-                        <div className="text-center py-12">
-                            <p className="text-gray-500 text-lg">
-                                {filter === "favorites" && favorites.length === 0
-                                    ? "No favorite terms yet. Click the star icon to add terms to your favorites."
-                                    : "No matching terms found."}
-                            </p>
-                        </div>
+                        <>
+                            {!searchTerm && activeTab !== "favorites" && (
+                                <FeaturedTermCard term={featuredTerm} definition={dictionary[featuredTerm]} />
+                            )}
+
+                            <div className="mb-8">
+                                <Tabs
+                                    defaultValue="all"
+                                    onValueChange={setActiveTab}
+                                    className="border-b border-gray-200 dark:border-gray-800 mb-6"
+                                >
+                                    <TabsList className="bg-transparent border-b-0">
+                                        <TabsTrigger
+                                            value="all"
+                                            className="data-[state=active]:text-red-600 data-[state=active]:border-red-600 dark:data-[state=active]:text-red-500 dark:data-[state=active]:border-red-500 rounded-none border-b-2 border-transparent data-[state=active]:shadow-none px-6 py-2 bg-transparent"
+                                        >
+                                            All Terms
+                                        </TabsTrigger>
+                                        <TabsTrigger
+                                            value="favorites"
+                                            className="data-[state=active]:text-red-600 data-[state=active]:border-red-600 dark:data-[state=active]:text-red-500 dark:data-[state=active]:border-red-500 rounded-none border-b-2 border-transparent data-[state=active]:shadow-none px-6 py-2 bg-transparent"
+                                        >
+                                            Favorites ({favorites.length})
+                                        </TabsTrigger>
+                                    </TabsList>
+
+                                    <TabsContent value="all">
+                                        {filteredTerms.length > 0 ? (
+                                            <div className="grid grid-cols-1 gap-6">
+                                                {filteredTerms.slice(0, 20).map((term) => (
+                                                    <TermCard
+                                                        key={term}
+                                                        term={term}
+                                                        definition={dictionary[term]}
+                                                        searchTerm={searchTerm}
+                                                        isFavorite={favorites.includes(term)}
+                                                        onToggleFavorite={toggleFavorite}
+                                                    />
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                                                <p className="text-gray-500 dark:text-gray-400 text-lg">
+                                                    No matching terms found. Try adjusting your search criteria.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </TabsContent>
+
+                                    <TabsContent value="favorites">
+                                        {filteredTerms.length > 0 ? (
+                                            <div className="grid grid-cols-1 gap-6">
+                                                {filteredTerms.map((term) => (
+                                                    <TermCard
+                                                        key={term}
+                                                        term={term}
+                                                        definition={dictionary[term]}
+                                                        searchTerm={searchTerm}
+                                                        isFavorite={favorites.includes(term)}
+                                                        onToggleFavorite={toggleFavorite}
+                                                    />
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                                                <p className="text-gray-500 dark:text-gray-400 text-lg">
+                                                    {favorites.length === 0
+                                                        ? "No favorite terms yet. Click the star icon to add terms to your favorites."
+                                                        : "No matching favorite terms found."}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </TabsContent>
+                                </Tabs>
+                            </div>
+                        </>
                     )}
-                </section>
-            </div>
-        </main>
+                </div>
+            </main>
+        </div>
     );
 };
 

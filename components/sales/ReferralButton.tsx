@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useState, useEffect } from 'react';
 import { ArrowUpRight, Users, Gift } from 'lucide-react';
@@ -49,31 +48,31 @@ export const ReferralButton = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 text-center">
             {/* Referral Info Card */}
             <div className="relative group">
                 <div className="absolute -inset-[1px] bg-gradient-to-r from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E] rounded-xl opacity-70 group-hover:opacity-100 blur-[2px] transition-all duration-500"></div>
                 <div className="relative rounded-xl p-6 backdrop-blur-sm border border-[#BC1A1E]/20 bg-black/90">
-                    <div className="flex items-start gap-4">
+                    <div className="flex flex-col items-center gap-4">
                         <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] p-2.5 shrink-0">
                             <Gift className="w-full h-full text-white" />
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-2 text-center w-full">
                             <h3 className="text-xl font-bold text-white">How Referrals Work</h3>
                             <div className="space-y-3 text-gray-400">
-                                <p className="flex items-center gap-2">
+                                <p className="flex items-center justify-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-[#BC1A1E] shrink-0 inline-block" />
                                     Share your unique referral link with friends
                                 </p>
-                                <p className="flex items-center gap-2">
+                                <p className="flex items-center justify-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-[#BC1A1E] shrink-0 inline-block" />
                                     When they mint using your link, you receive rewards in the form of $FLR
                                 </p>
-                                <p className="flex items-center gap-2">
+                                <p className="flex items-center justify-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-[#BC1A1E] shrink-0 inline-block" />
                                     Earn a percentage of their minting fee instantly
                                 </p>
-                                <p className="flex items-center gap-2">
+                                <p className="flex items-center justify-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-[#BC1A1E] shrink-0 inline-block" />
                                     Smart contract ensures automatic and secure rewards
                                 </p>
@@ -88,10 +87,10 @@ export const ReferralButton = () => {
                 onClick={handleCreateReferral}
                 disabled={isGenerating || !clientSideConnected}
                 className={`
-                    inline-flex items-center gap-2 px-6 py-3 
-                    bg-black/50 border border-[#BC1A1E] rounded-lg text-white 
+                    inline-flex items-center justify-center gap-2 px-6 py-3 
+                    bg-black/50 border border-[#BC1A1E] rounded-lg text-white text-center
                     hover:bg-[#BC1A1E]/10 transition-all duration-300 group
-                    disabled:opacity-50 disabled:cursor-not-allowed w-full justify-center
+                    disabled:opacity-50 disabled:cursor-not-allowed w-full
                 `}
             >
                 <Users className="w-5 h-5 text-[#BC1A1E]" />

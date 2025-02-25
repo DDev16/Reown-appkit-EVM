@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
 
-const CONTRACT_ADDRESS = '0xAf671476f32Fe0028F989c1225bf94ee8Bb4D4c0' as const;
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+if (!CONTRACT_ADDRESS) throw new Error("Contract address not found in environment variables");
 const IPFS_GATEWAY = 'https://ipfs.io/ipfs';
 const METADATA_CID = 'bafybeieud2medy2rjezh6ursckqfbmpxhzntd3uyqwszwhivfti3vnzn2y';
 
 // Import the ABI
 import ABI from '@/lib/contract-abi.json';
 
-const TOTAL_TIERS = 9;
+const TOTAL_TIERS = 10;
 
 interface NFTMetadata {
     name: string;

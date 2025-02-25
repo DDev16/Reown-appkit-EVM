@@ -40,7 +40,7 @@ const Navbar = () => {
 
     // Create balance check contracts for all 9 tiers - starting from index 0
     const balanceChecks = address
-        ? Array.from({ length: 9 }, (_, i) => ({
+        ? Array.from({ length: 10 }, (_, i) => ({
             address: CONTRACT_ADDRESS,
             abi: ERC1155_ABI,
             functionName: 'balanceOf',
@@ -102,6 +102,7 @@ const Navbar = () => {
                 { name: "Contact", path: "/contact" },
                 { name: "Contributor Application", path: "/contributors-apply" },
                 { name: "Flare/USD Price", path: "/flare-usd-price" },
+                { name: "Contracts", path: "/contracts" },
             ],
         },
         {

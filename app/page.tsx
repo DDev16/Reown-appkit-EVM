@@ -9,8 +9,7 @@ import FAQ from "@/components/sections/FAQ";
 import TechStack from "@/components/sections/techStack";
 // import Partners from "@/components/sections/partners";
 import Flare from "@/components/sections/flare";
-// import Team from "@/components/sections/team";
-// import Affiliate from "@/components/sections/affiliate";
+
 import SweepstakesComingSoon from "@/components/sections/sweepstakes";
 import RoadmapComingSoon from "@/components/sections/coming-soon-roadmap";
 import Roadmap from "@/components/sections/roadmap";
@@ -24,7 +23,6 @@ export default function Home() {
       <AboutSection />
       <FeaturesSection />
       <MembershipTiers />
-      {/* <Affiliate /> */}
       <SweepstakesComingSoon />
       <TechStack />
       <Flare />

@@ -3,8 +3,20 @@
 import { Wallet, Link as LinkIcon } from 'lucide-react';
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { useAccount } from 'wagmi';
+import { useRouter } from 'next/navigation';
 
 export default function NotConnectedPage() {
+    const { isConnected } = useAccount();
+    const router = useRouter();
+
+    // Redirect to dashboard when wallet gets connected
+    useEffect(() => {
+        if (isConnected) {
+            router.push('/dashboard');
+        }
+    }, [isConnected, router]);
+
     return (
         <div className="min-h-screen text-white flex items-center justify-center p-4">
             <div className="max-w-md w-full text-center">

@@ -56,25 +56,21 @@ const AboutUsPage = () => {
         {
             icon: <Target className="w-12 h-12 text-[#FF4B51]" />,
             title: "Platform Launch",
-            year: 2022,
             description: "Initiated our mission to democratize DeFi education with a groundbreaking learning platform."
         },
         {
             icon: <Globe className="w-12 h-12 text-[#FF4B51]" />,
             title: "Global Expansion",
-            year: 2023,
             description: "Expanded our reach, connecting DeFi learners across 50+ countries with localized content."
         },
         {
             icon: <Award className="w-12 h-12 text-[#FF4B51]" />,
             title: "Industry Recognition",
-            year: 2024,
-            description: "Received top blockchain education innovation award for our unique token-gated learning approach."
+            description: "Aiming to recieve top blockchain education innovation award for our unique token-gated learning approach."
         },
         {
             icon: <Rocket className="w-12 h-12 text-[#FF4B51]" />,
             title: "Future Roadmap",
-            year: 2025,
             description: "Committed to integrating AI-driven personalized learning and expanding our Web3 educational ecosystem."
         }
     ];
@@ -180,7 +176,6 @@ const AboutUsPage = () => {
                                     {milestone.icon}
                                 </div>
                                 <h3 className="text-xl font-bold text-[#FF4B51] mb-2">{milestone.title}</h3>
-                                <p className="text-white font-semibold mb-2">{milestone.year}</p>
                                 <p className="text-gray-400">{milestone.description}</p>
                             </div>
                         ))}

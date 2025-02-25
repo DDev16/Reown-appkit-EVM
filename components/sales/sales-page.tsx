@@ -51,6 +51,18 @@ const SectionWrapper = ({ children, className = '', dataAos = '' }: { children: 
     </div>
 );
 
+const VideoSection = ({ title, description, delay = 0 }: { title: string; description: string; delay?: number }) => (
+    <SectionWrapper dataAos="fade-up" data-aos-delay={delay} className="h-full">
+        <div className="aspect-video relative">
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
+                <Play className="w-16 h-16 text-[#FF4B51] opacity-70 mb-4 hover:opacity-100 cursor-pointer transition-all duration-300 hover:scale-110" />
+                <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+                <p className="text-gray-400 text-center max-w-md">{description}</p>
+            </div>
+        </div>
+    </SectionWrapper>
+);
+
 const SalesPageContent = () => {
     const searchParams = useSearchParams();
     const { toast } = useToast();
@@ -80,17 +92,32 @@ const SalesPageContent = () => {
         {
             icon: <BookOpen className="w-full h-full" />,
             title: "Expert Education",
-            description: "Comprehensive DeFi knowledge from industry experts"
+            description: "Comprehensive DeFi Bull PLatform Overview"
         },
         {
             icon: <Users className="w-full h-full" />,
             title: "Active Community",
-            description: "Join a thriving network of DeFi enthusiasts"
+            description: "Join a thriving network of DeFi enthusiasts and experts"
         },
         {
             icon: <Play className="w-full h-full" />,
             title: "Premium Content",
-            description: "Access exclusive educational materials"
+            description: "Access exclusive educational materials and resources"
+        }
+    ];
+
+    const videoContent = [
+        {
+            title: "DeFi Fundamentals Masterclass",
+            description: "Learn the core concepts of decentralized finance and start your journey with confidence"
+        },
+        {
+            title: "Advanced Trading Strategies",
+            description: "Discover how to analyze the market and implement effective DeFi trading strategies"
+        },
+        {
+            title: "Real-World Success Stories",
+            description: "Hear from our members who have achieved financial freedom through our education"
         }
     ];
 
@@ -137,25 +164,32 @@ const SalesPageContent = () => {
                     ))}
                 </div>
 
-                {/* Video Sections */}
-                <div className="space-y-20">
-                    {/* Primary Video */}
-                    <SectionWrapper dataAos="fade-up">
-                        <div className="aspect-video relative">
-                            <div className="absolute inset-0 flex items-center justify-center p-6">
-                                <span className="text-gray-500">Primary Video Content</span>
-                            </div>
-                        </div>
-                    </SectionWrapper>
+                {/* Video Sections - Enhanced Layout */}
+                <div className="space-y-8">
+                    <h2 className="text-3xl font-bold text-white text-center mb-8" data-aos="fade-up">
+                        Featured Content
+                        <div className="w-24 h-1 bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] mx-auto mt-4"></div>
+                    </h2>
 
-                    {/* Secondary Video */}
-                    <SectionWrapper dataAos="fade-up">
-                        <div className="aspect-video relative">
-                            <div className="absolute inset-0 flex items-center justify-center p-6">
-                                <span className="text-gray-500">Secondary Video Content</span>
-                            </div>
-                        </div>
-                    </SectionWrapper>
+                    {/* Featured Main Video */}
+                    <VideoSection
+                        title={videoContent[0].title}
+                        description={videoContent[0].description}
+                    />
+
+                    {/* Secondary Videos - Grid Layout */}
+                    <div className="grid md:grid-cols-2 gap-8 mt-8">
+                        <VideoSection
+                            title={videoContent[1].title}
+                            description={videoContent[1].description}
+                            delay={200}
+                        />
+                        <VideoSection
+                            title={videoContent[2].title}
+                            description={videoContent[2].description}
+                            delay={400}
+                        />
+                    </div>
                 </div>
 
                 {/* Call to Action Section */}
