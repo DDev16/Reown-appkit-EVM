@@ -118,7 +118,7 @@ const ContactPage = () => {
                         Get in Touch
                     </h1>
                     <p className="text-xl sm:text-2xl text-gray-300 max-w-3xl mx-auto font-light leading-relaxed">
-                        We're committed to providing exceptional support and addressing your inquiries with precision and care.
+                        We&quot;re committed to providing exceptional support and addressing your inquiries with precision and care.
                     </p>
                 </div>
 
