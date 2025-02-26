@@ -23,7 +23,7 @@ const featureDetails = {
         sections: [
             {
                 heading: "Personalized Learning Ecosystem",
-                content: "Our token-gated education platform represents a revolutionary approach to DeFi learning. By leveraging blockchain technology, we've created a dynamic educational environment that adapts to your expertise level and learning goals."
+                content: "Our token-gated education platform represents a revolutionary approach to DeFi learning. By leveraging blockchain technology, we have created a dynamic educational environment that adapts to your expertise level and learning goals."
             },
             {
                 heading: "Tiered Access Model",
@@ -35,7 +35,7 @@ const featureDetails = {
             },
             {
                 heading: "Continuous Content Evolution",
-                content: "The DeFi landscape moves at lightning speed. Our platform ensures you're always ahead of the curve with constantly updated content, cutting-edge research, and insights from industry leaders. Your learning never becomes obsolete."
+                content: "The DeFi landscape moves at lightning speed. Our platform ensures you are always ahead of the curve with constantly updated content, cutting-edge research, and insights from industry leaders. Your learning never becomes obsolete."
             }
         ],
         technicalDetails: {
@@ -49,11 +49,11 @@ const featureDetails = {
         sections: [
             {
                 heading: "UUPS Proxy Standard",
-                content: "At the heart of our platform's security is the Universal Upgradeable Proxy Standard (UUPS). This advanced contract architecture allows us to implement critical security updates without disrupting user experience or compromising existing data integrity."
+                content: "At the heart of our platform security is the Universal Upgradeable Proxy Standard (UUPS). This advanced contract architecture allows us to implement critical security updates without disrupting user experience or compromising existing data integrity."
             },
             {
                 heading: "Multi-Layer Security Protocol",
-                content: "We've implemented a comprehensive security approach that goes beyond traditional blockchain platforms. Our multi-signature wallet controls, advanced encryption methods, and continuous security audits create an impenetrable fortress for your digital assets and personal information."
+                content: "We have implemented a comprehensive security approach that goes beyond traditional blockchain platforms. Our multi-signature wallet controls, advanced encryption methods, and continuous security audits create an impenetrable fortress for your digital assets and personal information."
             },
             {
                 heading: "Continuous Vulnerability Assessment",
@@ -61,7 +61,7 @@ const featureDetails = {
             },
             {
                 heading: "Transparent Security Reporting",
-                content: "We believe in complete transparency. All security updates, audits, and potential vulnerability reports are immediately communicated to our community, ensuring that our users are always informed and can make confident decisions."
+                content: "We believe in transparency. All security updates, audits, and potential vulnerability reports are immediately communicated to our community, ensuring that our users are always informed and can make confident decisions."
             }
         ],
         technicalDetails: {
@@ -75,7 +75,7 @@ const featureDetails = {
         sections: [
             {
                 heading: "Dynamic Reward Mechanism",
-                content: "Our advanced airdrop system goes beyond traditional token distributions. We've created a sophisticated, merit-based reward ecosystem that recognizes and incentivizes meaningful platform engagement."
+                content: "Our advanced airdrop system goes beyond traditional token distributions. We have created a sophisticated, merit-based reward ecosystem that recognizes and incentivizes meaningful platform engagement."
             },
             {
                 heading: "Refferal Rewards",
@@ -92,7 +92,7 @@ const featureDetails = {
         ],
         technicalDetails: {
             heading: "Reward Infrastructure",
-            content: "Leveraging blockchain's transparency, our reward system uses complex smart contracts that automatically calculate and distribute rewards based on predefined, immutable rules. This ensures a fair and tamper-proof incentive mechanism."
+            content: "Leveraging blockchain transparency, our reward system uses complex smart contracts that automatically calculate and distribute rewards based on predefined, immutable rules. This ensures a fair and tamper-proof incentive mechanism."
         }
     },
     "web3-merchandise": {
@@ -101,7 +101,7 @@ const featureDetails = {
         sections: [
             {
                 heading: "Crypto-Enabled Shopping Experience",
-                content: "Our merchandise store is more than just a shop—it's a bridge between digital collectibles and real-world products. Shop using multiple cryptocurrencies, with a seamless, secure payment process powered by blockchain technology."
+                content: "Our merchandise store is more than just a shop—it is a bridge between digital collectibles and real-world products. Shop using multiple cryptocurrencies, with a seamless, secure payment process powered by blockchain technology."
             },
             {
                 heading: "Exclusive Design Collections",
@@ -131,7 +131,7 @@ const featureDetails = {
             },
             {
                 heading: "Expert-Led Discussion Forums",
-                content: "Engage in deep-dive discussions moderated by industry leaders. Our forums are not just chat rooms—they're structured learning environments where complex DeFi concepts are explored and debated."
+                content: "Engage in deep-dive discussions moderated by industry leaders. Our forums are not just chat rooms—they are structured learning environments where complex DeFi concepts are explored and debated."
             },
             {
                 heading: "Collaborative Learning Channels",
@@ -153,7 +153,7 @@ const featureDetails = {
         sections: [
             {
                 heading: "Real-Time DeFi Intelligence",
-                content: "Our integrated blog is more than a news platform—it's a comprehensive DeFi intelligence hub. Receive instant insights, market analyses, and breaking news that keep you ahead of the rapidly evolving blockchain ecosystem."
+                content: "Our integrated blog is more than a news platform—it is a comprehensive DeFi intelligence hub. Receive instant insights, market analyses, and breaking news that keep you ahead of the rapidly evolving blockchain ecosystem."
             },
             {
                 heading: "Expert Analysis and Insights",
@@ -161,7 +161,7 @@ const featureDetails = {
             },
             {
                 heading: "Predictive Market Research",
-                content: "Our research team doesn't just report news—we provide forward-looking analysis that helps you anticipate market trends, technological breakthroughs, and potential investment opportunities."
+                content: "Our research team does not just report news—we provide forward-looking analysis that helps you anticipate market trends, technological breakthroughs, and potential investment opportunities."
             },
             {
                 heading: "Personalized Content Curation",
@@ -237,8 +237,8 @@ const FeatureDetailPage = () => {
                                     key={featureKey}
                                     onClick={() => handleFeatureChange(featureKey)}
                                     className={`flex items-center space-x-2 py-4 border-b-2 transition-all duration-300 ${currentFeature === featureKey
-                                            ? 'border-[#FF4B51] text-white'
-                                            : 'border-transparent text-gray-400 hover:text-white'
+                                        ? 'border-[#FF4B51] text-white'
+                                        : 'border-transparent text-gray-400 hover:text-white'
                                         }`}
                                 >
                                     {featureDetails[featureKey].icon}
@@ -260,8 +260,8 @@ const FeatureDetailPage = () => {
                                 key={featureKey}
                                 onClick={() => handleFeatureChange(featureKey)}
                                 className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 ${currentFeature === featureKey
-                                        ? 'bg-[#BC1A1E]/10 text-white'
-                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                    ? 'bg-[#BC1A1E]/10 text-white'
+                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
                                     }`}
                             >
                                 {featureDetails[featureKey].icon}
@@ -298,8 +298,8 @@ const FeatureDetailPage = () => {
                                         <Circle
                                             key={index}
                                             className={`w-1.5 h-1.5 sm:w-2 sm:h-2 ${index === currentIndex
-                                                    ? 'fill-[#FF4B51] text-[#FF4B51]'
-                                                    : 'fill-gray-600 text-gray-600'
+                                                ? 'fill-[#FF4B51] text-[#FF4B51]'
+                                                : 'fill-gray-600 text-gray-600'
                                                 }`}
                                         />
                                     ))}
