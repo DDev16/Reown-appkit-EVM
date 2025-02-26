@@ -19,6 +19,7 @@ interface ContractAddress {
     network: string;
     explorerUrl?: string;
     contractType: "ERC20" | "Airdrop" | "Membership";
+    logoUrl?: string;
 }
 
 const CONTRACT_ADDRESSES: ContractAddress[] = [
@@ -28,7 +29,8 @@ const CONTRACT_ADDRESSES: ContractAddress[] = [
         description: "Defi Bull World Token",
         network: "Flare Mainnet",
         explorerUrl: "https://coston-explorer.flare.network/token/0x123456789...", // Replace with actual address
-        contractType: "ERC20"
+        contractType: "ERC20",
+        logoUrl: "/assets/tokens/dbw-logo.png"  // Add path to your token logo
     },
     {
         name: "DBWF Token Contract",
@@ -36,7 +38,8 @@ const CONTRACT_ADDRESSES: ContractAddress[] = [
         description: "Defi Bull World FTSO Token",
         network: "Flare Mainnet",
         explorerUrl: "https://coston-explorer.flare.network/token/0x987654321...", // Replace with actual address
-        contractType: "ERC20"
+        contractType: "ERC20",
+        logoUrl: "/assets/tokens/dbwf-logo.png"  // Add path to your token logo
     },
     {
         name: "DBWL Token Contract",
@@ -44,7 +47,8 @@ const CONTRACT_ADDRESSES: ContractAddress[] = [
         description: "Defi Bull World Liquidator Token",
         network: "Flare Mainnet",
         explorerUrl: "https://coston-explorer.flare.network/token/0xabcdef123...", // Replace with actual address
-        contractType: "ERC20"
+        contractType: "ERC20",
+        logoUrl: "/assets/tokens/dbwl-logo.png"  // Add path to your token logo
     },
     {
         name: "NFTC Token Contract",
@@ -52,7 +56,8 @@ const CONTRACT_ADDRESSES: ContractAddress[] = [
         description: "Defi Bull World NFT Collection Token",
         network: "Flare Mainnet",
         explorerUrl: "https://coston-explorer.flare.network/token/0x456789abc...", // Replace with actual address
-        contractType: "ERC20"
+        contractType: "ERC20",
+        logoUrl: "/assets/tokens/nftc-logo.png"  // Add path to your token logo
     },
     {
         name: "Membership NFT Contract",
@@ -181,9 +186,20 @@ export default function ContractAddressesPage() {
 
                             <div className="relative z-10">
                                 <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h2 className="text-lg sm:text-xl font-semibold text-white">{contract.name}</h2>
-                                        <p className="text-xs sm:text-sm text-gray-400 mt-1">{contract.network}</p>
+                                    <div className="flex items-center">
+                                        {contract.logoUrl && (
+                                            <div className="mr-3 h-8 w-8 sm:h-10 sm:w-10 rounded-full overflow-hidden bg-black/30 flex-shrink-0 border border-[#BC1A1E]/30">
+                                                <img
+                                                    src={contract.logoUrl}
+                                                    alt={`${contract.name} logo`}
+                                                    className="h-full w-full object-contain"
+                                                />
+                                            </div>
+                                        )}
+                                        <div>
+                                            <h2 className="text-lg sm:text-xl font-semibold text-white">{contract.name}</h2>
+                                            <p className="text-xs sm:text-sm text-gray-400 mt-1">{contract.network}</p>
+                                        </div>
                                     </div>
                                     <Button
                                         variant="outline"
@@ -250,15 +266,26 @@ export default function ContractAddressesPage() {
                 {selectedContract !== null && (
                     <div className="fixed inset-0 bg-black/90 z-50 flex flex-col overflow-auto" data-aos="fade">
                         <div className="sticky top-0 bg-gradient-to-b from-black to-transparent z-10 px-4 py-4 sm:px-6 sm:py-6">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl sm:text-2xl font-bold text-white">
-                                    {CONTRACT_ADDRESSES[selectedContract].name}
-                                </h2>
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center max-w-[80%]">
+                                    {CONTRACT_ADDRESSES[selectedContract].logoUrl && (
+                                        <div className="mr-3 h-8 w-8 sm:h-10 sm:w-10 rounded-full overflow-hidden bg-black/30 flex-shrink-0 border border-[#BC1A1E]/30">
+                                            <img
+                                                src={CONTRACT_ADDRESSES[selectedContract].logoUrl}
+                                                alt={`${CONTRACT_ADDRESSES[selectedContract].name} logo`}
+                                                className="h-full w-full object-contain"
+                                            />
+                                        </div>
+                                    )}
+                                    <h2 className="text-lg sm:text-2xl font-bold text-white truncate">
+                                        {CONTRACT_ADDRESSES[selectedContract].name}
+                                    </h2>
+                                </div>
                                 <Button
                                     variant="outline"
                                     size="icon"
                                     onClick={closeContractCode}
-                                    className="bg-black/50 z-50 mt-20 text-white border-[#BC1A1E]/50 hover:bg-[#BC1A1E]/20 h-8 w-8 p-0"
+                                    className="bg-black/50 mt-28 text-white border-[#BC1A1E]/50 hover:bg-[#BC1A1E]/20 h-8 w-8 p-0 flex-shrink-0"
                                 >
                                     <X className="h-4 w-4" />
                                 </Button>
@@ -271,11 +298,11 @@ export default function ContractAddressesPage() {
                                     onClick={() => navigateContract('prev')}
                                     className="bg-black/50 text-white border-[#BC1A1E]/50 hover:bg-[#BC1A1E]/20"
                                 >
-                                    <ChevronLeft className="h-4 w-4 mr-2" />
-                                    <span>Previous</span>
+                                    <ChevronLeft className="h-4 w-4 mr-1 sm:mr-2" />
+                                    <span className="hidden sm:inline">Previous</span>
                                 </Button>
 
-                                <span className="text-sm text-gray-400">
+                                <span className="text-xs sm:text-sm text-gray-400">
                                     {selectedContract + 1} of {CONTRACT_ADDRESSES.length}
                                 </span>
 
@@ -285,22 +312,27 @@ export default function ContractAddressesPage() {
                                     onClick={() => navigateContract('next')}
                                     className="bg-black/50 text-white border-[#BC1A1E]/50 hover:bg-[#BC1A1E]/20"
                                 >
-                                    <span>Next</span>
-                                    <ChevronRight className="h-4 w-4 ml-2" />
+                                    <span className="hidden sm:inline">Next</span>
+                                    <ChevronRight className="h-4 w-4 ml-1 sm:ml-2" />
                                 </Button>
                             </div>
                         </div>
 
-                        <div className="flex-1 p-4 sm:p-6 overflow-auto pb-20">
+                        <div className="flex-1 p-2 sm:p-6 overflow-auto pb-20">
                             {(() => {
                                 const { code, filename } = getContractDetails(CONTRACT_ADDRESSES[selectedContract].contractType);
                                 return (
                                     <div className="w-full max-w-4xl mx-auto">
-                                        <CodeBlock
-                                            language="solidity"
-                                            filename={filename}
-                                            code={code}
-                                        />
+                                        <div className="text-[#BC1A1E] text-xs mb-2 px-4 sm:px-0">
+                                            {filename}
+                                        </div>
+                                        <div className="text-sm sm:text-base w-full overflow-x-auto rounded-lg">
+                                            <CodeBlock
+                                                language="solidity"
+                                                filename={filename}
+                                                code={code}
+                                            />
+                                        </div>
                                     </div>
                                 );
                             })()}
