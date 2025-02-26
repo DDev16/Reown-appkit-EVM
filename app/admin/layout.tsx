@@ -21,6 +21,7 @@ export default function AdminLayout({
         { name: 'Dashboard', path: '/admin/dashboard' },
         { name: 'Settings', path: '/admin/settings' },
         { name: 'Post Blog', path: '/admin/post-blog' },
+        { name: 'Upload', path: '/admin/upload' },
     ]
 
     useEffect(() => {
