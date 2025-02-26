@@ -292,8 +292,8 @@ const ContactPage = () => {
                                     {
                                         icon: Mail,
                                         title: "Email",
-                                        value: "Defibullworld@gmail.com",
-                                        link: "mailto:Defibullworld@gmail.com"
+                                        value: "info@defibullworld.com",
+                                        link: "mailto:info@defibullworld.com"
                                     },
                                     {
                                         icon: FaDiscord,
@@ -304,8 +304,8 @@ const ContactPage = () => {
                                     {
                                         icon: FaTwitter,
                                         title: "Twitter",
-                                        value: "@XRP_FLR_SGB",
-                                        link: "https://x.com/XRP_FLR_SGB"
+                                        value: "@defibullworld",
+                                        link: "https://x.com/defibullworld"
                                     }
                                 ].map((contact, index) => (
                                     <div
