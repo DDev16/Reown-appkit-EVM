@@ -7,14 +7,8 @@ import Link from 'next/link';
 import {
     Layout,
     ChevronDown,
-    Crown,
-    Diamond,
-    Binary,
-    Gem,
-    Rocket,
-    Target,
-    Award,
     Wallet,
+    FileBarChart,
     VideoIcon,
     Library,
     Newspaper,
@@ -32,101 +26,100 @@ const ERC1155_ABI = parseAbi([
 ]);
 
 // Define membership tiers with routes
-// Define membership tiers with routes
 const MEMBERSHIP_TIERS = [
     {
-        id: 1,
-        name: 'Top Tier Tier-1',
-        path: '/dashboard/tier-1',
-        iconPath: '/tier-icons/DBW-icon.png',
-        color: 'from-[#d4af37] via-[#d4af37] to-[#b3941f]'
-    },
-    {
-        id: 2,
-        name: 'RHODIUM Tier-2',
-        path: '/dashboard/tier-2',
-        iconPath: '/tier-icons/Rh-icon.png',
-        color: 'from-[#00bf63] via-[#00bf63] to-[#009e52]'
-    },
-    {
-        id: 3,
-        name: 'PLATINUM Tier-3',
-        path: '/dashboard/tier-3',
-        iconPath: '/tier-icons/Pt-icon.png',
-        color: 'from-[#ff8018] via-[#ff8018] to-[#e67216]'
-    },
-    {
-        id: 4,
-        name: 'GOLD Tier-4',
-        path: '/dashboard/tier-4',
-        iconPath: '/tier-icons/Au-icon.png',
-        color: 'from-[#d4af37] via-[#d4af37] to-[#b3941f]'
-    },
-    {
-        id: 5,
-        name: 'RUTHENIUM Tier-5',
-        path: '/dashboard/tier-5',
-        iconPath: '/tier-icons/Ru-icon.png',
-        color: 'from-[#f6cefc] via-[#f6cefc] to-[#eab5f1]'
-    },
-    {
-        id: 6,
-        name: 'IRIDIUM Tier-6',
-        path: '/dashboard/tier-6',
-        iconPath: '/tier-icons/Ir-icon.png',
-        color: 'from-[#BC1A1E] via-[#BC1A1E] to-[#8B1315]'
-    },
-    {
-        id: 7,
-        name: 'OSMIUM Tier-7',
-        path: '/dashboard/tier-7',
-        iconPath: '/tier-icons/Os-icon.png',
-        color: 'from-[#0099CC] via-[#0099CC] to-[#007399]'
-    },
-    {
-        id: 8,
-        name: 'PALLADIUM Tier-8',
-        path: '/dashboard/tier-8',
-        iconPath: '/tier-icons/Pd-icon.png',
-        color: 'from-[#2ECC71] via-[#2ECC71] to-[#27AE60]'
-    },
-    {
-        id: 9,
-        name: 'RHENIUM Tier-9',
-        path: '/dashboard/tier-9',
-        iconPath: '/tier-icons/Re-icon.png',
-        color: 'from-[#FFD700] via-[#FFD700] to-[#FFC000]'
-    },
-    {
-        id: 10,
-        name: 'Silver Tier-10',
-        path: '/dashboard/tier-10',
-        iconPath: '/tier-icons/Ag-icon.png',
-        color: 'from-[#C0C0C0] via-[#C0C0C0] to-[#A9A9A9]'
-    },
-    {
-        id: 10,
-        name: 'Video Library',
-        path: '/dashboard/video-library',
-        icon: <VideoIcon className="w-5 h-5" />,
-        color: 'from-pink-400 to-pink-600'
-    },
-    {
-        id: 11,
-        name: 'Dictionary',
-        path: '/dashboard/dictionary',
-        icon: <Library className="w-5 h-5" />,
-        color: 'from-teal-400 to-teal-600'
-    },
-    {
-        id: 12,
+        id: 0,
         name: 'Wallet',
         path: '/dashboard/wallet',
         icon: <Wallet className="w-5 h-5" />,
         color: 'from-indigo-400 to-indigo-600'
     },
     {
+        id: 2,
+        name: 'Top Tier Tier-1',
+        path: '/dashboard/tier-1',
+        iconPath: '/tier-icons/DBW-icon.png',
+        color: 'from-[#d4af37] via-[#d4af37] to-[#b3941f]'
+    },
+    {
+        id: 3,
+        name: 'RHODIUM Tier-2',
+        path: '/dashboard/tier-2',
+        iconPath: '/tier-icons/Rh-icon.png',
+        color: 'from-[#00bf63] via-[#00bf63] to-[#009e52]'
+    },
+    {
+        id: 4,
+        name: 'PLATINUM Tier-3',
+        path: '/dashboard/tier-3',
+        iconPath: '/tier-icons/Pt-icon.png',
+        color: 'from-[#ff8018] via-[#ff8018] to-[#e67216]'
+    },
+    {
+        id: 5,
+        name: 'GOLD Tier-4',
+        path: '/dashboard/tier-4',
+        iconPath: '/tier-icons/Au-icon.png',
+        color: 'from-[#d4af37] via-[#d4af37] to-[#b3941f]'
+    },
+    {
+        id: 6,
+        name: 'RUTHENIUM Tier-5',
+        path: '/dashboard/tier-5',
+        iconPath: '/tier-icons/Ru-icon.png',
+        color: 'from-[#f6cefc] via-[#f6cefc] to-[#eab5f1]'
+    },
+    {
+        id: 7,
+        name: 'IRIDIUM Tier-6',
+        path: '/dashboard/tier-6',
+        iconPath: '/tier-icons/Ir-icon.png',
+        color: 'from-[#BC1A1E] via-[#BC1A1E] to-[#8B1315]'
+    },
+    {
+        id: 8,
+        name: 'OSMIUM Tier-7',
+        path: '/dashboard/tier-7',
+        iconPath: '/tier-icons/Os-icon.png',
+        color: 'from-[#0099CC] via-[#0099CC] to-[#007399]'
+    },
+    {
+        id: 9,
+        name: 'PALLADIUM Tier-8',
+        path: '/dashboard/tier-8',
+        iconPath: '/tier-icons/Pd-icon.png',
+        color: 'from-[#2ECC71] via-[#2ECC71] to-[#27AE60]'
+    },
+    {
+        id: 10,
+        name: 'RHENIUM Tier-9',
+        path: '/dashboard/tier-9',
+        iconPath: '/tier-icons/Re-icon.png',
+        color: 'from-[#FFD700] via-[#FFD700] to-[#FFC000]'
+    },
+    {
+        id: 11,
+        name: 'Silver Tier-10',
+        path: '/dashboard/tier-10',
+        iconPath: '/tier-icons/Ag-icon.png',
+        color: 'from-[#C0C0C0] via-[#C0C0C0] to-[#A9A9A9]'
+    },
+    {
+        id: 12,
+        name: 'Video Library',
+        path: '/dashboard/video-library',
+        icon: <VideoIcon className="w-5 h-5" />,
+        color: 'from-pink-400 to-pink-600'
+    },
+    {
         id: 13,
+        name: 'Dictionary',
+        path: '/dashboard/dictionary',
+        icon: <Library className="w-5 h-5" />,
+        color: 'from-teal-400 to-teal-600'
+    },
+    {
+        id: 14,
         name: 'General Blog',
         path: '/blog',
         icon: <Newspaper className="w-5 h-5" />,
@@ -225,24 +218,6 @@ export default function DashboardLayout({
                             <Layout className="w-5 h-5" />
                         </button>
 
-                        {/* Wallet Display */}
-                        <div className="relative group">
-                            <button className="flex items-center gap-2 text-gray-300 hover:text-white bg-black/40 rounded-full px-3 py-1.5 border border-red-900/30 hover:border-red-600/50 transition-all">
-                                <Wallet className="w-4 h-4" />
-                                <span className="text-sm max-w-[150px] truncate">
-                                    {isConnected ? formatAddress(address) : 'Connect Wallet'}
-                                </span>
-                                <ChevronDown size={16} />
-                            </button>
-                            <div className="absolute right-0 w-48 mt-2 py-2 bg-black border border-red-900/30 rounded-lg shadow-xl hidden group-hover:block">
-                                <div className="px-4 py-2 border-b border-red-900/30 mb-2">
-                                    <p className="text-xs text-gray-500">Connected Wallet</p>
-                                    <p className="text-sm text-gray-300 truncate">
-                                        {isConnected ? address : 'Not Connected'}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </nav>
@@ -254,8 +229,12 @@ export default function DashboardLayout({
                         ? 'translate-x-0 w-64'
                         : '-translate-x-full md:translate-x-0 w-0 md:w-20'}`}
             >
-                <div className="p-4 overflow-hidden">
-                    <div className="space-y-2">
+                <div className="p-4 h-full overflow-hidden">
+                    <div className={`space-y-2 h-full 
+                        ${isSidebarOpen
+                            ? 'overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-red-900/30 scrollbar-track-transparent'
+                            : 'overflow-hidden'
+                        }`}>
                         <Link
                             href="/dashboard"
                             className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${pathname === '/dashboard'
@@ -286,6 +265,7 @@ export default function DashboardLayout({
                                                 src={tier.iconPath}
                                                 alt={`${tier.name} icon`}
                                                 fill
+                                                sizes='5'
                                                 className="object-contain p-0.5"
                                             />
                                         </div>

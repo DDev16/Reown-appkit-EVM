@@ -63,29 +63,16 @@ const Navbar = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // Add debug logs
-    useEffect(() => {
-        console.log('Debug Info:');
-        console.log('Address:', address);
-        console.log('Contract Address:', CONTRACT_ADDRESS);
-        console.log('Mounted:', mounted);
-        console.log('NFT Balances:', nftBalances);
-    }, [address, mounted, nftBalances]);
 
     const isAdmin = mounted && address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
 
     // Check if user owns any NFT from any tier using BigInt constructor
     const hasAnyNFT = mounted && nftBalances?.some(result => {
-        console.log('Checking balance result:', result);
         return result.status === 'success' &&
             result.result !== undefined &&
             result.result > BigInt(0);
     });
 
-    // Log hasAnyNFT value
-    useEffect(() => {
-        console.log('Has Any NFT:', hasAnyNFT);
-    }, [hasAnyNFT]);
 
     const navItems: NavItem[] = [
         { name: "Home", path: "/" },

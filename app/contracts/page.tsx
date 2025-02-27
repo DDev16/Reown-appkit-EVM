@@ -265,7 +265,7 @@ export default function ContractAddressesPage() {
                 {/* Contract Code Display Section */}
                 {selectedContract !== null && (
                     <div className="fixed inset-0 bg-black/90 z-50 flex flex-col overflow-auto" data-aos="fade">
-                        <div className="sticky top-0 bg-gradient-to-b from-black to-transparent z-10 px-4 py-4 sm:px-6 sm:py-6">
+                        <div className="sticky top-20 bg-gradient-to-b from-black to-transparent z-10 px-4 py-4 sm:px-6 sm:py-6">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center max-w-[80%]">
                                     {CONTRACT_ADDRESSES[selectedContract].logoUrl && (
@@ -285,7 +285,7 @@ export default function ContractAddressesPage() {
                                     variant="outline"
                                     size="icon"
                                     onClick={closeContractCode}
-                                    className="bg-black/50 mt-28 text-white border-[#BC1A1E]/50 hover:bg-[#BC1A1E]/20 h-8 w-8 p-0 flex-shrink-0"
+                                    className="bg-black/50  text-white border-[#BC1A1E]/50 hover:bg-[#BC1A1E]/20 h-8 w-8 p-0 flex-shrink-0"
                                 >
                                     <X className="h-4 w-4" />
                                 </Button>

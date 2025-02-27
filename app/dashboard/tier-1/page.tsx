@@ -1,24 +1,41 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useTierContent } from '@/components/dashboard/tier-1-content/hooks/useTierContent';
-import { LoadingState } from '@/components/dashboard/tier-1-content/ui/LoadingState';
-import { ErrorState } from '@/components/dashboard/tier-1-content/ui/ErrorState';
-import { VideoSection } from '@/components/dashboard/tier-1-content/videos/VideoSection';
-import { CourseSection } from '@/components/dashboard/tier-1-content/courses/CourseSection';
-import { BlogSection } from '@/components/dashboard/tier-1-content/blogs/BlogSection';
-import { CallSection } from '@/components/dashboard/tier-1-content/calls/CallSection';
-import { TestSection } from '@/components/dashboard/tier-1-content/tests/TestSection';
+import { useState, useEffect, useRef } from 'react';
+import { useTierContent } from '@/hooks/useTierContent';
+import { useTierSpecificAnalytics } from '@/hooks/useTierSpecificAnalytics';
+import { LoadingState } from '@/components/dashboard/ui/LoadingState';
+import { ErrorState } from '@/components/dashboard/ui/ErrorState';
+import { VideoSection } from '@/components/dashboard/tier-1-content/videoSection/VideoSection';
+import { CourseSection } from '@/components/dashboard/tier-1-content/coursesSection/CourseSection';
+import { BlogSection } from '@/components/dashboard/tier-1-content/blogSection/BlogSection';
+import { CallSection } from '@/components/dashboard/tier-1-content/callSection/CallSection';
+import { TestSection } from '@/components/dashboard/tier-1-content/testSection/TestSection';
+import { TierAnalyticsSection } from '@/components/dashboard/analytics/TierAnalyticsSection';
+import { ContentType } from '@/components/dashboard/analytics/types';
 
 // Define content section type
-type ContentSectionId = 'videos' | 'courses' | 'blogs' | 'calls' | 'tests' | 'all';
+type ContentSectionId = ContentType;
 
 export default function Tier1Page() {
-    // Current tier
+    // Current tier - defined as a constant for this specific page
     const currentTier = 1;
-    const tierName = "TOP TIER";
 
-    // Use the custom hook to fetch all content
+    // Get analytics for ONLY tier 1 content - using the tier-specific hook
+    const {
+        analytics,
+        isLoading: analyticsLoading,
+        completionPercentages,
+        refreshAnalytics,
+        lastRefreshed,
+        isWalletConnected,
+        walletAddress,
+    } = useTierSpecificAnalytics(currentTier);
+
+
+    // Analytics refresh tracking
+    const hasRefreshedRef = useRef(false);
+
+    // Use the custom hook to fetch all content for current tier
     const {
         videos,
         courses,
@@ -39,6 +56,18 @@ export default function Tier1Page() {
         calls: 0,
         tests: 0
     });
+
+    // Refresh analytics for current tier
+    useEffect(() => {
+        if (isWalletConnected && !analyticsLoading && !hasRefreshedRef.current) {
+            console.log(`Refreshing tier-specific analytics for Tier ${currentTier}`);
+            hasRefreshedRef.current = true;
+
+            setTimeout(() => {
+                refreshAnalytics();
+            }, 500);
+        }
+    }, [isWalletConnected, analyticsLoading, refreshAnalytics]);
 
     // Animate numbers
     useEffect(() => {
@@ -84,14 +113,15 @@ export default function Tier1Page() {
         return <ErrorState message={error} onRetry={refreshData} />;
     }
 
-    // Filter tabs
+    // Filter tabs - Add Analytics tab
     const filterTabs: Array<{ id: ContentSectionId, label: string }> = [
         { id: 'all', label: 'All Content' },
         { id: 'videos', label: 'Videos' },
         { id: 'courses', label: 'Courses' },
         { id: 'blogs', label: 'Articles' },
         { id: 'tests', label: 'Knowledge Tests' },
-        { id: 'calls', label: 'Calls' }
+        { id: 'calls', label: 'Calls' },
+        { id: 'analytics', label: 'Analytics' }
     ];
 
     // Stat cards data with matching branding from screenshot
@@ -242,6 +272,26 @@ export default function Tier1Page() {
 
             {/* Content sections */}
             <div className="space-y-8">
+                {/* Analytics section */}
+                {(activeTab === 'analytics') && (
+                    <div className="bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800">
+
+                        <div className="p-4">
+                            <TierAnalyticsSection
+                                tier={currentTier}
+                                analytics={analytics}
+                                completionPercentages={completionPercentages}
+                                isLoading={analyticsLoading}
+                                lastRefreshed={lastRefreshed}
+                                walletAddress={walletAddress}
+                                isWalletConnected={isWalletConnected}
+                                refreshAnalytics={refreshAnalytics}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                {/* Videos section */}
                 {(activeTab === 'all' || activeTab === 'videos') && (
                     <div className="bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800">
                         <div className="border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
@@ -269,6 +319,7 @@ export default function Tier1Page() {
                     </div>
                 )}
 
+                {/* Courses section */}
                 {(activeTab === 'all' || activeTab === 'courses') && (
                     <div className="bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800">
                         <div className="border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
@@ -296,6 +347,7 @@ export default function Tier1Page() {
                     </div>
                 )}
 
+                {/* Blogs section */}
                 {(activeTab === 'all' || activeTab === 'blogs') && (
                     <div className="bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800">
                         <div className="border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
@@ -323,6 +375,7 @@ export default function Tier1Page() {
                     </div>
                 )}
 
+                {/* Tests section */}
                 {(activeTab === 'all' || activeTab === 'tests') && (
                     <div className="bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800">
                         <div className="border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
@@ -350,6 +403,7 @@ export default function Tier1Page() {
                     </div>
                 )}
 
+                {/* Calls section */}
                 {(activeTab === 'all' || activeTab === 'calls') && (
                     <div className="bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800">
                         <div className="border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
