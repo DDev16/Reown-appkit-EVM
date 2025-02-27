@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import ContentTypeSelector from './components/ContentTypeSelector';
 import TierSelector from './components/TierSelector';
 import BasicContentForm from './components/BasicContentForm';
@@ -35,7 +37,8 @@ export default function AdminUploadPage() {
     });
 
     const [courseFormData, setCourseFormData] = useState<Omit<CourseFormData, keyof BaseContentFormData>>({
-        numLessons: ''
+        numLessons: '',
+        lessonFiles: []
     });
 
     const [blogFormData, setBlogFormData] = useState<Omit<BlogFormData, keyof BaseContentFormData>>({
@@ -64,6 +67,7 @@ export default function AdminUploadPage() {
         setUploadStatus,
         uploadThumbnail,
         uploadContentFile,
+        uploadCourseLessonFiles,
         saveContentToFirestore
     } = useContentUpload();
 
@@ -85,7 +89,8 @@ export default function AdminUploadPage() {
         });
 
         setCourseFormData({
-            numLessons: ''
+            numLessons: '',
+            lessonFiles: []
         });
 
         setBlogFormData({
@@ -171,10 +176,10 @@ export default function AdminUploadPage() {
             return false;
         }
 
-        if (contentType === 'courses' && !courseFormData.numLessons) {
+        if (contentType === 'courses' && (!courseFormData.lessonFiles || courseFormData.lessonFiles.length === 0)) {
             setUploadStatus({
                 ...uploadStatus,
-                error: 'Please specify the number of lessons'
+                error: 'Please add at least one lesson to the course'
             });
             return false;
         }
@@ -229,24 +234,6 @@ export default function AdminUploadPage() {
             // Upload thumbnail
             const thumbnailUrl = await uploadThumbnail(baseFormData.thumbnailFile!, contentType);
 
-            // Upload content file if needed
-            let contentUrl = '';
-
-            // For videos, we always need to upload the file
-            if (contentType === 'videos' && videoFormData.contentFile) {
-                contentUrl = await uploadContentFile(videoFormData.contentFile, contentType);
-            }
-
-            // For blogs, we upload the optional PDF/Doc file if provided
-            if (contentType === 'blogs' && blogFormData.contentFile) {
-                contentUrl = await uploadContentFile(blogFormData.contentFile, contentType);
-            }
-
-            // For tests, optional content file
-            if (contentType === 'tests' && testFormData.contentFile) {
-                contentUrl = await uploadContentFile(testFormData.contentFile, contentType);
-            }
-
             // Create base content data
             const baseContentData = {
                 title: baseFormData.title,
@@ -254,44 +241,98 @@ export default function AdminUploadPage() {
                 thumbnail: thumbnailUrl,
             };
 
-            // Add content-specific fields
             let contentData;
+            let docIds = [];
+
+            // Handle different content types
             switch (contentType) {
-                case 'videos':
+                case 'videos': {
+                    // Upload video file
+                    const contentUrl = await uploadContentFile(videoFormData.contentFile!, contentType);
+
                     contentData = {
                         ...baseContentData,
                         url: contentUrl,
                         duration: parseInt(videoFormData.duration)
                     };
-                    break;
 
-                case 'courses':
+                    docIds = await saveContentToFirestore(contentType, contentData, selectedTiers);
+                    break;
+                }
+
+                case 'courses': {
+                    // For courses, we first create the course documents to get their IDs
                     contentData = {
                         ...baseContentData,
-                        lessons: parseInt(courseFormData.numLessons)
+                        lessons: courseFormData.lessonFiles.length,
+                        // We'll add the lessons array after uploading files
                     };
-                    break;
 
-                case 'blogs':
+                    // Save initial course data to get document IDs
+                    docIds = await saveContentToFirestore(contentType, contentData, selectedTiers);
+
+                    // For each course document (one per tier), upload lesson files
+                    for (const courseId of docIds) {
+                        try {
+                            // Upload all lesson files for this course
+                            const { lessons } = await uploadCourseLessonFiles(
+                                courseFormData.lessonFiles,
+                                courseId
+                            );
+
+                            // Update the course document with lesson data
+                            await updateDoc(doc(db, 'courses', courseId), {
+                                lessons: lessons.length,
+                                lessonData: lessons
+                            });
+
+                        } catch (error) {
+                            console.error(`Error uploading lessons for course ${courseId}:`, error);
+                            throw error;
+                        }
+                    }
+                    break;
+                }
+
+                case 'blogs': {
+                    // Upload optional PDF/Doc file if provided
+                    let contentUrl = '';
+                    if (blogFormData.contentFile) {
+                        contentUrl = await uploadContentFile(blogFormData.contentFile, contentType);
+                    }
+
                     contentData = {
                         ...baseContentData,
                         author: blogFormData.author,
                         readTime: parseInt(blogFormData.readTime),
                         url: contentUrl || '#'
                     };
-                    break;
 
-                case 'tests':
+                    docIds = await saveContentToFirestore(contentType, contentData, selectedTiers);
+                    break;
+                }
+
+                case 'tests': {
+                    // Upload optional test content file
+                    let contentUrl = '';
+                    if (testFormData.contentFile) {
+                        contentUrl = await uploadContentFile(testFormData.contentFile, contentType);
+                    }
+
                     contentData = {
                         ...baseContentData,
                         questions: parseInt(testFormData.numQuestions),
                         estimatedTime: parseInt(testFormData.estimatedTime),
                         difficulty: testFormData.testDifficulty,
-                        completed: false // Initial state for all users
+                        completed: false, // Initial state for all users
+                        url: contentUrl || '#'
                     };
-                    break;
 
-                case 'calls':
+                    docIds = await saveContentToFirestore(contentType, contentData, selectedTiers);
+                    break;
+                }
+
+                case 'calls': {
                     contentData = {
                         ...baseContentData,
                         host: callFormData.callHost,
@@ -300,21 +341,18 @@ export default function AdminUploadPage() {
                         duration: parseInt(callFormData.callDuration),
                         url: callFormData.callUrl || '#'
                     };
+
+                    docIds = await saveContentToFirestore(contentType, contentData, selectedTiers);
                     break;
-
-                default:
-                    contentData = baseContentData;
+                }
             }
-
-            // Save to Firestore
-            await saveContentToFirestore(contentType, contentData, selectedTiers);
 
             setUploadStatus({
                 isUploading: false,
                 progress: 100,
                 error: null,
                 success: true,
-                fileUrl: contentUrl || thumbnailUrl
+                fileUrl: thumbnailUrl
             });
 
             // Reset form after successful upload

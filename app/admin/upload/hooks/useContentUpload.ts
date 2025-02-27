@@ -3,15 +3,15 @@
 import { useState } from 'react';
 import {
     collection, addDoc, serverTimestamp,
-    query, getDocs, 
+    query, where, getDocs, doc, deleteDoc, updateDoc
 } from 'firebase/firestore';
 import {
     ref, uploadBytesResumable,
-    getDownloadURL
+    getDownloadURL, deleteObject
 } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import { createWeb3AnalyticsService } from '@/services/analytics/web3AnalyticsService';
-import { UploadStatus, ContentType } from '../types';
+import { UploadStatus, ContentType, CourseLessonFile } from '../types';
 
 export function useContentUpload() {
     const [uploadStatus, setUploadStatus] = useState<UploadStatus>({
@@ -51,10 +51,11 @@ export function useContentUpload() {
     };
 
     // Upload content file to Firebase Storage (for videos, PDFs, etc.)
-    const uploadContentFile = async (contentFile: File, contentType: ContentType): Promise<string> => {
+    const uploadContentFile = async (contentFile: File, contentType: ContentType, customPath?: string): Promise<string> => {
         if (!contentFile) throw new Error('No content file selected');
 
-        const storageRef = ref(storage, `content/${contentType}/${Date.now()}_${contentFile.name}`);
+        const path = customPath || `content/${contentType}`;
+        const storageRef = ref(storage, `${path}/${Date.now()}_${contentFile.name}`);
         const uploadTask = uploadBytesResumable(storageRef, contentFile);
 
         return new Promise((resolve, reject) => {
@@ -76,6 +77,52 @@ export function useContentUpload() {
                 }
             );
         });
+    };
+
+    // Upload multiple course lesson files
+    const uploadCourseLessonFiles = async (
+        lessonFiles: CourseLessonFile[],
+        courseId: string
+    ): Promise<{ lessons: any[] }> => {
+        const lessons = [];
+        let totalFiles = lessonFiles.length;
+        let completedFiles = 0;
+
+        // Sort lessons by order
+        const sortedLessonFiles = [...lessonFiles].sort((a, b) => a.order - b.order);
+
+        for (const lessonFile of sortedLessonFiles) {
+            try {
+                const path = `content/courses/${courseId}/lessons`;
+                const fileUrl = await uploadContentFile(lessonFile.file, 'courses', path);
+                
+                // Create lesson object with all necessary data for rendering
+                const lesson = {
+                    id: lessonFile.id,
+                    order: lessonFile.order,
+                    title: lessonFile.title,
+                    type: lessonFile.type,
+                    url: fileUrl,
+                    filename: lessonFile.file.name,
+                    ...(lessonFile.type === 'video' && { 
+                        duration: parseInt(lessonFile.duration || '0') 
+                    })
+                };
+                
+                lessons.push(lesson);
+                
+                // Update progress
+                completedFiles++;
+                const totalProgress = (completedFiles / totalFiles) * 100;
+                setUploadStatus(prev => ({ ...prev, progress: totalProgress }));
+                
+            } catch (error) {
+                console.error(`Error uploading lesson file: ${lessonFile.title}`, error);
+                throw error;
+            }
+        }
+
+        return { lessons };
     };
 
     // Update all user analytics after content upload
@@ -114,6 +161,7 @@ export function useContentUpload() {
         selectedTiers: number[]
     ) => {
         // Create content records for each selected tier
+        const docIds = [];
         for (const tierId of selectedTiers) {
             const finalContentData = {
                 ...contentData,
@@ -123,14 +171,17 @@ export function useContentUpload() {
             };
 
             // Add document to the appropriate collection
-            await addDoc(collection(db, contentType), finalContentData);
+            const docRef = await addDoc(collection(db, contentType), finalContentData);
+            docIds.push(docRef.id);
         }
 
         // Update analytics for all users to reflect new content
-        if (contentType === 'videos') {
-            console.log('New video uploaded, updating analytics for all users');
+        if (contentType === 'videos' || contentType === 'courses') {
+            console.log(`New ${contentType} uploaded, updating analytics for all users`);
             await updateAllUserAnalytics(contentType);
         }
+
+        return docIds;
     };
 
     return {
@@ -138,6 +189,7 @@ export function useContentUpload() {
         setUploadStatus,
         uploadThumbnail,
         uploadContentFile,
+        uploadCourseLessonFiles,
         saveContentToFirestore
     };
 }

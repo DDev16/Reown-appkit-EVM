@@ -1,5 +1,5 @@
 'use client';
-
+//C:\apps\dbw\Reown-appkit-EVM\app\dashboard\tier-1\page.tsx
 import { useState, useEffect, useRef } from 'react';
 import { useTierContent } from '@/hooks/useTierContent';
 import { useTierSpecificAnalytics } from '@/hooks/useTierSpecificAnalytics';

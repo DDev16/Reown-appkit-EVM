@@ -1,6 +1,7 @@
 // Content types
 export type ContentType = 'videos' | 'courses' | 'blogs' | 'tests' | 'calls';
 export type TestDifficulty = 'beginner' | 'intermediate' | 'advanced';
+export type CourseFileType = 'video' | 'pdf';
 
 export interface UploadStatus {
     isUploading: boolean;
@@ -34,6 +35,16 @@ export interface BaseContentFormData {
     thumbnailFile: File | null;
 }
 
+// Course lesson file
+export interface CourseLessonFile {
+    id: string; // Unique identifier
+    order: number; // For ordering the files
+    type: CourseFileType; // 'video' or 'pdf'
+    file: File;
+    title: string;
+    duration?: string; // Duration for videos in seconds
+}
+
 // Content-specific form data
 export interface VideoFormData extends BaseContentFormData {
     contentFile: File | null;
@@ -42,6 +53,7 @@ export interface VideoFormData extends BaseContentFormData {
 
 export interface CourseFormData extends BaseContentFormData {
     numLessons: string;
+    lessonFiles: CourseLessonFile[]; // Array of lesson files
 }
 
 export interface BlogFormData extends BaseContentFormData {

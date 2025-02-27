@@ -9,6 +9,7 @@ import {
   BlogItem, 
   CallItem,
   TestItem,
+  CourseLessonData, // Import the new type
   TierContentData 
 } from '@/types/types';
 
@@ -67,7 +68,9 @@ export const useTierContent = (tier: number): TierContentData => {
       const coursesSnapshot = await getDocs(coursesQuery);
       const coursesList = coursesSnapshot.docs.map(doc => {
         const data = doc.data();
-        return {
+        
+        // Create base course object
+        const courseData: CourseItem = {
           id: doc.id,
           title: data.title || "Untitled Course",
           description: data.description || "No description available",
@@ -76,6 +79,22 @@ export const useTierContent = (tier: number): TierContentData => {
           date: data.date || new Date().toISOString(),
           ...data
         };
+        
+        // Process lesson data if it exists
+        if (data.lessonData && Array.isArray(data.lessonData)) {
+          // Ensure each lesson has all required fields properly typed
+          courseData.lessonData = data.lessonData.map((lesson: any) => ({
+            id: lesson.id || `lesson-${Math.random().toString(36).substring(2, 9)}`,
+            order: typeof lesson.order === 'number' ? lesson.order : 0,
+            title: lesson.title || 'Untitled Lesson',
+            type: lesson.type === 'pdf' ? 'pdf' : 'video',
+            url: lesson.url || '',
+            filename: lesson.filename || '',
+            duration: typeof lesson.duration === 'number' ? lesson.duration : 0
+          })) as CourseLessonData[];
+        }
+        
+        return courseData;
       });
 
       // Sort courses manually by date (newest first)
