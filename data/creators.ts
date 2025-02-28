@@ -17,10 +17,10 @@ export interface Creator {
   export const creators: Creator[] = [
     // Tier 1 Contributor Specialists
     {
-      name: "Sarah Johnson",
-      image: "/assets/flareLogo1.png",
-      contentType: "Data Analyst & Writer",
-      bio: "DeFi researcher specialized in yield farming strategies and Tier 1 Contributor Former TradFi analyst with 5+ years experience in crypto markets.",
+      name: "Staaal Staalesen",
+      image: "/contributors/Staaal.png",
+      contentType: "Graphic Designer",
+      bio: "Graphic designer & crypto enthusiast focused on the Flare Network since 2021, blending creativity with blockchain trends.",
       specialization: "Tier 1 Contributor",
       socials: {
         twitter: "https://twitter.com/sarahjohnson",
@@ -28,10 +28,10 @@ export interface Creator {
       }
     },
     {
-      name: "Alex Rivera",
-      image: "/assets/flareLogo1.png",
-      contentType: "On-Chain Analyst",
-      bio: "Analyzing blockchain data to uncover DeFi trends. Creator of weekly market reports focusing on liquidity metrics and protocol adoption.",
+      name: "Anubis",
+      image: "/contributors/Anubis.png",
+      contentType: "Crypto Entusiast",
+      bio: "Polish crypto enthusiast since 2022. Optimizing logistics & simplifying crypto, I back Flare’s Web2–3 bridge.",
       specialization: "Tier 1 Contributor",
       socials: {
         twitter: "https://twitter.com/alexrivera",

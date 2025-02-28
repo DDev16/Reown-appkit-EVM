@@ -105,7 +105,7 @@ const CreatorCard: React.FC<{ creator: Creator }> = ({ creator }) => {
                             <img
                                 src={creator.image}
                                 alt={creator.name}
-                                className="w-1/2 h-1/2 object-cover object-center grayscale group-hover:grayscale-0 transition-all duration-300"
+                                className="w-full h-full object-cover object-center  transition-all duration-300"
                                 style={{
                                     transform: 'translateZ(80px)',
                                     transition: 'transform 0.3s ease-out'
