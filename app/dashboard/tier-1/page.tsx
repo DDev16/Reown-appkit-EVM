@@ -10,14 +10,50 @@ import { BlogSection } from '@/components/dashboard/tier-1-content/blogSection/B
 import { CallSection } from '@/components/dashboard/tier-1-content/callSection/CallSection';
 import { TestSection } from '@/components/dashboard/tier-1-content/testSection/TestSection';
 import { AnalyticsSection } from '@/components/dashboard/tier-1-content/analyticsSection/AnalyticsSection';
+import { useAccount, useReadContract } from 'wagmi';
+import { Lock } from 'lucide-react';
+import CONTRACT_ABI from '@/lib/contract-abi.json';
 
 // Define content section type
 type ContentSectionId = 'videos' | 'courses' | 'blogs' | 'calls' | 'tests' | 'analytics' | 'all';
+
+// Contract details
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+if (!CONTRACT_ADDRESS) throw new Error("Contract address not found in environment variables");
+
+// Token ID for Tier 1
+const TIER_1 = 0; // Assuming tier 1 has ID 0, adjust if different
 
 export default function Tier1Page() {
     // Current tier
     const currentTier = 1;
 
+    // Auth states for token gating
+    const [isAuthorized, setIsAuthorized] = useState(false);
+    const [authLoading, setAuthLoading] = useState(true);
+
+    // Get connected wallet
+    const { address } = useAccount();
+
+    // Read contract to check if user has the token
+    const { data: tierBalance } = useReadContract({
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'balanceOf',
+        args: [address!, TIER_1],
+        query: {
+            enabled: !!address,
+        },
+    });
+
+    // Check if user is authorized based on token balance
+    useEffect(() => {
+        if (tierBalance !== undefined) {
+            // User is authorized if they have at least 1 token of TIER_1
+            setIsAuthorized(Number(tierBalance) > 0);
+            setAuthLoading(false);
+        }
+    }, [tierBalance]);
 
     // Use the custom hook to fetch all content
     const {
@@ -26,7 +62,7 @@ export default function Tier1Page() {
         blogs,
         calls,
         tests,
-        isLoading,
+        isLoading: contentLoading,
         error,
         refreshData
     } = useTierContent(currentTier);
@@ -43,7 +79,7 @@ export default function Tier1Page() {
 
     // Animate numbers
     useEffect(() => {
-        if (!isLoading && !error) {
+        if (!contentLoading && !error) {
             const animationDuration = 1200; // ms
             const steps = 15;
             const interval = animationDuration / steps;
@@ -73,10 +109,45 @@ export default function Tier1Page() {
 
             return () => clearInterval(timer);
         }
-    }, [isLoading, error, videos.length, courses.length, blogs.length, calls.length, tests.length]);
+    }, [contentLoading, error, videos.length, courses.length, blogs.length, calls.length, tests.length]);
 
-    // Loading state
-    if (isLoading) {
+    // Show auth loading state
+    if (authLoading) {
+        return (
+            <div className="min-h-[80vh] flex items-center justify-center">
+                <div className="text-center space-y-4">
+                    <div className="w-8 h-8 border-t-2 border-red-600 rounded-full animate-spin mx-auto"></div>
+                    <p className="text-gray-400">Verifying membership...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Show unauthorized state
+    if (!isAuthorized) {
+        return (
+            <div className="min-h-[80vh] flex items-center justify-center">
+                <div className="text-center space-y-4">
+                    <Lock className="w-16 h-16 mx-auto text-red-600" />
+                    <h2 className="text-2xl font-bold">Access Required</h2>
+                    <p className="text-gray-400">
+                        You need to hold the Tier 1 token to access this content
+                    </p>
+                    <div className="space-y-2">
+                        <button className="px-6 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
+                            Purchase Tier 1 Membership
+                        </button>
+                        <p className="text-sm text-gray-500">
+                            Already own a Tier 1 NFT? Make sure it&apos;s in your connected wallet.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Loading state for content
+    if (contentLoading) {
         return <LoadingState />;
     }
 
