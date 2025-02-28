@@ -69,16 +69,17 @@ export const useTierContent = (tier: number): TierContentData => {
       const coursesList = coursesSnapshot.docs.map(doc => {
         const data = doc.data();
         
-        // Create base course object
-        const courseData: CourseItem = {
-          id: doc.id,
-          title: data.title || "Untitled Course",
-          description: data.description || "No description available",
-          thumbnail: data.thumbnail || "/placeholder-thumbnail.jpg",
-          lessons: data.lessons || 0,
-          date: data.date || new Date().toISOString(),
-          ...data
-        };
+         // Create base course object
+    const courseData: CourseItem = {
+        id: doc.id,
+        title: data.title || "Untitled Course",
+        description: data.description || "No description available",
+        thumbnail: data.thumbnail || "/placeholder-thumbnail.jpg",
+        lessons: data.lessons || 0,
+        date: data.date || new Date().toISOString(),
+        completed: data.completed || false, // Ensure the completed property is included
+        ...data
+    };
         
         // Process lesson data if it exists
         if (data.lessonData && Array.isArray(data.lessonData)) {

@@ -1,66 +1,93 @@
-'use client';
-
-import { Clock, Play, CalendarClock } from 'lucide-react';
+import React, { useState } from 'react';
+import { PlayCircle, Clock, BookmarkCheck } from 'lucide-react';
 import { VideoItem } from '@/types/types';
 import { formatDate, formatDuration } from '@/utils/formatters';
 
 interface VideoCardProps {
     video: VideoItem;
-    onPlay: (video: VideoItem) => void;
+    onClick: (video: VideoItem) => void;
 }
 
-export const VideoCard: React.FC<VideoCardProps> = ({ video, onPlay }) => {
+export const VideoCard: React.FC<VideoCardProps> = ({ video, onClick }) => {
+    const [isHovering, setIsHovering] = useState(false);
+
+    // Determine if the video is completed (progress >= 90%)
+    const isCompleted = video.progress && video.progress >= 90;
+
+    // Determine if the video is in progress (0 < progress < 90%)
+    const isInProgress = video.progress && video.progress > 0 && video.progress < 90;
+
     return (
-        <div className="bg-black/30 rounded-lg overflow-hidden border border-red-900/20 hover:border-red-600/40 transition-colors group">
-            <div className="relative">
+        <div
+            className="bg-zinc-800 rounded-lg overflow-hidden transition-transform hover:scale-[1.02] cursor-pointer"
+            onClick={() => onClick(video)}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+        >
+            {/* Thumbnail with overlay */}
+            <div className="relative aspect-video bg-zinc-900">
                 <img
-                    src={video.thumbnail || "/placeholder-thumbnail.jpg"}
-                    alt={video.title || "Video thumbnail"}
-                    className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/placeholder-thumbnail.jpg";
-                    }}
+                    src={video.thumbnail}
+                    alt={video.title}
+                    className="w-full h-full object-cover"
                 />
+
+                {/* Play overlay */}
+                <div className={`absolute inset-0 flex items-center justify-center bg-black/50 transition-opacity ${isHovering ? 'opacity-100' : 'opacity-0'}`}>
+                    <PlayCircle size={48} className="text-white opacity-80" />
+                </div>
+
                 {/* Duration badge */}
-                <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 rounded text-white text-xs flex items-center">
+                <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs rounded-md flex items-center">
                     <Clock size={12} className="mr-1" />
                     {formatDuration(video.duration)}
                 </div>
 
-                {/* Play button overlay */}
-                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                        className="bg-red-600 hover:bg-red-700 text-white rounded-full p-3 transform transition-all duration-200 hover:scale-110"
-                        onClick={() => onPlay(video)}
-                        aria-label={`Play ${video.title}`}
-                    >
-                        <Play size={24} />
-                    </button>
-                </div>
+                {/* Completion badge */}
+                {isCompleted && (
+                    <div className="absolute top-2 right-2 px-2 py-1 bg-green-900/80 text-white text-xs rounded-md flex items-center">
+                        <BookmarkCheck size={12} className="mr-1" />
+                        Completed
+                    </div>
+                )}
+
+                {/* Resume indicator */}
+                {isInProgress && (
+                    <div className="absolute top-2 left-2 px-2 py-1 bg-black/70 text-white text-xs rounded-md flex items-center">
+                        <div className="w-2 h-2 bg-red-500 rounded-full mr-1.5"></div>
+                        Resume
+                    </div>
+                )}
+
+                {/* Progress bar for in-progress videos */}
+                {video.progress !== undefined && video.progress > 0 && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-zinc-800">
+                        <div
+                            className={`h-full ${isCompleted ? 'bg-green-600' : 'bg-red-600'}`}
+                            style={{ width: `${video.progress}%` }}
+                        ></div>
+                    </div>
+                )}
             </div>
 
-            <div className="p-4">
-                <h3 className="font-semibold text-white line-clamp-1 mb-1">{video.title || "Untitled Video"}</h3>
-                <p className="text-gray-400 text-sm line-clamp-2 mb-2">{video.description || "No description available"}</p>
-                <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500 flex items-center">
-                        <CalendarClock size={12} className="mr-1" />
-                        {formatDate(video.date)}
-                    </span>
+            {/* Video info */}
+            <div className="p-3">
+                <h3 className="font-medium text-white text-sm mb-1 line-clamp-2">{video.title}</h3>
+                <p className="text-xs text-gray-400 mb-2 line-clamp-2">{video.description}</p>
 
-                    {/* Optional watch progress */}
-                    {video.progress && (
-                        <div className="w-full mt-2">
-                            <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-red-600"
-                                    style={{ width: `${video.progress}%` }}
-                                ></div>
-                            </div>
-                            <span className="text-xs text-gray-500 mt-1">{video.progress}% watched</span>
-                        </div>
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>{formatDate(video.date)}</span>
+                    {video.views && (
+                        <span>{video.views.toLocaleString()} views</span>
                     )}
                 </div>
+
+                {/* Progress percentage for in-progress videos */}
+                {isInProgress && (
+                    <div className="mt-2 text-xs text-gray-400">
+                        {video.progress}% watched
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -5,7 +5,11 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAccount } from 'wagmi'
 
-const ADMIN_ADDRESS = '0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37';
+// Change to an array with both admin addresses
+const ADMIN_ADDRESSES = [
+    '0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37',
+    '0x3B8AF2bE3192c4e93A97be13E43152660c0AA942'
+]
 
 export default function AdminLayout({
     children,
@@ -25,9 +29,15 @@ export default function AdminLayout({
     ]
 
     useEffect(() => {
-        // Check if user is connected and is the admin
+        // Check if user is connected and is one of the admins
         if (isConnected) {
-            if (address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase()) {
+            // Use Array.some to check if the connected address matches any admin address
+            if (
+                ADMIN_ADDRESSES.some(
+                    (adminAddr) =>
+                        adminAddr.toLowerCase() === address?.toLowerCase()
+                )
+            ) {
                 setIsAdmin(true)
             } else {
                 // Redirect non-admin users
@@ -62,8 +72,8 @@ export default function AdminLayout({
                                 key={item.path}
                                 href={item.path}
                                 className={`${pathname === item.path
-                                    ? 'text-blue-600'
-                                    : 'text-gray-600 hover:text-gray-900'
+                                        ? 'text-blue-600'
+                                        : 'text-gray-600 hover:text-gray-900'
                                     }`}
                             >
                                 {item.name}

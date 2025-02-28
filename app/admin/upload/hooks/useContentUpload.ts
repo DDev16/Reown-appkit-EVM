@@ -10,7 +10,6 @@ import {
     getDownloadURL, deleteObject
 } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
-import { createWeb3AnalyticsService } from '@/services/analytics/web3AnalyticsService';
 import { UploadStatus, ContentType, CourseLessonFile } from '../types';
 
 export function useContentUpload() {
@@ -142,8 +141,6 @@ export function useContentUpload() {
             // For each user, update their content counts
             const updatePromises = analyticsSnapshot.docs.map(async (doc) => {
                 const walletAddress = doc.id;
-                const analyticsService = createWeb3AnalyticsService(walletAddress);
-                await analyticsService.refreshContentCounts();
                 console.log(`Updated analytics for user: ${walletAddress}`);
             });
 

@@ -1,6 +1,4 @@
-'use client';
-
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { X, Maximize2, Minimize2, Volume2, VolumeX, Bookmark, BookmarkCheck } from 'lucide-react';
 import { VideoItem } from '@/types/types';
 import { formatDate, formatDuration } from '@/utils/formatters';
@@ -20,32 +18,69 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
+    const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const [isMuted, setIsMuted] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isBookmarked, setIsBookmarked] = useState(false);
 
+    // Clear interval on unmount
+    useEffect(() => {
+        return () => {
+            if (progressIntervalRef.current) {
+                clearInterval(progressIntervalRef.current);
+                progressIntervalRef.current = null;
+            }
+        };
+    }, []);
+
     // Start playback from the last position if available
     useEffect(() => {
         if (isOpen && videoRef.current && video?.lastPosition) {
-            videoRef.current.currentTime = video.lastPosition;
+            // Small timeout to ensure video is ready
+            const timer = setTimeout(() => {
+                if (videoRef.current) {
+                    videoRef.current.currentTime = video.lastPosition || 0;
+                }
+            }, 300);
+
+            return () => clearTimeout(timer);
         }
     }, [isOpen, video]);
+
+    // Report progress once when closing
+    const reportFinalProgress = useCallback(() => {
+        const videoElement = videoRef.current;
+        if (!videoElement || !onProgress || !video) return;
+
+        if (videoElement.currentTime > 0) {
+            onProgress(video.id, videoElement.currentTime, videoElement.duration);
+        }
+    }, [video, onProgress]);
 
     // Track video progress
     useEffect(() => {
         const videoElement = videoRef.current;
-        if (!videoElement || !onProgress || !video) return;
+        if (!videoElement || !onProgress || !video || !isOpen) return;
 
-        // Save progress every 5 seconds
-        const progressInterval = setInterval(() => {
+        // Clear any existing interval
+        if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+            progressIntervalRef.current = null;
+        }
+
+        // Function to report progress
+        const reportProgress = () => {
             if (videoElement.currentTime > 0) {
                 onProgress(video.id, videoElement.currentTime, videoElement.duration);
             }
-        }, 5000);
+        };
+
+        // Save progress every 5 seconds
+        progressIntervalRef.current = setInterval(reportProgress, 5000);
 
         // Also save on pause
         const handlePause = () => {
-            onProgress(video.id, videoElement.currentTime, videoElement.duration);
+            reportProgress();
         };
 
         // And save when the video ends
@@ -57,21 +92,22 @@ export const VideoModal: React.FC<VideoModalProps> = ({
         videoElement.addEventListener('ended', handleEnded);
 
         return () => {
-            clearInterval(progressInterval);
+            if (progressIntervalRef.current) {
+                clearInterval(progressIntervalRef.current);
+                progressIntervalRef.current = null;
+            }
             videoElement.removeEventListener('pause', handlePause);
             videoElement.removeEventListener('ended', handleEnded);
-
-            // Save final position when closing
-            if (videoElement.currentTime > 0) {
-                onProgress(video.id, videoElement.currentTime, videoElement.duration);
-            }
         };
     }, [isOpen, video, onProgress]);
 
     // Close on escape key
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') onClose();
+            if (e.key === 'Escape') {
+                reportFinalProgress();
+                onClose();
+            }
         };
 
         if (isOpen) {
@@ -84,7 +120,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
             document.removeEventListener('keydown', handleKeyDown);
             document.body.style.overflow = 'auto';
         };
-    }, [isOpen, onClose]);
+    }, [isOpen, onClose, reportFinalProgress]);
 
     // Watch for fullscreen changes
     useEffect(() => {
@@ -102,6 +138,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
     // Close when clicking outside of video container
     const handleBackdropClick = (e: React.MouseEvent) => {
         if (modalRef.current && e.target === modalRef.current) {
+            reportFinalProgress();
             onClose();
         }
     };
@@ -131,7 +168,16 @@ export const VideoModal: React.FC<VideoModalProps> = ({
         // Here you could also save this to a database
     };
 
+    // Safe close handler
+    const handleClose = () => {
+        reportFinalProgress();
+        onClose();
+    };
+
     if (!isOpen || !video) return null;
+
+    // Use consistent threshold (90%) for completion status
+    const isVideoCompleted = video.progress !== undefined && video.progress >= 90;
 
     return (
         <div
@@ -144,7 +190,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
                 <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
                     <h3 className="text-white font-medium truncate pr-2">{video.title}</h3>
                     <button
-                        onClick={onClose}
+                        onClick={handleClose}
                         className="text-gray-400 hover:text-white transition-colors"
                         aria-label="Close"
                     >
@@ -233,7 +279,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
                             </div>
                             <div className="flex justify-between mt-1">
                                 <span className="text-xs text-gray-500">{video.progress}% watched</span>
-                                {video.progress >= 90 && (
+                                {isVideoCompleted && (
                                     <span className="text-xs text-green-500 flex items-center">
                                         <BookmarkCheck size={12} className="mr-1" />
                                         Completed

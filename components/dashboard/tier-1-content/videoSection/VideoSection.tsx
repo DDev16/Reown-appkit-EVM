@@ -1,117 +1,229 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { Play } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { VideoItem } from '@/types/types';
 import { VideoCard } from '../../videos/VideoCard';
-import { VideoModalWithWagmi } from '../../videos/VideoModalWithWagmi';
-import { useVideoProgress } from '../../videos/useVideoProgress';
-import Link from 'next/link';
+import { VideoModal } from '../../videos/VideoModal';
+import { useAccount } from 'wagmi';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+
 interface VideoSectionProps {
     videos: VideoItem[];
-    title?: string;
-    viewAllLink?: string;
-    userId?: string;
 }
 
-export const VideoSection: React.FC<VideoSectionProps> = ({
-    videos,
-    title = "Latest Videos",
-    userId = "anonymous" // In a real app, this would come from auth
-}) => {
-    // State for selected video and modal
+export const VideoSection: React.FC<VideoSectionProps> = ({ videos }) => {
+    // State to track videos with progress information
+    const [videoList, setVideoList] = useState<VideoItem[]>(videos);
     const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [progressDataLoaded, setProgressDataLoaded] = useState(false);
 
-    // Use the progress hook
-    const {
-        isLoading: isProgressLoading,
-        saveVideoProgress,
-        enhanceVideosWithProgress
-    } = useVideoProgress(userId);
+    // Get user wallet connection status
+    const { address, isConnected } = useAccount();
 
-    // Enhanced videos with progress data
-    const [enhancedVideos, setEnhancedVideos] = useState<VideoItem[]>(videos);
-
-    // Update enhanced videos when progress data changes
+    // Load progress data from Firebase when component mounts or wallet connects
     useEffect(() => {
-        if (!isProgressLoading) {
-            setEnhancedVideos(enhanceVideosWithProgress(videos));
+        // Skip if progress data already loaded or no wallet connection
+        if (progressDataLoaded || !isConnected || !address) {
+            return;
         }
-    }, [isProgressLoading, videos, enhanceVideosWithProgress]);
 
-    // Handle playing a video
-    const handlePlayVideo = (video: VideoItem) => {
-        // Find the enhanced version of this video with progress info
-        const enhancedVideo = enhancedVideos.find(v => v.id === video.id) || video;
-        setSelectedVideo(enhancedVideo);
+        const loadProgressData = async () => {
+            try {
+                // Skip if no videos to process
+                if (videos.length === 0) {
+                    setProgressDataLoaded(true);
+                    return;
+                }
+
+                // Create a copy of videos to update with progress data
+                const updatedVideos = [...videos];
+                const userId = address.toLowerCase();
+                const userProgressRef = doc(db, 'userProgress', userId);
+                const userProgressDoc = await getDoc(userProgressRef);
+
+                if (userProgressDoc.exists()) {
+                    const progressData = userProgressDoc.data();
+                    const items = progressData.items || [];
+
+                    // Update video list with progress information
+                    for (let i = 0; i < updatedVideos.length; i++) {
+                        const videoProgress = items.find(
+                            (item: any) => item.id === updatedVideos[i].id && item.contentType === 'video'
+                        );
+
+                        if (videoProgress) {
+                            updatedVideos[i] = {
+                                ...updatedVideos[i],
+                                progress: videoProgress.progress,
+                                lastPosition: videoProgress.lastPosition,
+                                completed: videoProgress.completed
+                            };
+                        }
+                    }
+
+                    setVideoList(updatedVideos);
+                }
+
+                setProgressDataLoaded(true);
+            } catch (error) {
+                console.error('Error loading progress data:', error);
+                setProgressDataLoaded(true);
+            }
+        };
+
+        loadProgressData();
+    }, [videos, address, isConnected, progressDataLoaded]);
+
+    // Handle video selection and open modal
+    const handleVideoClick = useCallback((video: VideoItem) => {
+        setSelectedVideo(video);
         setIsModalOpen(true);
-    };
+    }, []);
 
-    // Close the modal
-    const handleCloseModal = () => {
+    // Close modal
+    const handleCloseModal = useCallback(() => {
         setIsModalOpen(false);
-    };
+    }, []);
 
-    // Handle video progress updates
-    const handleVideoProgress = (videoId: string, currentTime: number, duration: number) => {
-        saveVideoProgress(videoId, currentTime, duration);
-    };
+    // Save progress to Firebase
+    const saveProgress = useCallback(async (
+        videoId: string,
+        currentTime: number,
+        duration: number,
+        progressPercentage: number,
+        title: string
+    ) => {
+        if (!isConnected || !address) return;
 
-    // Sort videos by newest first (default behavior)
-    const sortedVideos = [...enhancedVideos].sort((a, b) => {
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
+        try {
+            const userId = address.toLowerCase();
+            const userProgressRef = doc(db, 'userProgress', userId);
+            const userProgressDoc = await getDoc(userProgressRef);
+
+            const isCompleted = progressPercentage >= 90;
+
+            const videoProgress = {
+                id: videoId,
+                title: title,
+                lastPosition: currentTime,
+                duration: duration,
+                progress: progressPercentage,
+                completed: isCompleted,
+                contentType: 'video',
+                lastUpdated: new Date().toISOString()
+            };
+
+            if (userProgressDoc.exists()) {
+                const data = userProgressDoc.data();
+                const items = data.items || [];
+
+                const videoIndex = items.findIndex((item: any) =>
+                    item.id === videoId && item.contentType === 'video'
+                );
+
+                if (videoIndex >= 0) {
+                    items[videoIndex] = {
+                        ...items[videoIndex],
+                        ...videoProgress
+                    };
+                } else {
+                    items.push(videoProgress);
+                }
+
+                await updateDoc(userProgressRef, {
+                    items: items,
+                    lastUpdated: new Date().toISOString()
+                });
+            } else {
+                await setDoc(userProgressRef, {
+                    userId,
+                    walletAddress: address,
+                    items: [videoProgress],
+                    lastUpdated: new Date().toISOString()
+                });
+            }
+        } catch (error) {
+            console.error('Error saving progress:', error);
+        }
+    }, [address, isConnected]);
+
+    // Track video progress - memoized to prevent infinite loops
+    const handleVideoProgress = useCallback((videoId: string, currentTime: number, duration: number) => {
+        if (duration <= 0) return; // Prevent division by zero
+
+        // Calculate progress percentage
+        const progressPercentage = Math.floor((currentTime / duration) * 100);
+
+        // Update the selected video and video list
+        setSelectedVideo(prevSelectedVideo => {
+            if (prevSelectedVideo && prevSelectedVideo.id === videoId) {
+                return {
+                    ...prevSelectedVideo,
+                    progress: progressPercentage,
+                    lastPosition: currentTime,
+                    completed: progressPercentage >= 90
+                };
+            }
+            return prevSelectedVideo;
+        });
+
+        setVideoList(prevVideos =>
+            prevVideos.map(video =>
+                video.id === videoId
+                    ? {
+                        ...video,
+                        progress: progressPercentage,
+                        lastPosition: currentTime,
+                        completed: progressPercentage >= 90
+                    }
+                    : video
+            )
+        );
+
+        // Find the video title
+        const video = videoList.find(v => v.id === videoId);
+        if (video) {
+            // Save progress to Firebase (throttled by the debounce)
+            saveProgress(
+                videoId,
+                currentTime,
+                duration,
+                progressPercentage,
+                video.title || "Unknown Video"
+            );
+        }
+    }, [videoList, saveProgress]);
 
     return (
         <div>
-            {/* Header with title and view all link */}
-            <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
-                <div className="flex items-center">
-                    <Play className="w-5 h-5 text-red-500 mr-2" />
-                    <h2 className="text-xl font-semibold text-white">{title}</h2>
-                    <span className="ml-2 px-2 py-0.5 bg-red-900/50 text-red-100 rounded text-xs">
-                        {videos.length}
-                    </span>
-                </div>
-                <Link
-                    href="/dashboard/tier-1/view-all-videos"
-                    className="text-red-500 hover:text-red-400 transition-colors duration-300"
-                >
-                    View All
-                </Link>
-
-            </div>
-
-            {/* Loading state for progress data */}
-            {isProgressLoading ? (
-                <div className="flex justify-center py-8">
-                    <div className="w-8 h-8 border-t-2 border-b-2 border-red-600 rounded-full animate-spin"></div>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {sortedVideos.length > 0 ? (
-                        sortedVideos.map((video) => (
-                            <VideoCard
-                                key={video.id}
-                                video={video}
-                                onPlay={handlePlayVideo}
-                            />
-                        ))
-                    ) : (
-                        <div className="col-span-3 text-center py-8 bg-black/20 rounded-lg">
-                            <p className="text-gray-400">No videos available yet.</p>
-                        </div>
-                    )}
+            {!isConnected && (
+                <div className="bg-amber-900/20 border border-amber-800 text-amber-400 p-3 mb-4 rounded-md text-sm">
+                    Connect your wallet to track your progress and earn rewards.
                 </div>
             )}
 
-            {/* Video modal */}
-            <VideoModalWithWagmi
+            {videoList.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                    <p>No videos available</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {videoList.map((video) => (
+                        <VideoCard
+                            key={video.id}
+                            video={video}
+                            onClick={handleVideoClick}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {/* Video Modal */}
+            <VideoModal
                 video={selectedVideo}
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
-
+                onProgress={handleVideoProgress}
             />
         </div>
     );

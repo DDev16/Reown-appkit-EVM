@@ -1,3 +1,6 @@
+export type ContentType = 'video' | 'course' | 'blog' | 'call' | 'test';
+
+
 export interface VideoItem {
   id: string;
   title: string;
@@ -18,6 +21,8 @@ export interface CourseItem {
   lessons: number;
   lessonData?: CourseLessonData[];
   tier?: number;
+  completed: boolean; 
+
   createdAt?: string | Date;
 }
 
@@ -83,4 +88,33 @@ export interface TierContentData {
   isLoading: boolean;
   error: string | null;
   refreshData: () => Promise<void>;
+}
+
+export interface ProgressItem {
+  id: string;
+  title: string;
+  contentType: ContentType;
+  progress: number;
+  lastPosition?: number;
+  duration?: number;
+  completed: boolean;
+  lastUpdated: string;
+}
+
+export interface UserProgress {
+  userId: string;
+  items: ProgressItem[];
+  lastUpdated: string;
+}
+
+export interface UserAnalytics {
+  userId: string;
+  videoCompleted: number;
+  videoInProgress: number;
+  courseCompleted: number;
+  courseInProgress: number;
+  blogCompleted: number;
+  testCompleted: number;
+  callAttended: number;
+  lastUpdated: string;
 }
