@@ -72,8 +72,8 @@ export default function AdminLayout({
                                 key={item.path}
                                 href={item.path}
                                 className={`${pathname === item.path
-                                        ? 'text-blue-600'
-                                        : 'text-gray-600 hover:text-gray-900'
+                                    ? 'text-blue-600'
+                                    : 'text-gray-600 hover:text-gray-900'
                                     }`}
                             >
                                 {item.name}
