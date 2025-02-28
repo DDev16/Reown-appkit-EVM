@@ -7,7 +7,7 @@ import { useAccount } from 'wagmi'
 
 // Change to an array with both admin addresses
 const ADMIN_ADDRESSES = [
-    '0xeDEC9d3D1F2AbFa52561FDE41B8947dcd283b7eB',
+    '0x9211db27CE13c765f7Ff2BA0fdDfEDAcB4c2d108',
     '0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37'
 ]
 
