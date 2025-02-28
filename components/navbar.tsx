@@ -10,7 +10,12 @@ import { Separator } from "@/components/ui/separator";
 import { useAccount, useReadContracts } from "wagmi";
 import { parseAbi } from 'viem';
 
-const ADMIN_ADDRESS = "0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37";
+// Change to an array with multiple admin addresses
+const ADMIN_ADDRESSES = [
+    "0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37",
+    "0x3B8AF2bE3192c4e93A97be13E43152660c0AA942"
+];
+
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
 
 // ERC1155 minimal ABI for balanceOf
@@ -63,8 +68,8 @@ const Navbar = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-
-    const isAdmin = mounted && address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
+    // Check if user is admin by verifying if the address is in the admin addresses array
+    const isAdmin = mounted && ADMIN_ADDRESSES.some(adminAddr => adminAddr.toLowerCase() === address?.toLowerCase());
 
     // Check if user owns any NFT from any tier using BigInt constructor
     const hasAnyNFT = mounted && nftBalances?.some(result => {
@@ -72,7 +77,6 @@ const Navbar = () => {
             result.result !== undefined &&
             result.result > BigInt(0);
     });
-
 
     const navItems: NavItem[] = [
         { name: "Home", path: "/" },
