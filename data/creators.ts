@@ -15,12 +15,34 @@ export interface Creator {
   }
   
   export const creators: Creator[] = [
-    // Tier 1 Contributor Specialists
+   // DeFi Educators
+   {
+    name: "Defi Bull",
+    image: "/contributors/DB.jpg",
+    contentType: "Founder",
+    bio: "Founder of DeFi Bull, a leading DeFi education platform. Focuses on simplifying complex DeFi concepts for beginners and advanced users.",
+    specialization: "Tier 1 Contributor",
+    socials: {
+      twitter: "https://twitter.com/michaelchen",
+      discord: "https://discord.gg/defi-simplified"
+    }
+  },
+  {
+    name: "Dan Rocky",
+    image: "/contributors/dan.jpg",
+    contentType: "Tech Specialist",
+    bio: "Dancocky is an Flare Network subject matter expert, SME, and has been involved in the Flare community since go-live on main net January 2023, but Dancocky has more than 10 years experience within the crypto industry within the BTC, ETH and XRP communities. Dancocky has been supporting the Flare community in various ways, from facilitating community X spaces to running his own YouTube channel focusing on Flare Networks. Dancocky has a wide profile which includes technical blockchain knowledge, specifically for Flare Network and the ecosystem.",
+    specialization: "Tier 1 Contributor",
+    socials: {
+      twitter: "https://twitter.com/liwei_defi",
+      github: "https://github.com/liwei-analytics"
+    }
+  },
     {
       name: "Staaal Staalesen",
       image: "/contributors/Staaal.png",
       contentType: "Graphic Designer",
-      bio: "Graphic designer & crypto enthusiast focused on the Flare Network since 2021, blending creativity with blockchain trends.",
+      bio: "I’m a graphic designer interested in crypto, especially the Flare Network. I’ve been in the space since 2021, always learning and keeping up with the latest trends. I love mixing creativity with blockchain to bring ideas to life.",
       specialization: "Tier 1 Contributor",
       socials: {
         twitter: "https://twitter.com/sarahjohnson",
@@ -31,37 +53,14 @@ export interface Creator {
       name: "Anubis",
       image: "/contributors/Anubis.png",
       contentType: "Crypto Entusiast",
-      bio: "Polish crypto enthusiast since 2022. Optimizing logistics & simplifying crypto, I back Flare’s Web2–3 bridge.",
+      bio: "Enthusiast of crypto from Poland, in the space since 2022 – I bring a fresh yet analytical perspective. By day, I optimize logistics processes, which fuels my drive to find efficient solutions in blockchain and AI. I see Flare as a 3rd-generation blockchain that, through decentralization, can bridge Web 2 and Web 3, freeing us from centralized systems. I write to break down the crypto world for everyone, not just coders.",
       specialization: "Tier 1 Contributor",
       socials: {
         twitter: "https://twitter.com/alexrivera",
         github: "https://github.com/alexrivera"
       }
     },
-    {
-      name: "Li Wei",
-      image: "/assets/flareLogo1.png",
-      contentType: "Dashboard Creator",
-      bio: "Building data dashboards that visualize complex DeFi metrics. Specialist in DEX volumes, TVL analysis, and cross-chain comparisons.",
-      specialization: "Tier 1 Contributor",
-      socials: {
-        twitter: "https://twitter.com/liwei_defi",
-        github: "https://github.com/liwei-analytics"
-      }
-    },
-    
-    // DeFi Educators
-    {
-      name: "Michael Chen",
-      image: "/assets/flareLogo1.png",
-      contentType: "Video Educator",
-      bio: "Breaking down complex DeFi concepts through easy-to-understand videos. Founder of DeFi Simplified YouTube channel with 200K+ subscribers.",
-      specialization: "Tier 1 Contributor",
-      socials: {
-        twitter: "https://twitter.com/michaelchen",
-        discord: "https://discord.gg/defi-simplified"
-      }
-    },
+  
     {
       name: "Priya Sharma",
       image: "/assets/flareLogo1.png",
