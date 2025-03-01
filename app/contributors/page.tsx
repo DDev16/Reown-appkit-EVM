@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState } from 'react';
-import { ArrowUpRight, X } from 'lucide-react';
+import { X, ArrowUpRight } from 'lucide-react';
 import { FaGithub, FaLinkedin, FaTwitter, FaDiscord } from 'react-icons/fa';
 import { Creator, creators } from '@/data/creators';
 
@@ -103,6 +103,7 @@ const CreatorCard: React.FC<{ creator: Creator }> = ({ creator }) => {
         translateZ: 0
     });
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showTooltip, setShowTooltip] = useState(false);
 
     // Mapping for social icons
     const socialIcons = {
@@ -142,10 +143,18 @@ const CreatorCard: React.FC<{ creator: Creator }> = ({ creator }) => {
             rotateY: 0,
             translateZ: 0
         });
+        setShowTooltip(false);
+    };
+
+    const handleMouseEnter = () => {
+        setShowTooltip(true);
     };
 
     const openModal = (e: React.MouseEvent) => {
-        e.preventDefault();
+        // Prevent opening modal when clicking on social links
+        if ((e.target as HTMLElement).closest('a')) {
+            return;
+        }
         setIsModalOpen(true);
     };
 
@@ -154,8 +163,10 @@ const CreatorCard: React.FC<{ creator: Creator }> = ({ creator }) => {
             <div
                 ref={cardRef}
                 onMouseMove={handleMouseMove}
+                onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
-                className="perspective-600 group relative w-[280px] h-[400px]"
+                onClick={openModal}
+                className="perspective-600 group relative w-[280px] h-[400px] cursor-pointer"
                 style={{
                     perspective: '600px',
                     transformStyle: 'preserve-3d'
@@ -170,6 +181,19 @@ const CreatorCard: React.FC<{ creator: Creator }> = ({ creator }) => {
                         transition: 'transform 0.1s ease-out'
                     }}
                 />
+
+                {/* Tooltip */}
+                {showTooltip && (
+                    <div
+                        className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white text-xs py-1 px-2 rounded z-20 opacity-90 font-medium"
+                        style={{
+                            transform: `translateX(-50%) translateZ(150px)`,
+                            pointerEvents: 'none'
+                        }}
+                    >
+                        Click card to view
+                    </div>
+                )}
 
                 {/* Elevated Content */}
                 <div
@@ -268,11 +292,12 @@ const CreatorCard: React.FC<{ creator: Creator }> = ({ creator }) => {
                                         href={link.toString()}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-zinc-300 hover:text-red-500 transition-colors group/icon"
+                                        className="text-zinc-300 hover:text-red-500 transition-colors group/icon z-30"
                                         style={{
                                             transform: 'translateZ(130px)',
                                             transition: 'transform 0.3s ease-out'
                                         }}
+                                        onClick={(e) => e.stopPropagation()}
                                     >
                                         <IconComponent
                                             className="w-5 h-5 group-hover/icon:scale-110 transition-transform"
@@ -281,18 +306,6 @@ const CreatorCard: React.FC<{ creator: Creator }> = ({ creator }) => {
                                 ) : null;
                             })}
                         </div>
-
-                        {/* See More Button */}
-                        <button
-                            onClick={openModal}
-                            className="absolute bottom-14 left-0 right-0 text-center text-red-500 hover:text-red-400 text-sm font-medium transition-colors flex items-center justify-center gap-1"
-                            style={{
-                                transform: 'translateZ(130px)',
-                                transition: 'transform 0.3s ease-out, color 0.3s ease-out'
-                            }}
-                        >
-                            See More <ArrowUpRight size={14} className="inline transition-transform group-hover:rotate-45" />
-                        </button>
                     </div>
                 </div>
             </div>
