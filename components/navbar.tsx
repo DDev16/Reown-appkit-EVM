@@ -14,6 +14,7 @@ import { parseAbi } from 'viem';
 const ADMIN_ADDRESSES = [
     "0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37",
     "0x9211db27CE13c765f7Ff2BA0fdDfEDAcB4c2d108",
+    '0x51c0BD4bA7B521601bBBEC907365E24d5de65BA5'
 ];
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;

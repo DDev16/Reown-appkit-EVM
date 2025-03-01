@@ -8,7 +8,8 @@ import { useAccount } from 'wagmi'
 // Change to an array with both admin addresses
 const ADMIN_ADDRESSES = [
     '0x9211db27CE13c765f7Ff2BA0fdDfEDAcB4c2d108',
-    '0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37'
+    '0xd0cfD2e3Be2D49976D870898fcD6fE94Dbc98f37',
+    '0x51c0BD4bA7B521601bBBEC907365E24d5de65BA5'
 ]
 
 export default function AdminLayout({
