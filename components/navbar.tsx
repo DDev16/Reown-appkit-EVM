@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Menu, X, ArrowRight } from "lucide-react";
 import Image from "next/image";
-import MusicPlayer from "./ui/MusicPlayer";
 import AppKitButton from "./appkit/appkitButton";
 import { Separator } from "@/components/ui/separator";
 import { useAccount, useReadContracts } from "wagmi";
@@ -232,15 +231,13 @@ const Navbar = () => {
                                 </Link>
                             )
                         )}
-                        <div className="ml-4 flex items-center">
-                            <MusicPlayer />
+                        <div className="ml-4">
                             <AppKitButton />
                         </div>
                     </div>
 
                     {/* Mobile Navigation */}
-                    <div className="sm:hidden flex items-center gap-2">
-                        <MusicPlayer />
+                    <div className="sm:hidden flex items-center">
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             className="text-gray-300 hover:text-white p-2 rounded-lg hover:bg-[#BC1A1E]/10 transition-colors"
