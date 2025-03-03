@@ -6,6 +6,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useRouter } from 'next/navigation';
+import { X } from 'lucide-react';
 
 export default function BlogForm() {
     const router = useRouter();
@@ -14,6 +15,36 @@ export default function BlogForm() {
     const [image, setImage] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+
+    // Tags handling
+    const [tagInput, setTagInput] = useState('');
+    const [tags, setTags] = useState<string[]>([]);
+
+    const handleAddTag = () => {
+        if (tagInput.trim()) {
+            // Split by commas and handle multiple tags at once
+            const newTags = tagInput
+                .split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag !== '' && !tags.includes(tag));
+
+            if (newTags.length > 0) {
+                setTags([...tags, ...newTags]);
+                setTagInput('');
+            }
+        }
+    };
+
+    const handleRemoveTag = (tagToRemove: string) => {
+        setTags(tags.filter(tag => tag !== tagToRemove));
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleAddTag();
+        }
+    };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -40,11 +71,12 @@ export default function BlogForm() {
                 }
             }
 
-            // Create the post document
+            // Create the post document with tags
             const postData = {
                 title,
                 content,
                 imageUrl,
+                tags: tags.length > 0 ? tags : ['General'], // Default to General if no tags
                 createdAt: Timestamp.now()
             };
 
@@ -56,6 +88,8 @@ export default function BlogForm() {
             setTitle('');
             setContent('');
             setImage(null);
+            setTags([]);
+            setTagInput('');
             router.refresh();
 
         } catch (err: any) {
@@ -96,6 +130,47 @@ export default function BlogForm() {
                         className="w-full p-2 border rounded h-40"
                         required
                     />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">Tags</label>
+                    <div className="flex">
+                        <input
+                            type="text"
+                            value={tagInput}
+                            onChange={(e) => setTagInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Add tags (comma separated)"
+                            className="w-full p-2 border rounded-l"
+                        />
+                        <button
+                            type="button"
+                            onClick={handleAddTag}
+                            className="bg-blue-600 text-white px-4 rounded-r hover:bg-blue-700"
+                        >
+                            Add
+                        </button>
+                    </div>
+
+                    {tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {tags.map((tag, index) => (
+                                <div key={index} className="flex items-center bg-gray-200 text-gray-800 px-2 py-1 rounded">
+                                    {tag}
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveTag(tag)}
+                                        className="ml-1 text-gray-600 hover:text-gray-900"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    <p className="text-sm text-gray-500 mt-1">
+                        First tag will be used as the post category
+                    </p>
                 </div>
 
                 <div>

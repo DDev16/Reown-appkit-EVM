@@ -41,12 +41,7 @@ const PartnerCard = ({ partner }: { partner: Partner }) => (
 
 const Affiliate = () => {
     const partners: Partner[] = [
-        {
-            name: "DRKET Sweepstakes",
-            logo: "/assets/DRKET.jpeg",
-            description: "Monthly sweepstakes with prize pools up to 450K $DRKET",
-            link: "/sweepstakes/drket"
-        },
+
         {
             name: "GOAT Sweepstakes",
             logo: "/assets/GOAT.jpeg",

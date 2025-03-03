@@ -36,7 +36,7 @@ export default function Tier1VideosPage() {
     const { address } = useAccount();
 
     // Current tier
-    const currentTier = 2;
+    const currentTier = 1;
 
     // Generate progress tracking ID (using wallet address or fallback to localStorage)
     const getProgressTrackingId = () => {
@@ -192,7 +192,7 @@ export default function Tier1VideosPage() {
     return (
         <div>
             <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
-                <h1 className="text-2xl font-bold text-white">Tier 2 Video Library</h1>
+                <h1 className="text-2xl font-bold text-white">TOP TIER Video Library</h1>
 
                 {/* Search and filter controls */}
                 <div className="flex flex-col md:flex-row gap-2">

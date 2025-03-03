@@ -1,35 +1,75 @@
 "use client";
 
-import { ArrowRight, ChevronRight } from 'lucide-react';
-import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import { ArrowRight, ChevronRight, Loader2 } from 'lucide-react';
+import { collection, query, orderBy, getDocs, limit } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+// Using regular img tag instead of next/image to avoid domain configuration
+import Link from 'next/link';
+import type { BlogPost as BlogPostType } from '@/types/blog';
 
 const BlogPreview: React.FC = () => {
-    const blogPosts = [
-        {
-            title: "Understanding DeFi Fundamentals",
-            excerpt: "Learn the basic concepts of decentralized finance and how it's revolutionizing traditional banking.",
-            date: "Jan 28, 2025",
-            readTime: "5 min read",
-            image: "/placeholder/600/400",
-            category: "Blockchain"
-        },
-        {
-            title: "Advanced NFT Trading Strategies",
-            excerpt: "Discover proven strategies for trading NFTs and maximizing your returns in the digital asset market.",
-            date: "Jan 25, 2025",
-            readTime: "7 min read",
-            image: "/placeholder/600/400",
-            category: "NFT"
-        },
-        {
-            title: "The Future of Web3 Education",
-            excerpt: "Explore how blockchain technology is transforming educational systems and creating new opportunities.",
-            date: "Jan 22, 2025",
-            readTime: "6 min read",
-            image: "/placeholder/600/400",
-            category: "Education"
-        }
-    ];
+    const [posts, setPosts] = useState<BlogPostType[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchLatestPosts = async () => {
+            try {
+                const q = query(
+                    collection(db, 'posts'),
+                    orderBy('createdAt', 'desc'),
+                    limit(3)
+                );
+
+                const querySnapshot = await getDocs(q);
+                const fetchedPosts = querySnapshot.docs.map(doc => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        ...data,
+                        createdAt: data.createdAt
+                    } as BlogPostType;
+                });
+
+                setPosts(fetchedPosts);
+            } catch (err) {
+                console.error('Error fetching latest posts:', err);
+                setError('Failed to load latest blog posts');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchLatestPosts();
+    }, []);
+
+    // Helper function to calculate read time (if not provided)
+    const getReadTime = (post: BlogPostType) => {
+        if (post.readTime) return `${post.readTime} min read`;
+
+        // Estimate read time based on content length (about 200 words per minute)
+        const wordCount = post.content.split(/\s+/).length;
+        const estimatedMinutes = Math.max(1, Math.ceil(wordCount / 200));
+        return `${estimatedMinutes} min read`;
+    };
+
+    // Helper function to format date
+    const formatDate = (timestamp: any) => {
+        if (!timestamp) return '';
+
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    };
+
+    // Extract category from tags (first tag)
+    const getCategory = (post: BlogPostType) => {
+        return post.tags && post.tags.length > 0 ? post.tags[0] : 'General';
+    };
 
     return (
         <section className="relative py-24 overflow-hidden">
@@ -73,70 +113,108 @@ const BlogPreview: React.FC = () => {
                 </div>
 
                 {/* Blog Posts Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {blogPosts.map((post, index) => (
-                        <article
-                            key={index}
-                            className="group relative"
-                            data-aos="fade-up"
-                            data-aos-delay={index * 100}
-                        >
-                            {/* Glow border */}
-                            <div className="absolute -inset-[1px] bg-gradient-to-r from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E] rounded-xl opacity-70 group-hover:opacity-100 blur-[2px] transition-all duration-500"></div>
+                {loading ? (
+                    // Loading state - skeleton loader
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {[...Array(3)].map((_, index) => (
+                            <div
+                                key={index}
+                                className="relative rounded-xl p-6 backdrop-blur-sm border border-[#BC1A1E]/20 bg-black/90"
+                            >
+                                <div className="relative h-56 rounded-lg overflow-hidden mb-6 bg-gray-800 animate-pulse"></div>
+                                <div className="space-y-4">
+                                    <div className="h-4 bg-gray-800 rounded animate-pulse"></div>
+                                    <div className="h-8 bg-gray-800 rounded animate-pulse"></div>
+                                    <div className="h-16 bg-gray-800 rounded animate-pulse"></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : error ? (
+                    // Error state
+                    <div className="text-center text-red-500">
+                        <p>{error}</p>
+                    </div>
+                ) : (
+                    // Blog posts grid
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {posts.map((post, index) => (
+                            <article
+                                key={post.id}
+                                className="group relative"
+                                data-aos="fade-up"
+                                data-aos-delay={index * 100}
+                            >
+                                {/* Glow border */}
+                                <div className="absolute -inset-[1px] bg-gradient-to-r from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E] rounded-xl opacity-70 group-hover:opacity-100 blur-[2px] transition-all duration-500"></div>
 
-                            {/* Inner glow */}
-                            <div className="absolute inset-[1px] rounded-xl opacity-0 group-hover:opacity-20 bg-gradient-to-b from-[#BC1A1E] to-transparent transition-opacity duration-500 blur-xl"></div>
+                                {/* Inner glow */}
+                                <div className="absolute inset-[1px] rounded-xl opacity-0 group-hover:opacity-20 bg-gradient-to-b from-[#BC1A1E] to-transparent transition-opacity duration-500 blur-xl"></div>
 
-                            {/* Content */}
-                            <div className="relative rounded-xl p-6 backdrop-blur-sm border border-[#BC1A1E]/20 bg-black/90">
-                                {/* Image Container */}
-                                <div className="relative h-56 rounded-lg overflow-hidden mb-6">
-                                    <div className="absolute inset-0 bg-[#242223] flex items-center justify-center">
-                                        <span className="text-gray-400">Placeholder {index + 1}</span>
-                                    </div>
-                                    <div className="absolute top-4 right-4">
-                                        <div className="bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] p-[1px] rounded-full">
-                                            <div className="px-3 py-1 rounded-full bg-black/50 backdrop-blur-sm">
-                                                <span className="text-xs font-medium text-white">{post.category}</span>
+                                {/* Content */}
+                                <div className="relative rounded-xl p-6 backdrop-blur-sm border border-[#BC1A1E]/20 bg-black/90">
+                                    {/* Image Container */}
+                                    <div className="relative h-56 rounded-lg overflow-hidden mb-6">
+                                        {post.imageUrl ? (
+                                            <img
+                                                src={post.imageUrl}
+                                                alt={post.title}
+                                                className="absolute inset-0 w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 bg-[#242223] flex items-center justify-center">
+                                                <span className="text-gray-400">Blog Image {index + 1}</span>
+                                            </div>
+                                        )}
+                                        <div className="absolute top-4 right-4">
+                                            <div className="bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] p-[1px] rounded-full">
+                                                <div className="px-3 py-1 rounded-full bg-black/50 backdrop-blur-sm">
+                                                    <span className="text-xs font-medium text-white">{getCategory(post)}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Post Info */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center text-sm text-gray-400 space-x-2">
-                                        <span>{post.date}</span>
-                                        <span className="text-[#BC1A1E]">•</span>
-                                        <span>{post.readTime}</span>
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-white group-hover:text-[#BC1A1E] transition-colors duration-300">
-                                        {post.title}
-                                    </h3>
-                                    <p className="text-gray-400 line-clamp-3">
-                                        {post.excerpt}
-                                    </p>
-                                    <div className="pt-4">
-                                        <button className="flex items-center text-[#BC1A1E] hover:text-[#FF4B51] font-semibold transition-colors duration-300 group/btn">
-                                            <span>Read More</span>
-                                            <ArrowRight className="ml-2 h-4 w-4 transform group-hover/btn:translate-x-1 transition-transform" />
-                                        </button>
+                                    {/* Post Info */}
+                                    <div className="space-y-4">
+                                        <div className="flex items-center text-sm text-gray-400 space-x-2">
+                                            <span>{formatDate(post.createdAt)}</span>
+                                            <span className="text-[#BC1A1E]">•</span>
+                                            <span>{getReadTime(post)}</span>
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-white group-hover:text-[#BC1A1E] transition-colors duration-300">
+                                            {post.title}
+                                        </h3>
+                                        <p className="text-gray-400 line-clamp-3">
+                                            {post.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
+                                        </p>
+                                        <div className="pt-4">
+                                            <Link
+                                                href={`/blog/${post.id}`}
+                                                className="flex items-center text-[#BC1A1E] hover:text-[#FF4B51] font-semibold transition-colors duration-300 group/btn"
+                                            >
+                                                <span>Read More</span>
+                                                <ArrowRight className="ml-2 h-4 w-4 transform group-hover/btn:translate-x-1 transition-transform" />
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </article>
-                    ))}
-                </div>
+                            </article>
+                        ))}
+                    </div>
+                )}
 
                 {/* View All Button */}
                 <div className="mt-16 text-center">
-                    <button className="group relative px-8 py-4 font-semibold">
-                        <div className="absolute -inset-[1px] bg-gradient-to-r from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E] rounded-lg blur-md transition-all duration-500 group-hover:blur-lg" />
-                        <span className="relative bg-black block rounded-lg px-8 py-4 text-white transition-colors duration-300 group-hover:bg-black/80">
-                            View All Posts
-                            <ChevronRight className="inline-block ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
-                        </span>
-                    </button>
+                    <Link href="/blog">
+                        <button className="group relative px-8 py-4 font-semibold">
+                            <div className="absolute -inset-[1px] bg-gradient-to-r from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E] rounded-lg blur-md transition-all duration-500 group-hover:blur-lg" />
+                            <span className="relative bg-black block rounded-lg px-8 py-4 text-white transition-colors duration-300 group-hover:bg-black/80">
+                                View All Posts
+                                <ChevronRight className="inline-block ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
+                            </span>
+                        </button>
+                    </Link>
                 </div>
             </div>
 

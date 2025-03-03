@@ -68,7 +68,7 @@ const CreatorModal: React.FC<{ creator: Creator; isOpen: boolean; onClose: () =>
                         {creator.bio}
                     </p>
 
-                    {/* Social Links */}
+                    {/* Social Links
                     <div className="flex space-x-5 mb-4">
                         {Object.entries(creator.socials).map(([platform, link]) => {
                             const IconComponent = socialIcons[platform as keyof typeof socialIcons];
@@ -88,7 +88,7 @@ const CreatorModal: React.FC<{ creator: Creator; isOpen: boolean; onClose: () =>
                                 </a>
                             ) : null;
                         })}
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>
@@ -275,7 +275,7 @@ const CreatorCard: React.FC<{ creator: Creator }> = ({ creator }) => {
                             {truncateBio(creator.bio)}
                         </p>
 
-                        {/* Social Links */}
+                        {/* Social Links
                         <div
                             className="flex space-x-3 transition-all duration-300 group-hover:-translate-y-1 shrink-0 absolute bottom-20 left-0 right-0 justify-center"
                             style={{
@@ -305,7 +305,7 @@ const CreatorCard: React.FC<{ creator: Creator }> = ({ creator }) => {
                                     </a>
                                 ) : null;
                             })}
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

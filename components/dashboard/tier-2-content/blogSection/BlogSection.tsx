@@ -15,7 +15,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ blogs }) => {
         <div className="mb-8">
             <ContentSectionHeader
                 title="Latest Blogs"
-                viewAllLink="/dashboard/tier-2/blogs"
+                viewAllLink="/dashboard/tier-1/blogs"
                 icon={<BookOpen className="ml-1 w-4 h-4" />}
             />
 

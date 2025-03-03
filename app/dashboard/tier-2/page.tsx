@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { useTierContent } from '@/hooks/useTierContent';
 import { LoadingState } from '@/components/dashboard/ui/LoadingState';
 import { ErrorState } from '@/components/dashboard/ui/ErrorState';
-import { VideoSection } from '@/components/dashboard/tier-1-content/videoSection/VideoSection';
-import { CourseSection } from '@/components/dashboard/tier-1-content/coursesSection/CourseSection';
-import { BlogSection } from '@/components/dashboard/tier-1-content/blogSection/BlogSection';
-import { CallSection } from '@/components/dashboard/tier-1-content/callSection/CallSection';
-import { TestSection } from '@/components/dashboard/tier-1-content/testSection/TestSection';
-import { AnalyticsSection } from '@/components/dashboard/tier-1-content/analyticsSection/AnalyticsSection';
+import { VideoSection } from '@/components/dashboard/tier-2-content/videoSection/VideoSection';
+import { CourseSection } from '@/components/dashboard/tier-2-content/coursesSection/CourseSection';
+import { BlogSection } from '@/components/dashboard/tier-2-content/blogSection/BlogSection';
+import { CallSection } from '@/components/dashboard/tier-2-content/callSection/CallSection';
+import { TestSection } from '@/components/dashboard/tier-2-content/testSection/TestSection';
+import { AnalyticsSection } from '@/components/dashboard/tier-2-content/analyticsSection/AnalyticsSection';
 import { useAccount, useReadContract } from 'wagmi';
 import { Lock } from 'lucide-react';
 import CONTRACT_ABI from '@/lib/contract-abi.json';
@@ -22,11 +22,11 @@ const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string
 if (!CONTRACT_ADDRESS) throw new Error("Contract address not found in environment variables");
 
 // Token ID for Tier 1
-const TIER_2 = 1; // Assuming tier 1 has ID 0, adjust if different
+const TIER_1 = 0; // Assuming tier 1 has ID 0, adjust if different
 
-export default function Tier2Page() {
+export default function Tier1Page() {
     // Current tier
-    const currentTier = 2;
+    const currentTier = 1;
 
     // Auth states for token gating
     const [isAuthorized, setIsAuthorized] = useState(false);
@@ -40,7 +40,7 @@ export default function Tier2Page() {
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'balanceOf',
-        args: [address!, TIER_2],
+        args: [address!, TIER_1],
         query: {
             enabled: !!address,
         },
@@ -49,7 +49,7 @@ export default function Tier2Page() {
     // Check if user is authorized based on token balance
     useEffect(() => {
         if (tierBalance !== undefined) {
-            // User is authorized if they have at least 1 token of TIER_2
+            // User is authorized if they have at least 1 token of TIER_1
             setIsAuthorized(Number(tierBalance) > 0);
             setAuthLoading(false);
         }
@@ -131,14 +131,14 @@ export default function Tier2Page() {
                     <Lock className="w-16 h-16 mx-auto text-red-600" />
                     <h2 className="text-2xl font-bold">Access Required</h2>
                     <p className="text-gray-400">
-                        You need to hold the Tier 2 token to access this content
+                        You need to hold the Tier 1 token to access this content
                     </p>
                     <div className="space-y-2">
                         <button className="px-6 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
-                            Purchase Tier 2 Membership
+                            Purchase Tier 1 Membership
                         </button>
                         <p className="text-sm text-gray-500">
-                            Already own a Tier 2 NFT? Make sure it&apos;s in your connected wallet.
+                            Already own a Tier 1 NFT? Make sure it&apos;s in your connected wallet.
                         </p>
                     </div>
                 </div>
@@ -266,7 +266,7 @@ export default function Tier2Page() {
             {/* Header with content type tabs */}
             <div className="mb-6 px-1">
                 <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-xl font-bold text-white"> Tier 2 Dashboard</h1>
+                    <h1 className="text-xl font-bold text-white">Top Tier Dashboard</h1>
                     <button
                         onClick={refreshData}
                         className="flex items-center justify-center px-4 py-2 bg-red-800 hover:bg-red-700 rounded text-sm font-medium transition-colors"

@@ -45,7 +45,7 @@ if (!CONTRACT_ADDRESS) throw new Error("Contract address not found in environmen
 
 // Map tier IDs to names based on contract constants
 const TIER_NAMES = {
-    0: 'TOP TIER',
+    0: 'Top Tier',  // Changed to match MEMBERSHIP_TIERS
     1: 'RHODIUM',
     2: 'PLATINUM',
     3: 'GOLD',
@@ -56,7 +56,6 @@ const TIER_NAMES = {
     8: 'RHENIUM',
     9: 'SILVER'
 };
-
 export default function DashboardPage() {
     // Get user's connected wallet address
     const { address, isConnected } = useAccount();
@@ -384,8 +383,8 @@ export default function DashboardPage() {
                                     <div className={`w-full h-full bg-gradient-to-r ${tier.color} opacity-20`} />
                                 </div>
                                 <div className={`relative bg-black/40 backdrop-blur-sm border rounded-xl p-4 transition-all duration-300 
-                                    ${tier.highlighted ? 'ring-2 ring-[#FFD700]/50' : ''} 
-                                    ${owned && tier.name !== 'IRIDIUM'
+                ${tier.highlighted ? 'ring-2 ring-[#FFD700]/50' : ''} 
+                ${owned && tier.name !== 'IRIDIUM'
                                         ? 'border-emerald-500 hover:border-emerald-400'
                                         : tier.name === 'SILVER'
                                             ? 'border-pink-500 hover:border-fuchsia-500'

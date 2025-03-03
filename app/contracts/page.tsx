@@ -25,56 +25,58 @@ interface ContractAddress {
 const CONTRACT_ADDRESSES: ContractAddress[] = [
     {
         name: "DBW Token Contract",
-        address: "0x123456789...", // Replace with actual address
+        address: "0x31Db774C3B1c44ea7d718fFbf7D3FFbc6484B1fc", // Replace with actual address
         description: "Defi Bull World Token",
         network: "Flare Mainnet",
-        explorerUrl: "https://coston-explorer.flare.network/token/0x123456789...", // Replace with actual address
+        explorerUrl: "https://flare-explorer.flare.network/token/0x31Db774C3B1c44ea7d718fFbf7D3FFbc6484B1fc", // Replace with actual address
         contractType: "ERC20",
         logoUrl: "/assets/tokens/dbw-logo.png"  // Add path to your token logo
     },
     {
         name: "DBWF Token Contract",
-        address: "0x987654321...", // Replace with actual address
+        address: "0x77aA1BCf27D2F2eD9ABa33F66958F4978B3Ab611", // Replace with actual address
         description: "Defi Bull World FTSO Token",
         network: "Flare Mainnet",
-        explorerUrl: "https://coston-explorer.flare.network/token/0x987654321...", // Replace with actual address
+        explorerUrl: "https://flare-explorer.flare.network/token/0x77aA1BCf27D2F2eD9ABa33F66958F4978B3Ab611", // Replace with actual address
         contractType: "ERC20",
         logoUrl: "/assets/tokens/dbwf-logo.png"  // Add path to your token logo
     },
     {
         name: "DBWL Token Contract",
-        address: "0xabcdef123...", // Replace with actual address
+        address: "0x8D41444B9d0ca97b9FEB993640963988458c5f71", // Replace with actual address
         description: "Defi Bull World Liquidator Token",
         network: "Flare Mainnet",
-        explorerUrl: "https://coston-explorer.flare.network/token/0xabcdef123...", // Replace with actual address
+        explorerUrl: "https://flare-explorer.flare.network/token/0x8D41444B9d0ca97b9FEB993640963988458c5f71", // Replace with actual address
         contractType: "ERC20",
         logoUrl: "/assets/tokens/dbwl-logo.png"  // Add path to your token logo
     },
     {
+        name: "DBT Token Contract",
+        address: "0xE259f855f9EdCbBCD5837794948C1CD418665d03", // Replace with actual address
+        description: "Defi Bull Token",
+        network: "Flare Mainnet",
+        explorerUrl: "https://flare-explorer.flare.network/token/0xE259f855f9EdCbBCD5837794948C1CD418665d03", // Replace with actual address
+        contractType: "ERC20",
+        logoUrl: "/assets/tokens/dbwlp-logo.png"  // Add path to your token logo
+    },
+    {
         name: "NFTC Token Contract",
-        address: "0x456789abc...", // Replace with actual address
+        address: "0xF5976f03bBe85315e5610F0c9C306cA979DeA6E5", // Replace with actual address
         description: "Defi Bull World NFT Collection Token",
         network: "Flare Mainnet",
-        explorerUrl: "https://coston-explorer.flare.network/token/0x456789abc...", // Replace with actual address
+        explorerUrl: "https://flare-explorer.flare.network/token/0xF5976f03bBe85315e5610F0c9C306cA979DeA6E5", // Replace with actual address
         contractType: "ERC20",
         logoUrl: "/assets/tokens/nftc-logo.png"  // Add path to your token logo
     },
     {
         name: "Membership NFT Contract",
-        address: "0x123456789...", // Replace with actual address
+        address: "0x51e5f900e080886D2188c3Df462e96276810A699", // Replace with actual address
         description: "Manages NFTs for membership tiers",
         network: "Flare Mainnet",
-        explorerUrl: "https://coston-explorer.flare.network/token/0x123456789...", // Replace with actual address
+        explorerUrl: "https://flare-explorer.flare.network/address/0x51e5f900e080886D2188c3Df462e96276810A699", // Replace with actual address
         contractType: "Membership"
     },
-    {
-        name: "Airdrop Contract",
-        address: "0x987654321...", // Replace with actual address
-        description: "Handles airdrops for Tokens",
-        network: "Flare Mainnet",
-        explorerUrl: "https://coston-explorer.flare.network/token/0x987654321...",
-        contractType: "Airdrop"
-    }
+
 ];
 
 export default function ContractAddressesPage() {
@@ -187,7 +189,7 @@ export default function ContractAddressesPage() {
                             <div className="relative z-10">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex items-center">
-                                        {contract.logoUrl && (
+                                        {/* {contract.logoUrl && (
                                             <div className="mr-3 h-8 w-8 sm:h-10 sm:w-10 rounded-full overflow-hidden bg-black/30 flex-shrink-0 border border-[#BC1A1E]/30">
                                                 <img
                                                     src={contract.logoUrl}
@@ -195,7 +197,7 @@ export default function ContractAddressesPage() {
                                                     className="h-full w-full object-contain"
                                                 />
                                             </div>
-                                        )}
+                                        )} */}
                                         <div>
                                             <h2 className="text-lg sm:text-xl font-semibold text-white">{contract.name}</h2>
                                             <p className="text-xs sm:text-sm text-gray-400 mt-1">{contract.network}</p>
@@ -268,7 +270,7 @@ export default function ContractAddressesPage() {
                         <div className="sticky top-20 bg-gradient-to-b from-black to-transparent z-10 px-4 py-4 sm:px-6 sm:py-6">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center max-w-[80%]">
-                                    {CONTRACT_ADDRESSES[selectedContract].logoUrl && (
+                                    {/* {CONTRACT_ADDRESSES[selectedContract].logoUrl && (
                                         <div className="mr-3 h-8 w-8 sm:h-10 sm:w-10 rounded-full overflow-hidden bg-black/30 flex-shrink-0 border border-[#BC1A1E]/30">
                                             <img
                                                 src={CONTRACT_ADDRESSES[selectedContract].logoUrl}
@@ -276,7 +278,7 @@ export default function ContractAddressesPage() {
                                                 className="h-full w-full object-contain"
                                             />
                                         </div>
-                                    )}
+                                    )} */}
                                     <h2 className="text-lg sm:text-2xl font-bold text-white truncate">
                                         {CONTRACT_ADDRESSES[selectedContract].name}
                                     </h2>

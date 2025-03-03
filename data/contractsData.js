@@ -21,7 +21,7 @@ contract TokenStorageV1 is Initializable {
     uint256[47] private __gap;
 }
 
-contract AutoBurnToken is 
+contract ERC20 is 
     TokenStorageV1,
     ERC20Upgradeable, 
     ERC20PausableUpgradeable,
@@ -43,7 +43,7 @@ contract AutoBurnToken is
     ) initializer public {
         require(!_initialized, "Contract already initialized");
         
-        __ERC20_init("AutoBurnToken", "ABT");
+        __ERC20_init("", "");
         __ERC20Pausable_init();
         __Ownable_init(initialOwner);
         __UUPSUpgradeable_init();
@@ -329,6 +329,14 @@ interface IFtso {
     function getCurrentPriceWithDecimals() external view returns (uint256 _price, uint256 _timestamp, uint256 _decimals);
 }
 
+interface IERC20 {
+    function transfer(address recipient, uint256 amount) external returns (bool);
+    function balanceOf(address account) external view returns (uint256);
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+    function decimals() external view returns (uint8);
+    function allowance(address owner, address spender) external view returns (uint256);
+}
+
 contract MembershipNFT is Initializable, ERC1155Upgradeable, OwnableUpgradeable, UUPSUpgradeable {
     
     // Name and symbol for the token
@@ -349,6 +357,32 @@ contract MembershipNFT is Initializable, ERC1155Upgradeable, OwnableUpgradeable,
     uint256 public constant PALLADIUM = 7;
     uint256 public constant RHENIUM = 8;
     uint256 public constant SILVER = 9;
+
+    // ERC20 Token type constants
+    uint256 public constant DBW_TOKEN = 0;
+    uint256 public constant DBT_TOKEN = 1;
+    uint256 public constant DBWF_TOKEN = 2;
+    uint256 public constant DBWL_TOKEN = 3;
+    uint256 public constant NFTC_TOKEN = 4;
+
+    // Payment method constants
+    uint256 public constant PAYMENT_FLR = 0;
+    uint256 public constant PAYMENT_USDT = 1;
+    uint256 public constant PAYMENT_USDC_E = 2;
+
+    // ERC20 token addresses
+    IERC20 public dbwToken;
+    IERC20 public dbtToken;
+    IERC20 public dbwfToken;
+    IERC20 public dbwlToken;
+    IERC20 public nftcToken;
+
+    // Stablecoin token addresses
+    IERC20 public usdtToken;
+    IERC20 public usdcEToken;
+
+    // Mapping to store token reward amounts per tier
+    mapping(uint256 => mapping(uint256 => uint256)) public tierTokenRewards;
 
     // Struct for tier ownership information
     struct TierOwnership {
@@ -371,6 +405,12 @@ contract MembershipNFT is Initializable, ERC1155Upgradeable, OwnableUpgradeable,
     uint256 public totalMaxSupply;
     mapping(address => mapping(uint256 => uint256)) public userMintTimestamps;
 
+    // User token reward tracking
+    mapping(address => mapping(uint256 => uint256)) public userTotalTokenRewards;
+
+    // Mapping to track equivalent FLR value for stablecoin payments
+    mapping(address => mapping(uint256 => uint256)) public stablecoinMintFLREquivalent;
+
     // Enhanced referral tracking
     struct ReferralInfo {
         uint256 totalReferrals;       // Total number of successful referrals
@@ -385,7 +425,7 @@ contract MembershipNFT is Initializable, ERC1155Upgradeable, OwnableUpgradeable,
     // Mapping to store referral information
     mapping(address => ReferralInfo) public referralStats;
     
-    // Events
+    // Events - Optimized
     event MembershipMinted(
         address indexed account, 
         uint256 indexed tier, 
@@ -395,6 +435,19 @@ contract MembershipNFT is Initializable, ERC1155Upgradeable, OwnableUpgradeable,
         uint256 usdPrice,
         uint256 flrAmount
     );
+
+    event MembershipMintedWithERC20(
+        address indexed account, 
+        uint256 indexed tier, 
+        uint256 amount, 
+        uint256 timestamp,
+        address referrer,
+        uint256 usdPrice,
+        uint256 tokenAmount,
+        uint256 paymentMethod,
+        uint256 flrEquivalent
+    );
+    
     event TierUSDPriceUpdated(uint256 indexed tier, uint256 newUSDPrice);
     event TierURIUpdated(uint256 indexed tier, string newURI);
     event WalletUpdated(string indexed walletType, address newWallet);
@@ -411,6 +464,25 @@ contract MembershipNFT is Initializable, ERC1155Upgradeable, OwnableUpgradeable,
         uint256 totalAmount,
         uint256 timestamp
     );
+    event TokenRewardDistributed(
+        address indexed user, 
+        uint256 indexed tier, 
+        uint256 indexed tokenType, 
+        uint256 amount
+    );
+    event TokenAddressUpdated(uint256 indexed tokenType, address tokenAddress);
+    event TierTokenRewardUpdated(uint256 indexed tier, uint256 indexed tokenType, uint256 amount);
+
+    // Custom modifiers for validation
+    modifier validTier(uint256 tier) {
+        require(tier <= SILVER, "Invalid tier");
+        _;
+    }
+    
+    modifier validTokenType(uint256 tokenType) {
+        require(tokenType <= NFTC_TOKEN, "Invalid token type");
+        _;
+    }
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -437,17 +509,20 @@ contract MembershipNFT is Initializable, ERC1155Upgradeable, OwnableUpgradeable,
         partnerWallet = _partnerWallet;
         ftso = IFtso(_ftso);
         
-        // Initialize tier USD prices (in cents)
-        tierUSDPrices[TOP_TIER] = 900;      // $9.00
-        tierUSDPrices[RHODIUM] = 450;       // $4.50
-        tierUSDPrices[PLATINUM] = 225;      // $2.25
-        tierUSDPrices[GOLD] = 110;          // $1.10
-        tierUSDPrices[RUTHENIUM] = 50;      // $0.50
-        tierUSDPrices[IRIDIUM] = 25;        // $0.25
-        tierUSDPrices[OSMIUM] = 12;         // $0.12
-        tierUSDPrices[PALLADIUM] = 6;       // $0.06
-        tierUSDPrices[RHENIUM] = 3;         // $0.03
-        tierUSDPrices[SILVER] = 1;          // $0.01
+        // Initialize stablecoin addresses with hard-coded values
+        usdtToken = IERC20(0x0B38e83B86d491735fEaa0a791F65c2B99535396);
+        usdcEToken = IERC20(0xFbDa5F676cB37624f28265A144A48B0d6e87d3b6);
+        
+       tierUSDPrices[TOP_TIER] = 960000;     // $9,600.00
+        tierUSDPrices[RHODIUM] = 480000;      // $4,800.00
+        tierUSDPrices[PLATINUM] = 240000;     // $2,400.00
+        tierUSDPrices[GOLD] = 120000;         // $1,200.00
+        tierUSDPrices[RUTHENIUM] = 60000;     // $600.00
+        tierUSDPrices[IRIDIUM] = 30000;       // $300.00
+        tierUSDPrices[OSMIUM] = 15000;        // $150.00
+        tierUSDPrices[PALLADIUM] = 7500;      // $75.00
+        tierUSDPrices[RHENIUM] = 3750;        // $37.50
+        tierUSDPrices[SILVER] = 1875;         // $18.75
         
         // Initialize max supply per tier
         maxSupplyPerTier[TOP_TIER] = 25;
@@ -462,113 +537,314 @@ contract MembershipNFT is Initializable, ERC1155Upgradeable, OwnableUpgradeable,
         maxSupplyPerTier[SILVER] = 12800;
 
         totalMaxSupply = 25275; // Total including SILVER tier
+        
+        // Initialize token reward amounts for each tier (assuming 18 decimals for all tokens)
+        // TOP_TIER
+        tierTokenRewards[TOP_TIER][DBW_TOKEN] = 32000 * 10**18;
+        tierTokenRewards[TOP_TIER][DBT_TOKEN] = 30000 * 10**18;
+        tierTokenRewards[TOP_TIER][DBWF_TOKEN] = 24000 * 10**18;
+        tierTokenRewards[TOP_TIER][DBWL_TOKEN] = 24000 * 10**18;
+        tierTokenRewards[TOP_TIER][NFTC_TOKEN] = 24000 * 10**18;
+        
+        // RHODIUM
+        tierTokenRewards[RHODIUM][DBW_TOKEN] = 16000 * 10**18;
+        tierTokenRewards[RHODIUM][DBT_TOKEN] = 15000 * 10**18;
+        tierTokenRewards[RHODIUM][DBWF_TOKEN] = 12000 * 10**18;
+        tierTokenRewards[RHODIUM][DBWL_TOKEN] = 12000 * 10**18;
+        tierTokenRewards[RHODIUM][NFTC_TOKEN] = 12000 * 10**18;
+        
+        // PLATINUM
+        tierTokenRewards[PLATINUM][DBW_TOKEN] = 8000 * 10**18;
+        tierTokenRewards[PLATINUM][DBT_TOKEN] = 7500 * 10**18;
+        tierTokenRewards[PLATINUM][DBWF_TOKEN] = 6000 * 10**18;
+        tierTokenRewards[PLATINUM][DBWL_TOKEN] = 6000 * 10**18;
+        tierTokenRewards[PLATINUM][NFTC_TOKEN] = 6000 * 10**18;
+        
+        // GOLD
+        tierTokenRewards[GOLD][DBW_TOKEN] = 4000 * 10**18;
+        tierTokenRewards[GOLD][DBT_TOKEN] = 3750 * 10**18;
+        tierTokenRewards[GOLD][DBWF_TOKEN] = 3000 * 10**18;
+        tierTokenRewards[GOLD][DBWL_TOKEN] = 3000 * 10**18;
+        
+        // RUTHENIUM
+        tierTokenRewards[RUTHENIUM][DBW_TOKEN] = 2000 * 10**18;
+        tierTokenRewards[RUTHENIUM][DBT_TOKEN] = 1875 * 10**18;
+        tierTokenRewards[RUTHENIUM][DBWF_TOKEN] = 1500 * 10**18;
+        
+        // IRIDIUM
+        tierTokenRewards[IRIDIUM][DBW_TOKEN] = 800 * 10**18;
+        tierTokenRewards[IRIDIUM][DBT_TOKEN] = 938 * 10**18;
+        
+        // OSMIUM
+        tierTokenRewards[OSMIUM][DBW_TOKEN] = 400 * 10**18;
+        
+        // PALLADIUM
+        tierTokenRewards[PALLADIUM][DBW_TOKEN] = 200 * 10**18;
+        
+        // RHENIUM
+        tierTokenRewards[RHENIUM][DBW_TOKEN] = 100 * 10**18;
     }
 
     // Price calculation functions
     function getFlareAmount(uint256 usdPrice) public view returns (uint256) {
         // Get current price from FTSO
-        // Price comes with 5 decimals (e.g., 12345 = $0.12345)
         (uint256 flarePrice, , ) = ftso.getCurrentPriceWithDecimals();
         
-        // usdPrice comes in cents (2 decimals, e.g., 10000 = $100.00)
-        // Convert USD cents to full USD and calculate FLR amount
-        uint256 flareAmount = (usdPrice * 1e18 * 1e5) / (flarePrice * 100);
-        return flareAmount;
+        // usdPrice comes in cents (2 decimals), convert to USD and calculate FLR amount
+        return (usdPrice * 1e18 * 1e5) / (flarePrice * 100);
     }
 
-    // Test functions for price verification
-    function getCurrentFlarePriceRaw() external view returns (
-        uint256 price, 
-        uint256 timestamp, 
-        uint256 decimals
-    ) {
-        return ftso.getCurrentPriceWithDecimals();
+// Refactor the function to use fewer local variables
+function mint(uint256 _tier, uint256 _amount, address _referrer) external payable validTier(_tier) {
+    require(_amount > 0, "Amount must be greater than 0");
+    require(
+        currentSupplyPerTier[_tier] + _amount <= maxSupplyPerTier[_tier],
+        "Exceeds max supply for tier"
+    );
+    
+    // Calculate payment
+    uint256 usdPrice = tierUSDPrices[_tier] * _amount;
+    uint256 flareRequired = getFlareAmount(usdPrice);
+    require(msg.value == flareRequired, "Incorrect payment amount");
+    
+    // Calculate and transfer partner share (2%)
+    uint256 partnerShare = (msg.value * 2) / 100;
+    (bool success,) = payable(partnerWallet).call{value: partnerShare}("");
+    require(success, "Partner payment failed");
+    
+    // Calculate remaining amount to split
+    uint256 halfRemaining = (msg.value - partnerShare) / 2;
+    
+    // Transfer to pool wallet (always gets the full half)
+    (success,) = payable(poolWallet).call{value: halfRemaining}("");
+    require(success, "Pool payment failed");
+    
+    // Handle referral and get adjusted company share
+    uint256 companyShare = _handleReferral(_referrer, _tier, halfRemaining, false, address(0));
+    
+    // Transfer adjusted company share (after referral payment)
+    (success,) = payable(companyWallet).call{value: companyShare}("");
+    require(success, "Company payment failed");
+    
+    // Record mint timestamp and mint NFT
+    uint256 timestamp = block.timestamp;
+    userMintTimestamps[msg.sender][_tier] = timestamp;
+    _mint(msg.sender, _tier, _amount, "");
+    currentSupplyPerTier[_tier] += _amount;
+    
+    // Distribute token rewards
+    _distributeTokenRewards(msg.sender, _tier, _amount);
+    
+    emit MembershipMinted(msg.sender, _tier, _amount, timestamp, _referrer, usdPrice, msg.value);
+}
+   // Helper function to get the payment token based on payment method
+function _getPaymentToken(uint256 paymentMethod) internal view returns (IERC20) {
+    if (paymentMethod == PAYMENT_USDT) {
+        return usdtToken;
+    } else {
+        return usdcEToken;
     }
+}
 
-    function testPriceConversion(uint256 usdCents) external view returns (
-        uint256 flarePriceRaw,
-        uint256 flareAmount,
-        string memory explanation
-    ) {
-        (uint256 currentPrice, , ) = ftso.getCurrentPriceWithDecimals();
-        uint256 requiredFlare = getFlareAmount(usdCents);
-        
-        return (
-            currentPrice,
-            requiredFlare,
-            "FlarePriceRaw shows FTSO price with 5 decimals, flareAmount shows required FLR in wei"
-        );
-    }
+// Helper function to calculate token amount based on USD price
+function _calculateTokenAmount(uint256 usdPriceInCents, IERC20 paymentToken) internal view returns (uint256) {
+    uint8 tokenDecimals = paymentToken.decimals();
+    return (usdPriceInCents * 10**tokenDecimals) / 100;
+}
 
-    function mint(uint256 tier, uint256 amount, address _referrer) external payable {
-        require(tier <= SILVER, "Invalid tier");
-        require(amount > 0, "Amount must be greater than 0");
-        require(
-            currentSupplyPerTier[tier] + amount <= maxSupplyPerTier[tier],
-            "Exceeds max supply for tier"
-        );
-        
-        uint256 usdPrice = tierUSDPrices[tier] * amount;
-        uint256 flareRequired = getFlareAmount(usdPrice);
-        require(msg.value == flareRequired, "Incorrect payment amount");
-        
-        // Calculate shares
-        uint256 partnerShare = (msg.value * 2) / 100;  // 2%
-        uint256 remainingAmount = msg.value - partnerShare;
-        uint256 poolShare = remainingAmount / 2;    // 49% of total
-        uint256 companyShare = remainingAmount / 2; // 49% of total
-        
-        // Handle referral based on tier
-        if (_referrer != address(0) && _referrer != msg.sender) {
-            uint256 referralAmount;
-            uint256 referralPercentage;
-            
-            if (tier <= RUTHENIUM) {
-                referralAmount = (companyShare * 5) / 100;
-                referralPercentage = 5;
-            } else {
-                referralAmount = (companyShare * 10) / 100;
-                referralPercentage = 10;
-            }
-            
-            (bool referralSuccess,) = payable(_referrer).call{value: referralAmount}("");
-            require(referralSuccess, "Referral payment failed");
-            companyShare -= referralAmount;
-            
-            // Update referral tracking with detailed information
-            ReferralInfo storage refInfo = referralStats[_referrer];
-            if (referrer[msg.sender] == address(0)) {
-                referrer[msg.sender] = _referrer;
-                refInfo.totalReferrals += 1;
-            }
-            refInfo.totalEarned += referralAmount;
-            refInfo.lastReferralTime = block.timestamp;
-            refInfo.referralAmounts.push(referralAmount);
-            refInfo.referralTimes.push(block.timestamp);
-            refInfo.referredUsers.push(msg.sender);
-            refInfo.referralTiers.push(tier);
-            
-            emit ReferralPayment(_referrer, msg.sender, tier, referralAmount, referralPercentage);
-            emit ReferralRewardsClaimed(_referrer, referralAmount, block.timestamp);
+// Helper function to process the payment and shares
+function _processERC20Payment(IERC20 paymentToken, uint256 tokenAmount, uint256 tier, address _referrer) internal returns (uint256, uint256) {
+    // Transfer the tokens from user to this contract
+    require(paymentToken.transferFrom(msg.sender, address(this), tokenAmount), "Token transfer failed");
+    
+    // Calculate shares
+    uint256 partnerShare = (tokenAmount * 2) / 100;  // 2%
+    uint256 remainingAmount = tokenAmount - partnerShare;
+    uint256 poolShare = remainingAmount / 2;    // 49% of total
+    uint256 companyShare = remainingAmount / 2; // 49% of total
+    
+    // Handle referral
+    companyShare = _handleReferral(_referrer, tier, companyShare, true, address(paymentToken));
+    
+    // Transfer shares
+    require(paymentToken.transfer(partnerWallet, partnerShare), "Partner payment failed");
+    require(paymentToken.transfer(poolWallet, poolShare), "Pool payment failed");
+    require(paymentToken.transfer(companyWallet, companyShare), "Company payment failed");
+    
+    return (tokenAmount, block.timestamp);
+}
+
+// Modified mintWithERC20 function with fewer local variables
+function mintWithERC20(uint256 tier, uint256 amount, address _referrer, uint256 paymentMethod) external validTier(tier) {
+    require(amount > 0, "Amount must be greater than 0");
+    require(
+        currentSupplyPerTier[tier] + amount <= maxSupplyPerTier[tier],
+        "Exceeds max supply for tier"
+    );
+    require(paymentMethod == PAYMENT_USDT || paymentMethod == PAYMENT_USDC_E, "Invalid payment method");
+    
+    // Get payment token
+    IERC20 paymentToken = _getPaymentToken(paymentMethod);
+    require(address(paymentToken) != address(0), "Token not set");
+    
+    // Calculate USD price and token amount
+    uint256 usdPriceInCents = tierUSDPrices[tier] * amount;
+    uint256 tokenAmount = _calculateTokenAmount(usdPriceInCents, paymentToken);
+    
+    // Check if user has enough allowance
+    require(paymentToken.allowance(msg.sender, address(this)) >= tokenAmount, "Insufficient allowance");
+    
+    // Process payment and get timestamp
+    uint256 timestamp;
+    (tokenAmount, timestamp) = _processERC20Payment(paymentToken, tokenAmount, tier, _referrer);
+    
+    // Calculate and store FLR equivalent
+    uint256 flrEquivalent = getFlareAmount(usdPriceInCents);
+    stablecoinMintFLREquivalent[msg.sender][tier] = flrEquivalent;
+    
+    // Record mint timestamp and mint NFT
+    userMintTimestamps[msg.sender][tier] = timestamp;
+    _mint(msg.sender, tier, amount, "");
+    currentSupplyPerTier[tier] += amount;
+    
+    // Distribute token rewards
+    _distributeTokenRewards(msg.sender, tier, amount);
+    
+    emit MembershipMintedWithERC20(
+        msg.sender, 
+        tier, 
+        amount, 
+        timestamp, 
+        _referrer, 
+        usdPriceInCents, 
+        tokenAmount, 
+        paymentMethod,
+        flrEquivalent
+    );
+}
+    
+    // Refactored common referral handling logic
+    function _handleReferral(
+        address _referrer, 
+        uint256 tier, 
+        uint256 companyShare, 
+        bool isERC20, 
+        address paymentToken
+    ) internal returns (uint256) {
+        if (_referrer == address(0) || _referrer == msg.sender) {
+            return companyShare;
         }
         
-        // Transfer shares
-        (bool partnerSuccess,) = payable(partnerWallet).call{value: partnerShare}("");
-        require(partnerSuccess, "Partner payment failed");
+        uint256 referralAmount;
+        uint256 referralPercentage;
         
-        (bool poolSuccess,) = payable(poolWallet).call{value: poolShare}("");
-        require(poolSuccess, "Pool payment failed");
+        if (tier <= RUTHENIUM) {
+            referralAmount = (companyShare * 5) / 100;
+            referralPercentage = 5;
+        } else {
+            referralAmount = (companyShare * 10) / 100;
+            referralPercentage = 10;
+        }
         
-        (bool companySuccess,) = payable(companyWallet).call{value: companyShare}("");
-        require(companySuccess, "Company payment failed");
+        // Process payment based on type
+        if (isERC20) {
+            require(IERC20(paymentToken).transfer(_referrer, referralAmount), "Referral payment failed");
+        } else {
+            (bool referralSuccess,) = payable(_referrer).call{value: referralAmount}("");
+            require(referralSuccess, "Referral payment failed");
+        }
         
-        // Record mint timestamp and mint NFT
-        uint256 timestamp = block.timestamp;
-        userMintTimestamps[msg.sender][tier] = timestamp;
-        _mint(msg.sender, tier, amount, "");
-        currentSupplyPerTier[tier] += amount;
+        companyShare -= referralAmount;
         
-        emit MembershipMinted(msg.sender, tier, amount, timestamp, _referrer, usdPrice, msg.value);
+        // Update referral tracking with detailed information
+        ReferralInfo storage refInfo = referralStats[_referrer];
+        if (referrer[msg.sender] == address(0)) {
+            referrer[msg.sender] = _referrer;
+            refInfo.totalReferrals += 1;
+        }
+        refInfo.totalEarned += referralAmount;
+        refInfo.lastReferralTime = block.timestamp;
+        refInfo.referralAmounts.push(referralAmount);
+        refInfo.referralTimes.push(block.timestamp);
+        refInfo.referredUsers.push(msg.sender);
+        refInfo.referralTiers.push(tier);
+        
+        emit ReferralPayment(_referrer, msg.sender, tier, referralAmount, referralPercentage);
+        emit ReferralRewardsClaimed(_referrer, referralAmount, block.timestamp);
+        
+        return companyShare;
+    }
+
+    // Get the FLR equivalent for a stablecoin payment
+    function getStablecoinMintFLREquivalent(address user, uint256 tier) external view validTier(tier) returns (uint256) {
+        return stablecoinMintFLREquivalent[user][tier];
+    }
+
+    // Function to distribute ERC20 token rewards
+    function _distributeTokenRewards(address to, uint256 tier, uint256 amount) internal {
+        // Distribute token rewards if token is set and reward amount > 0
+        _distributeTokenReward(to, tier, DBW_TOKEN, amount, dbwToken);
+        _distributeTokenReward(to, tier, DBT_TOKEN, amount, dbtToken);
+        _distributeTokenReward(to, tier, DBWF_TOKEN, amount, dbwfToken);
+        _distributeTokenReward(to, tier, DBWL_TOKEN, amount, dbwlToken);
+        _distributeTokenReward(to, tier, NFTC_TOKEN, amount, nftcToken);
+    }
+    
+    // Helper function to distribute a single token reward
+    function _distributeTokenReward(
+        address to, 
+        uint256 tier, 
+        uint256 tokenType, 
+        uint256 amount, 
+        IERC20 token
+    ) internal {
+        if (address(token) != address(0) && tierTokenRewards[tier][tokenType] > 0) {
+            uint256 tokenAmount = tierTokenRewards[tier][tokenType] * amount;
+            bool success = token.transfer(to, tokenAmount);
+            require(success, "Token transfer failed");
+            
+            // Update user's total received tokens
+            userTotalTokenRewards[to][tokenType] += tokenAmount;
+            
+            emit TokenRewardDistributed(to, tier, tokenType, tokenAmount);
+        }
+    }
+
+    // Admin functions to set token addresses
+    function setDBWTokenAddress(address _tokenAddress) external onlyOwner {
+        dbwToken = IERC20(_tokenAddress);
+        emit TokenAddressUpdated(DBW_TOKEN, _tokenAddress);
+    }
+    
+    function setDBTTokenAddress(address _tokenAddress) external onlyOwner {
+        dbtToken = IERC20(_tokenAddress);
+        emit TokenAddressUpdated(DBT_TOKEN, _tokenAddress);
+    }
+    
+    function setDBWFTokenAddress(address _tokenAddress) external onlyOwner {
+        dbwfToken = IERC20(_tokenAddress);
+        emit TokenAddressUpdated(DBWF_TOKEN, _tokenAddress);
+    }
+    
+    function setDBWLTokenAddress(address _tokenAddress) external onlyOwner {
+        dbwlToken = IERC20(_tokenAddress);
+        emit TokenAddressUpdated(DBWL_TOKEN, _tokenAddress);
+    }
+    
+    function setNFTCTokenAddress(address _tokenAddress) external onlyOwner {
+        nftcToken = IERC20(_tokenAddress);
+        emit TokenAddressUpdated(NFTC_TOKEN, _tokenAddress);
+    }
+    
+    // Admin function to set token reward amount for a specific tier
+    function setTierTokenReward(uint256 tier, uint256 tokenType, uint256 amount) 
+        external 
+        onlyOwner 
+        validTier(tier) 
+        validTokenType(tokenType) 
+    {
+        tierTokenRewards[tier][tokenType] = amount;
+        emit TierTokenRewardUpdated(tier, tokenType, amount);
     }
 
     // Admin functions
@@ -577,8 +853,7 @@ contract MembershipNFT is Initializable, ERC1155Upgradeable, OwnableUpgradeable,
         emit FTSOUpdated(_newFtso);
     }
 
-    function setTierUSDPrice(uint256 tier, uint256 newUSDPrice) external onlyOwner {
-        require(tier <= SILVER, "Invalid tier");
+    function setTierUSDPrice(uint256 tier, uint256 newUSDPrice) external onlyOwner validTier(tier) {
         tierUSDPrices[tier] = newUSDPrice;
         emit TierUSDPriceUpdated(tier, newUSDPrice);
     }
@@ -598,8 +873,7 @@ contract MembershipNFT is Initializable, ERC1155Upgradeable, OwnableUpgradeable,
         emit WalletUpdated("partner", _newPartnerWallet);
     }
 
-    function setTierURI(uint256 tier, string memory newUri) external onlyOwner {
-        require(tier <= SILVER, "Invalid tier");
+    function setTierURI(uint256 tier, string memory newUri) external onlyOwner validTier(tier) {
         tierURIs[tier] = newUri;
         emit TierURIUpdated(tier, newUri);
     }
@@ -609,19 +883,19 @@ contract MembershipNFT is Initializable, ERC1155Upgradeable, OwnableUpgradeable,
         return tierURIs[tier];
     }
     
-    function getTierUSDPrice(uint256 tier) external view returns (uint256) {
+    function getTierUSDPrice(uint256 tier) external view validTier(tier) returns (uint256) {
         return tierUSDPrices[tier];
     }
     
-    function getTierFlarePrice(uint256 tier) external view returns (uint256) {
+    function getTierFlarePrice(uint256 tier) external view validTier(tier) returns (uint256) {
         return getFlareAmount(tierUSDPrices[tier]);
     }
     
-    function getTierSupply(uint256 tier) external view returns (uint256 current, uint256 max) {
+    function getTierSupply(uint256 tier) external view validTier(tier) returns (uint256 current, uint256 max) {
         return (currentSupplyPerTier[tier], maxSupplyPerTier[tier]);
     }
 
-    function totalSupply() public view returns (uint256) {
+    function totalSupply() external view returns (uint256) {
         uint256 total = 0;
         for(uint256 i = 0; i <= SILVER; i++) {
             total += currentSupplyPerTier[i];
@@ -629,16 +903,41 @@ contract MembershipNFT is Initializable, ERC1155Upgradeable, OwnableUpgradeable,
         return total;
     }
 
-    function maxSupply() public view returns (uint256) {
+    function maxSupply() external view returns (uint256) {
         return totalMaxSupply;
     }
 
-    function getUserMintTimestamp(address user, uint256 tier) external view returns (uint256) {
+    function getUserMintTimestamp(address user, uint256 tier) external view validTier(tier) returns (uint256) {
         return userMintTimestamps[user][tier];
     }
 
     function getReferrer(address user) external view returns (address) {
         return referrer[user];
+    }
+
+    // Get token reward amount for a specific tier and token type
+    function getTierTokenReward(uint256 tier, uint256 tokenType) external view 
+        validTier(tier) 
+        validTokenType(tokenType) 
+        returns (uint256) 
+    {
+        return tierTokenRewards[tier][tokenType];
+    }
+
+    // Get user's total received tokens of a specific type
+    function getUserTotalTokenRewards(address user, uint256 tokenType) external view 
+        validTokenType(tokenType) 
+        returns (uint256) 
+    {
+        return userTotalTokenRewards[user][tokenType];
+    }
+    
+    // Function to get all token rewards for a user
+    function getUserAllTokenRewards(address user) external view returns (uint256[5] memory tokenAmounts) {
+        for(uint256 i = 0; i <= NFTC_TOKEN; i++) {
+            tokenAmounts[i] = userTotalTokenRewards[user][i];
+        }
+        return tokenAmounts;
     }
 
     // Enhanced referral tracking view functions
@@ -711,13 +1010,11 @@ contract MembershipNFT is Initializable, ERC1155Upgradeable, OwnableUpgradeable,
         return type(uint256).max; // Return max uint if no tiers owned
     }
 
-    function getTierBalance(address user, uint256 tier) external view returns (uint256) {
-        require(tier <= SILVER, "Invalid tier");
+    function getTierBalance(address user, uint256 tier) external view validTier(tier) returns (uint256) {
         return balanceOf(user, tier);
     }
 
-    function hasTier(address user, uint256 tier) external view returns (bool) {
-        require(tier <= SILVER, "Invalid tier");
+    function hasTier(address user, uint256 tier) external view validTier(tier) returns (bool) {
         return balanceOf(user, tier) > 0;
     }
 

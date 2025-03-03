@@ -9,6 +9,14 @@ export interface UploadStatus {
     error: string | null;
     success: boolean;
     fileUrl: string | null;
+    // New fields for improved UX
+    transferredMB?: number;
+    totalMB?: number;
+    state?: 'running' | 'paused' | 'error' | 'success';
+    // Functions for controlling upload
+    pauseUpload?: () => void;
+    resumeUpload?: () => void;
+    cancelUpload?: () => void;
 }
 
 export interface Tier {
@@ -84,3 +92,54 @@ export type ContentFormData =
     | BlogFormData
     | TestFormData
     | CallFormData;
+
+// NEW: Database document interfaces
+
+// Course document in Firestore
+export interface CourseDocument {
+    id?: string;
+    title: string;
+    description: string;
+    thumbnail: string;
+    tiers: number[]; // Array of tier numbers this course belongs to
+    lessons: number; // Total number of lessons
+    lessonCount: number; // Actual count of uploaded lessons
+    createdAt?: any; // Firestore timestamp
+    date: string; // ISO date string
+    status?: 'pending' | 'complete';
+}
+
+// Lesson document in Firestore
+export interface LessonDocument {
+    id?: string;
+    courseId: string; // Reference to parent course
+    order: number;
+    title: string;
+    type: CourseFileType;
+    url: string;
+    filename: string;
+    duration?: number; // Duration for videos in seconds
+    createdAt?: any; // Firestore timestamp
+}
+
+// Existing item interfaces used in UI components
+export interface CourseItem {
+    id?: string;
+    title?: string;
+    description?: string;
+    thumbnail?: string;
+    tier?: number; 
+    tiers?: number[]; // NEW: Array of tier numbers
+    lessons?: number;
+    lessonData?: CourseLessonData[];
+    status?: string;
+}
+
+export interface CourseLessonData {
+    id: string;
+    order: number;
+    title: string;
+    type: CourseFileType;
+    url: string;
+    duration?: number;
+}

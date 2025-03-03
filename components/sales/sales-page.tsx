@@ -6,8 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import { ReferralButton } from './ReferralButton';
-import ReferralHandler from './ReferralHandler';
+
 
 // Reusable UI Components
 const GradientBackground = () => (
@@ -51,17 +50,51 @@ const SectionWrapper = ({ children, className = '', dataAos = '' }: { children: 
     </div>
 );
 
-const VideoSection = ({ title, description, delay = 0 }: { title: string; description: string; delay?: number }) => (
-    <SectionWrapper dataAos="fade-up" data-aos-delay={delay} className="h-full">
-        <div className="aspect-video relative">
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
-                <Play className="w-16 h-16 text-[#FF4B51] opacity-70 mb-4 hover:opacity-100 cursor-pointer transition-all duration-300 hover:scale-110" />
-                <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-                <p className="text-gray-400 text-center max-w-md">{description}</p>
+const VideoSection = ({ title, description, videoSrc, delay = 0 }: { title: string; description: string; videoSrc: string; delay?: number }) => {
+    const [isPlaying, setIsPlaying] = useState(false);
+    const videoRef = React.useRef<HTMLVideoElement>(null);
+
+    const handlePlayClick = () => {
+        if (videoRef.current) {
+            if (videoRef.current.paused) {
+                videoRef.current.play();
+                setIsPlaying(true);
+            } else {
+                videoRef.current.pause();
+                setIsPlaying(false);
+            }
+        }
+    };
+
+    return (
+        <SectionWrapper dataAos="fade-up" data-aos-delay={delay} className="h-full">
+            <div className="aspect-video relative">
+                <video
+                    ref={videoRef}
+                    className="w-full h-full object-cover rounded-xl"
+                    controls={isPlaying}
+                    poster="/images/video-poster.jpg"
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                    onEnded={() => setIsPlaying(false)}
+                >
+                    <source src={videoSrc} type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
+                {!isPlaying && (
+                    <div
+                        className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/60 cursor-pointer"
+                        onClick={handlePlayClick}
+                    >
+                        <Play className="w-16 h-16 text-[#FF4B51] opacity-70 mb-4 hover:opacity-100 transition-all duration-300 hover:scale-110" />
+                        <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+                        <p className="text-gray-400 text-center max-w-md">{description}</p>
+                    </div>
+                )}
             </div>
-        </div>
-    </SectionWrapper>
-);
+        </SectionWrapper>
+    );
+};
 
 const SalesPageContent = () => {
     const searchParams = useSearchParams();
@@ -108,16 +141,19 @@ const SalesPageContent = () => {
 
     const videoContent = [
         {
-            title: "DeFi Fundamentals Masterclass",
-            description: "Learn the core concepts of decentralized finance and start your journey with confidence"
+            title: "Introduction to DeFi Bull World",
+            description: "Learn the core concepts of decentralized finance and start your journey with confidence",
+            videoSrc: "/videos/Sales_Video_1A.mp4"
         },
         {
-            title: "Advanced Trading Strategies",
-            description: "Discover how to analyze the market and implement effective DeFi trading strategies"
+            title: "Compare our NFTs",
+            description: "Discover the unique features of our NFTs and choose the right one for you and start learning",
+            videoSrc: "/videos/Sales_Video_2A.mp4"
         },
         {
             title: "Real-World Success Stories",
-            description: "Hear from our members who have achieved financial freedom through our education"
+            description: "Hear from our members who have achieved financial freedom through our education",
+            videoSrc: "/videos/future-video.mp4" // Placeholder for future video
         }
     ];
 
@@ -175,20 +211,27 @@ const SalesPageContent = () => {
                     <VideoSection
                         title={videoContent[0].title}
                         description={videoContent[0].description}
+                        videoSrc={videoContent[0].videoSrc}
                     />
 
-                    {/* Secondary Videos - Grid Layout */}
-                    <div className="grid md:grid-cols-2 gap-8 mt-8">
+                    {/* Secondary Video - Centered */}
+                    <div className="mt-8 max-w-3xl mx-auto">
                         <VideoSection
                             title={videoContent[1].title}
                             description={videoContent[1].description}
+                            videoSrc={videoContent[1].videoSrc}
                             delay={200}
                         />
+
+                        {/* Commented out third video section but kept for future use */}
+                        {/* 
                         <VideoSection
                             title={videoContent[2].title}
                             description={videoContent[2].description}
+                            videoSrc={videoContent[2].videoSrc}
                             delay={400}
                         />
+                        */}
                     </div>
                 </div>
 
@@ -203,7 +246,7 @@ const SalesPageContent = () => {
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-                            <Link href="/mint">
+                            <Link href="/membership/tier-1">
                                 <button className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#BC1A1E] to-[#FF4B51] rounded-lg font-bold text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(188,26,30,0.3)] transform hover:scale-[1.02] group">
                                     <Sparkles className="w-5 h-5" />
                                     <span>Mint Your NFT Now</span>
@@ -249,7 +292,6 @@ const SalesPageContent = () => {
 export const SalesPage = () => {
     return (
         <div className="min-h-screen bg-transparent">
-            {/* <ReferralHandler /> */}
             <SalesPageContent />
         </div>
     );

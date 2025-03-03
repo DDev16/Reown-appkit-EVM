@@ -1,6 +1,5 @@
 export type ContentType = 'video' | 'course' | 'blog' | 'call' | 'test';
 
-
 export interface VideoItem {
   id: string;
   title: string;
@@ -18,15 +17,17 @@ export interface CourseItem {
   date: string;
   description?: string;
   thumbnail?: string;
-  lessons: number;
-  lessonData?: CourseLessonData[];
-  tier?: number;
-  completed: boolean; 
-
-  createdAt?: string | Date;
+  lessons: number; // Number of lessons
+  lessonData?: CourseLessonData[]; // Lesson data from either embedded or subcollection
+  lessonSource?: 'embedded' | 'subcollection' | 'collection'; // Updated to include collection source
+  tier?: number; // For backward compatibility
+  tiers?: number[]; // NEW: Array of tier numbers this course belongs to
+  completed: boolean;
+  createdAt?: string | Date | any; // Support for Firestore Timestamp
+  [key: string]: any; // For additional Firestore fields
 }
 
-// New type for course lessons
+// Course lesson data interface - updated for top-level collection
 export interface CourseLessonData {
   id: string;
   title: string;
@@ -35,6 +36,19 @@ export interface CourseLessonData {
   url: string;
   filename?: string;
   duration?: number;
+  courseId?: string; // NEW: Reference to parent course for top-level collection
+  createdAt?: string | Date | any; // Support for Firestore Timestamp
+  [key: string]: any; // For additional fields that may come from Firestore
+}
+
+// New interface to represent course progress for a specific lesson
+export interface LessonProgress {
+  lessonId: string;
+  courseId: string;
+  progress: number; // 0-100
+  lastPosition: number; // seconds
+  lastWatched: string | Date; // ISO date string or Date object
+  completed: boolean;
 }
 
 export interface BlogItem {
@@ -78,7 +92,7 @@ export interface TestItem {
   [key: string]: any;
 }
 
-// Update the TierContentData interface to include tests
+// TierContentData interface including tests
 export interface TierContentData {
   videos: VideoItem[];
   courses: CourseItem[];
@@ -117,4 +131,56 @@ export interface UserAnalytics {
   testCompleted: number;
   callAttended: number;
   lastUpdated: string;
+}
+
+// For lesson file uploads
+export interface CourseLessonFile {
+  id: string;
+  order: number;
+  title: string;
+  type: 'video' | 'pdf';
+  file: File;
+  duration?: string;
+}
+
+// For upload status tracking
+export interface UploadStatus {
+  isUploading: boolean;
+  progress: number;
+  error: string | null;
+  success: boolean;
+  fileUrl: string | null;
+  transferredMB: number;
+  totalMB: number;
+  state: 'running' | 'paused' | 'success' | 'error';
+  pauseUpload?: () => void;
+  resumeUpload?: () => void;
+  cancelUpload?: () => void;
+}
+
+// NEW: Database document interface for lessons collection
+export interface LessonDocument {
+  id: string;
+  courseId: string; // Reference to parent course
+  order: number;
+  title: string;
+  type: 'video' | 'pdf';
+  url: string;
+  filename: string;
+  duration?: number; // Duration for videos in seconds
+  createdAt: any; // Firestore timestamp
+}
+
+// NEW: Database document interface for courses collection
+export interface CourseDocument {
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  tiers: number[]; // Array of tier numbers this course belongs to
+  lessons: number; // Total number of lessons
+  lessonCount: number; // Actual count of uploaded lessons
+  createdAt: any; // Firestore timestamp
+  date: string; // ISO date string
+  status: 'pending' | 'complete'; 
 }

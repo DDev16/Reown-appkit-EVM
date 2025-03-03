@@ -292,6 +292,67 @@
 			{
 				"indexed": true,
 				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tier",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "referrer",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "usdPrice",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "tokenAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "paymentMethod",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "flrEquivalent",
+				"type": "uint256"
+			}
+		],
+		"name": "MembershipMintedWithERC20",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
 				"name": "previousOwner",
 				"type": "address"
 			},
@@ -377,6 +438,31 @@
 				"type": "uint256"
 			},
 			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tokenType",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "TierTokenRewardUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tier",
+				"type": "uint256"
+			},
+			{
 				"indexed": false,
 				"internalType": "string",
 				"name": "newURI",
@@ -403,6 +489,56 @@
 			}
 		],
 		"name": "TierUSDPriceUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tokenType",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "tokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "TokenAddressUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tier",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tokenType",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "TokenRewardDistributed",
 		"type": "event"
 	},
 	{
@@ -532,6 +668,58 @@
 	},
 	{
 		"inputs": [],
+		"name": "DBT_TOKEN",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "DBWF_TOKEN",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "DBWL_TOKEN",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "DBW_TOKEN",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "GOLD",
 		"outputs": [
 			{
@@ -558,6 +746,19 @@
 	},
 	{
 		"inputs": [],
+		"name": "NFTC_TOKEN",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "OSMIUM",
 		"outputs": [
 			{
@@ -572,6 +773,45 @@
 	{
 		"inputs": [],
 		"name": "PALLADIUM",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "PAYMENT_FLR",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "PAYMENT_USDC_E",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "PAYMENT_USDT",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -755,10 +995,10 @@
 	},
 	{
 		"inputs": [],
-		"name": "ftso",
+		"name": "dbtToken",
 		"outputs": [
 			{
-				"internalType": "contract IFtso",
+				"internalType": "contract IERC20",
 				"name": "",
 				"type": "address"
 			}
@@ -768,22 +1008,51 @@
 	},
 	{
 		"inputs": [],
-		"name": "getCurrentFlarePriceRaw",
+		"name": "dbwToken",
 		"outputs": [
 			{
-				"internalType": "uint256",
-				"name": "price",
-				"type": "uint256"
-			},
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "dbwfToken",
+		"outputs": [
 			{
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			},
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "dbwlToken",
+		"outputs": [
 			{
-				"internalType": "uint256",
-				"name": "decimals",
-				"type": "uint256"
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "ftso",
+		"outputs": [
+			{
+				"internalType": "contract IFtso",
+				"name": "",
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -922,6 +1191,30 @@
 				"type": "uint256"
 			}
 		],
+		"name": "getStablecoinMintFLREquivalent",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tier",
+				"type": "uint256"
+			}
+		],
 		"name": "getTierBalance",
 		"outputs": [
 			{
@@ -982,6 +1275,30 @@
 				"internalType": "uint256",
 				"name": "tier",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenType",
+				"type": "uint256"
+			}
+		],
+		"name": "getTierTokenReward",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tier",
+				"type": "uint256"
 			}
 		],
 		"name": "getTierUSDPrice",
@@ -1009,6 +1326,25 @@
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getUserAllTokenRewards",
+		"outputs": [
+			{
+				"internalType": "uint256[5]",
+				"name": "tokenAmounts",
+				"type": "uint256[5]"
 			}
 		],
 		"stateMutability": "view",
@@ -1115,6 +1451,30 @@
 				"internalType": "struct MembershipNFT.TierOwnership[]",
 				"name": "",
 				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenType",
+				"type": "uint256"
+			}
+		],
+		"name": "getUserTotalTokenRewards",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -1237,12 +1597,12 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "tier",
+				"name": "_tier",
 				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "amount",
+				"name": "_amount",
 				"type": "uint256"
 			},
 			{
@@ -1257,6 +1617,34 @@
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tier",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_referrer",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "paymentMethod",
+				"type": "uint256"
+			}
+		],
+		"name": "mintWithERC20",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "name",
 		"outputs": [
@@ -1264,6 +1652,19 @@
 				"internalType": "string",
 				"name": "",
 				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "nftcToken",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -1477,11 +1878,76 @@
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "_tokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "setDBTTokenAddress",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_tokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "setDBWFTokenAddress",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_tokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "setDBWLTokenAddress",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_tokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "setDBWTokenAddress",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "_newFtso",
 				"type": "address"
 			}
 		],
 		"name": "setFTSO",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_tokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "setNFTCTokenAddress",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -1508,6 +1974,29 @@
 			}
 		],
 		"name": "setPoolWallet",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tier",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenType",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "setTierTokenReward",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -1551,6 +2040,30 @@
 	{
 		"inputs": [
 			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "stablecoinMintFLREquivalent",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "bytes4",
 				"name": "interfaceId",
 				"type": "bytes4"
@@ -1584,26 +2097,21 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "usdCents",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
 				"type": "uint256"
 			}
 		],
-		"name": "testPriceConversion",
+		"name": "tierTokenRewards",
 		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "flarePriceRaw",
+				"name": "",
 				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "flareAmount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "explanation",
-				"type": "string"
 			}
 		],
 		"stateMutability": "view",
@@ -1724,6 +2232,32 @@
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "usdcEToken",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "usdtToken",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -1737,6 +2271,30 @@
 			}
 		],
 		"name": "userMintTimestamps",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "userTotalTokenRewards",
 		"outputs": [
 			{
 				"internalType": "uint256",

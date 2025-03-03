@@ -28,7 +28,7 @@ export default function Home() {
       <Flare />
       {/* <Partners /> */}
 
-      <Roadmap />
+      {/* <Roadmap /> */}
 
       <FAQ />
       <Blog />

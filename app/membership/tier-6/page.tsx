@@ -6,8 +6,9 @@ import Swal, { SweetAlertResult } from 'sweetalert2';
 import {
     Crown, Play, BookOpen, Users, Award, Rocket, Coins,
     Gift, Video, ArrowUpRight, Ticket, ChartBar, Sparkles,
+    DollarSign, Check
 } from 'lucide-react';
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
 import { parseEther } from 'viem';
 import TierNavbar from '@/components/ui/tier-navbar';
 import CONTRACT_ABI from '@/lib/contract-abi.json';
@@ -16,8 +17,40 @@ import CONTRACT_ABI from '@/lib/contract-abi.json';
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
 if (!CONTRACT_ADDRESS) throw new Error("Contract address not found in environment variables");
 
-const TIER_6 = 5; // Updated to Tier 6
+// ERC20 token addresses from contract
+const USDT_ADDRESS = "0x0B38e83B86d491735fEaa0a791F65c2B99535396";
+const USDC_E_ADDRESS = "0xFbDa5F676cB37624f28265A144A48B0d6e87d3b6";
 
+// Standard ERC20 ABI for approvals
+const ERC20_ABI = [
+    {
+        "inputs": [
+            { "name": "spender", "type": "address" },
+            { "name": "amount", "type": "uint256" }
+        ],
+        "name": "approve",
+        "outputs": [{ "name": "", "type": "bool" }],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "name": "owner", "type": "address" },
+            { "name": "spender", "type": "address" }
+        ],
+        "name": "allowance",
+        "outputs": [{ "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    }
+];
+
+// Payment method constants from contract
+const PAYMENT_FLR = 0;
+const PAYMENT_USDT = 1;
+const PAYMENT_USDC_E = 2;
+
+const TIER_6 = 5; // Top tier
 const benefits = [
     {
         title: "Perfect starting NFT",
@@ -37,7 +70,7 @@ const benefits = [
     {
         title: "Token Package",
         icon: <Coins />,
-        description: "800 DBW, 938 TDB, 938 DRKET tokens.",
+        description: "800 DBW, 938 TDB",
     },
     {
         title: "Educational Resources",
@@ -78,9 +111,16 @@ const benefits = [
 
 const Tier6Page = () => {
     const [isMinting, setIsMinting] = useState(false);
+    const [isApproving, setIsApproving] = useState(false);
     const [hasShownConfetti, setHasShownConfetti] = useState(false);
+    const [transactionType, setTransactionType] = useState<'none' | 'approval' | 'mint'>('none');
     const [referrerAddress, setReferrerAddress] = useState<string | null>(null);
-
+    const [paymentMethod, setPaymentMethod] = useState<number>(PAYMENT_FLR);
+    const [approvalStatus, setApprovalStatus] = useState<Record<number, boolean>>({
+        [PAYMENT_FLR]: true, // Native token doesn't need approval
+        [PAYMENT_USDT]: false,
+        [PAYMENT_USDC_E]: false
+    });
 
     // Contract reads for supply and price
     const { data: supplyData } = useReadContract({
@@ -107,13 +147,37 @@ const Tier6Page = () => {
     });
 
     // Contract write for minting
-    const { writeContract, data: hash, error } = useWriteContract();
+    const { writeContract, data: hash, error, reset: resetWriteContract } = useWriteContract();
 
     // Wait for transaction
     const { isLoading: isConfirming, isSuccess: isConfirmed } =
         useWaitForTransactionReceipt({
             hash,
         });
+
+    // Track mint completion status separately from transaction confirmation
+    const [mintCompleted, setMintCompleted] = useState(false);
+
+    // Get the user's address from wagmi
+    const { address: userAddress } = useAccount();
+
+    // Get token allowance for USDT
+    const { data: usdtAllowanceData, refetch: refetchUsdtAllowance } = useReadContract({
+        address: USDT_ADDRESS as `0x${string}`,
+        abi: ERC20_ABI,
+        functionName: 'allowance',
+        args: userAddress ? [userAddress, CONTRACT_ADDRESS] : undefined,
+        account: userAddress as `0x${string}`,
+    });
+
+    // Get token allowance for USDC-E
+    const { data: usdcEAllowanceData, refetch: refetchUsdcEAllowance } = useReadContract({
+        address: USDC_E_ADDRESS as `0x${string}`,
+        abi: ERC20_ABI,
+        functionName: 'allowance',
+        args: userAddress ? [userAddress, CONTRACT_ADDRESS] : undefined,
+        account: userAddress as `0x${string}`,
+    });
 
     // Check for referral code on component mount
     useEffect(() => {
@@ -124,8 +188,26 @@ const Tier6Page = () => {
         }
     }, []);
 
+    // Check token approvals when component mounts and when allowance data changes
+    useEffect(() => {
+        if (usdtAllowanceData && usdPriceData) {
+            const tokenAmount = getRequiredTokenAmount(PAYMENT_USDT);
+            setApprovalStatus(prev => ({
+                ...prev,
+                [PAYMENT_USDT]: BigInt(usdtAllowanceData.toString()) >= tokenAmount
+            }));
+        }
 
-    // Confetti effect function with updated red colors
+        if (usdcEAllowanceData && usdPriceData) {
+            const tokenAmount = getRequiredTokenAmount(PAYMENT_USDC_E);
+            setApprovalStatus(prev => ({
+                ...prev,
+                [PAYMENT_USDC_E]: BigInt(usdcEAllowanceData.toString()) >= tokenAmount
+            }));
+        }
+    }, [usdtAllowanceData, usdcEAllowanceData, usdPriceData]);
+
+    // Confetti effect function with Rhenium colors
     const fireConfetti = () => {
         const duration = 3000;
         const animationEnd = Date.now() + duration;
@@ -146,13 +228,13 @@ const Tier6Page = () => {
                 ...defaults,
                 particleCount,
                 origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-                colors: ['#BC1A1E', '#FF4B51', '#FF6B6E', '#FFFFFF'],
+                colors: ['#FFD700', '#FFC000', '#FFD700', '#FFC000'], // Rhenium themed colors
             });
             confetti({
                 ...defaults,
                 particleCount,
                 origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-                colors: ['#BC1A1E', '#FF4B51', '#FF6B6E', '#FFFFFF'],
+                colors: ['#FFD700', '#FFC000', '#FFD700', '#FFC000'], // Rhenium themed colors
             });
         }, 250);
     };
@@ -166,6 +248,8 @@ const Tier6Page = () => {
         if (error) {
             console.error("Transaction error:", error);
             setIsMinting(false);
+            setIsApproving(false);
+            setTransactionType('none');
             Swal.fire({
                 title: 'Transaction Failed',
                 text: error.message || 'Transaction failed. Please try again.',
@@ -178,13 +262,52 @@ const Tier6Page = () => {
 
         if (isConfirmed) {
             setIsMinting(false);
-            if (!hasShownConfetti) {
+            setIsApproving(false);
+
+            // Show different alerts based on transaction type
+            if (transactionType === 'approval') {
+                // Immediately update approval status
+                if (paymentMethod === PAYMENT_USDT) {
+                    setApprovalStatus(prev => ({
+                        ...prev,
+                        [PAYMENT_USDT]: true
+                    }));
+                } else if (paymentMethod === PAYMENT_USDC_E) {
+                    setApprovalStatus(prev => ({
+                        ...prev,
+                        [PAYMENT_USDC_E]: true
+                    }));
+                }
+
+                // Then refresh allowances for data consistency
+                refetchUsdtAllowance();
+                refetchUsdcEAllowance();
+
+                Swal.fire({
+                    title: 'Approval Successful',
+                    text: 'Token approval successful! You can now mint your NFT.',
+                    icon: 'success',
+                    confirmButtonText: 'Continue',
+                    confirmButtonColor: '#d4af37',
+                    background: '#1a1a1a',
+                    color: '#ffffff'
+                });
+
+                // Reset transaction states
+                resetWriteContract();
+            } else if (transactionType === 'mint' && !hasShownConfetti) {
+                // Set mint as completed
+                setMintCompleted(true);
+
+                // Refresh allowances after mint
+                refetchUsdtAllowance();
+                refetchUsdcEAllowance();
                 fireConfetti();
                 setHasShownConfetti(true);
 
                 Swal.fire({
-                    title: 'Congratulations on your Tier-1 DBW NFT! 🎉',
-                    text: 'Now that you own a DBW NFT, You can access your token gated education dashboard where only users who own DBW NFTs have access to!',
+                    title: 'Congratulations on your Tier-6 NFT! 🎉',
+                    text: 'Now that you own a NFT, You can access your token gated education dashboard where only users who own NFTs have access to!',
                     icon: 'success',
                     confirmButtonText: 'Click here to access your dashboard!',
                     confirmButtonColor: '#d4af37',
@@ -202,46 +325,139 @@ const Tier6Page = () => {
                     }
                 });
             }
+
+            // Reset transaction type
+            setTransactionType('none');
         }
-    }, [hash, error, isConfirmed, hasShownConfetti]);
+    }, [hash, error, isConfirmed, hasShownConfetti, transactionType, resetWriteContract]);
+
+    // When payment method changes, reset mint completion state
+    useEffect(() => {
+        setMintCompleted(false);
+    }, [paymentMethod]);
+
+    // Helper to get required token amount based on payment method
+    const getRequiredTokenAmount = (method: number): bigint => {
+        if (!usdPriceData) return BigInt(0);
+
+        const usdPriceInCents = BigInt(usdPriceData.toString());
+
+        // USDT and USDC-E typically have 6 decimals
+        const tokenDecimals = method === PAYMENT_USDT ? 6 : 6;
+
+        // Convert USD cents to token amount (USD cents / 100 * 10^decimals)
+        // Using BigInt(Math.pow(10, decimals)) to avoid bigint exponentiation
+        const decimalFactor = BigInt(Math.pow(10, tokenDecimals));
+        return (usdPriceInCents * decimalFactor) / BigInt(100);
+    };
+
+    // Handle ERC20 approvals
+    const handleApprove = async () => {
+        if (isApproving || isMinting) return;
+
+        try {
+            setIsApproving(true);
+            setTransactionType('approval');
+
+            let tokenAddress: string;
+            if (paymentMethod === PAYMENT_USDT) {
+                tokenAddress = USDT_ADDRESS;
+            } else if (paymentMethod === PAYMENT_USDC_E) {
+                tokenAddress = USDC_E_ADDRESS;
+            } else {
+                throw new Error("Invalid payment method");
+            }
+
+            const tokenAmount = getRequiredTokenAmount(paymentMethod);
+            console.log(`Approving ${tokenAmount.toString()} tokens at address ${tokenAddress}`);
+
+            await writeContract({
+                address: tokenAddress as `0x${string}`,
+                abi: ERC20_ABI,
+                functionName: 'approve',
+                args: [
+                    CONTRACT_ADDRESS,
+                    tokenAmount
+                ]
+            });
+
+        } catch (err) {
+            console.error('Approval error:', err);
+            const errorMessage = err instanceof Error ? err.message : 'Failed to approve token. Please try again.';
+
+            Swal.fire({
+                title: 'Approval Failed',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonColor: '#d4af37',
+                background: '#1a1a1a',
+                color: '#ffffff'
+            });
+            setIsApproving(false);
+            setTransactionType('none');
+        }
+    };
 
     // Updated handleMint function
     const handleMint = async () => {
-        if (isMinting) return;
+        if (isMinting || isApproving) return;
 
         try {
             setIsMinting(true);
-
-            if (!flrPriceData) {
-                throw new Error("Price data not available");
-            }
-
-            // Convert flrPriceData to BigInt
-            const price = BigInt(flrPriceData.toString());
+            setTransactionType('mint');
 
             // Ensure referrerAddress is a valid address or zero address
             const referrer = referrerAddress && /^0x[a-fA-F0-9]{40}$/.test(referrerAddress)
                 ? referrerAddress
                 : '0x0000000000000000000000000000000000000000';
 
-            console.log('Minting with params:', {
-                tier: TIER_6,
-                amount: 1,
-                referrer,
-                price: price.toString()
-            });
+            if (paymentMethod === PAYMENT_FLR) {
+                // Mint with native token (FLR)
+                if (!flrPriceData) {
+                    throw new Error("Price data not available");
+                }
 
-            await writeContract({
-                address: CONTRACT_ADDRESS,
-                abi: CONTRACT_ABI,
-                functionName: 'mint',
-                args: [
-                    BigInt(TIER_6),    // tier
-                    BigInt(1),         // amount
-                    referrer          // referrer address
-                ],
-                value: price          // Properly formatted as BigInt
-            });
+                const price = BigInt(flrPriceData.toString());
+
+                console.log('Minting with FLR:', {
+                    tier: TIER_6,
+                    amount: 1,
+                    referrer,
+                    price: price.toString()
+                });
+
+                await writeContract({
+                    address: CONTRACT_ADDRESS,
+                    abi: CONTRACT_ABI,
+                    functionName: 'mint',
+                    args: [
+                        BigInt(TIER_6),    // tier
+                        BigInt(1),         // amount
+                        referrer           // referrer address
+                    ],
+                    value: price           // Properly formatted as BigInt
+                });
+            } else {
+                // Mint with ERC20 token
+                console.log('Minting with ERC20:', {
+                    tier: TIER_6,
+                    amount: 1,
+                    referrer,
+                    paymentMethod
+                });
+
+                await writeContract({
+                    address: CONTRACT_ADDRESS,
+                    abi: CONTRACT_ABI,
+                    functionName: 'mintWithERC20',
+                    args: [
+                        BigInt(TIER_6),          // tier
+                        BigInt(1),               // amount
+                        referrer,                // referrer address
+                        BigInt(paymentMethod)    // payment method
+                    ]
+                });
+            }
 
         } catch (err: unknown) {
             console.error('Minting error:', err);
@@ -258,6 +474,7 @@ const Tier6Page = () => {
                 color: '#ffffff'
             });
             setIsMinting(false);
+            setTransactionType('none');
         }
     };
 
@@ -295,12 +512,27 @@ const Tier6Page = () => {
         return () => observer.disconnect();
     }, []);
 
-    // Get mint button text
+    // Get button text
+    const getApproveButtonText = () => {
+        if (isApproving) return "Approving...";
+        return "Approve Token";
+    };
+
     const getMintButtonText = () => {
-        if (isConfirming) return "Confirming...";
+        if (isConfirming && transactionType === 'mint') return "Confirming...";
         if (isMinting) return "Minting...";
-        if (isConfirmed) return "Minted!";
+        if (mintCompleted) return "Minted!";
         return "Mint Your NFT";
+    };
+
+    // Get payment method name
+    const getPaymentMethodName = (methodId: number) => {
+        switch (methodId) {
+            case PAYMENT_FLR: return "FLR";
+            case PAYMENT_USDT: return "USDT";
+            case PAYMENT_USDC_E: return "USDC.e";
+            default: return "Unknown";
+        }
     };
 
     return (
@@ -319,10 +551,15 @@ const Tier6Page = () => {
                             <Crown className="w-16 h-16 text-[#BC1A1E]" />
                             <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
                                 Iridium Tier NFT
+
                             </h1>
                         </div>
                         <p className="text-xl text-gray-400 max-w-6xl mx-auto">
                             Begin your education journey with our accessible entry-level membership
+
+
+
+
                         </p>
                     </div>
 
@@ -330,8 +567,9 @@ const Tier6Page = () => {
                         {/* Left Side – NFT & Content */}
                         <div className="space-y-4">
                             {/* Price / Supply & Mint Button */}
-                            <div className="flex items-center justify-center space-y-2 flex-wrap gap-8">
-                                <div className="px-4 py-2 bg-black border border-[#BC1A1E] rounded-xl text-center shadow-lg shadow-[#BC1A1E]/50">
+                            <div className="flex flex-col items-center justify-center space-y-4 flex-wrap gap-4">
+                                {/* Price and supply info */}
+                                <div className="px-4 py-2 bg-black border border-[#BC1A1E] rounded-xl text-center shadow-lg shadow-[#BC1A1E]/50 w-full max-w-xs">
                                     <p className="text-gray-300 text-base font-semibold">
                                         Price: <span className="text-[#BC1A1E]">${formatPrices().usd} USD</span>
                                     </p>
@@ -342,28 +580,84 @@ const Tier6Page = () => {
                                         Supply: <span className="text-[#BC1A1E]">{formatSupply()}</span>
                                     </p>
                                 </div>
-                                <div className="relative">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-[#BC1A1E] via-[#BC1A1E] to-[#BC1A1E] rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all duration-500"></div>
-                                    <button
-                                        onClick={handleMint}
-                                        disabled={isMinting || isConfirming || isConfirmed}
-                                        className="relative px-6 py-2 bg-black rounded-xl group transition-all duration-300 hover:shadow-2xl hover:shadow-[#BC1A1E]/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-[#BC1A1E] to-[#BC1A1E] opacity-0 group-hover:opacity-20 rounded-xl transition-opacity duration-300"></div>
-                                        <span className="relative flex items-center gap-2">
-                                            <Sparkles className="w-5 h-5 text-[#BC1A1E] group-hover:scale-110 transition-transform duration-300" />
-                                            <span className="text-base font-semibold text-white">
-                                                {getMintButtonText()}
-                                            </span>
-                                        </span>
-                                    </button>
 
-                                    {referrerAddress && (
-                                        <div className="fixed bottom-4 right-4 bg-black z-20 border border-[#BC1A1E] rounded-lg p-2 text-sm text-white">
-                                            Referral Active: {referrerAddress.slice(0, 6)}...{referrerAddress.slice(-4)}
+                                {/* Payment method selection */}
+                                <div className="w-full max-w-xs">
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                                        Choose Payment Method
+                                    </label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[PAYMENT_FLR, PAYMENT_USDT, PAYMENT_USDC_E].map((method) => (
+                                            <button
+                                                key={method}
+                                                onClick={() => setPaymentMethod(method)}
+                                                className={`px-2 py-2 rounded-lg transition-all duration-200 flex items-center justify-center ${paymentMethod === method
+                                                    ? "bg-[#BC1A1E] text-black font-semibold"
+                                                    : "bg-black/60 border border-[#BC1A1E]/30 text-white"
+                                                    }`}
+                                            >
+                                                {getPaymentMethodName(method)}
+                                                {paymentMethod === method && (
+                                                    <Check className="ml-1 w-4 h-4" />
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Action buttons */}
+                                <div className="w-full flex flex-col gap-2 max-w-xs">
+                                    {/* ERC20 Approve button - show only for ERC20 tokens that need approval */}
+                                    {paymentMethod !== PAYMENT_FLR && !approvalStatus[paymentMethod] && (
+                                        <div className="relative">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-[#BC1A1E] via-[#BC1A1E] to-[#BC1A1E] rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all duration-500"></div>
+                                            <button
+                                                onClick={handleApprove}
+                                                disabled={isApproving || isMinting || isConfirming}
+                                                className="relative w-full px-6 py-2 bg-black rounded-xl group transition-all duration-300 hover:shadow-2xl hover:shadow-[#BC1A1E]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                <div className="absolute inset-0 bg-gradient-to-r from-[#BC1A1E] to-[#BC1A1E] opacity-0 group-hover:opacity-20 rounded-xl transition-opacity duration-300"></div>
+                                                <span className="relative flex items-center justify-center gap-2">
+                                                    <DollarSign className="w-5 h-5 text-[#BC1A1E] group-hover:scale-110 transition-transform duration-300" />
+                                                    <span className="text-base font-semibold text-white">
+                                                        {getApproveButtonText()}
+                                                    </span>
+                                                </span>
+                                            </button>
                                         </div>
                                     )}
+
+                                    {/* Mint button - disabled for ERC20 tokens that need approval */}
+                                    <div className="relative">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-[#BC1A1E] via-[#BC1A1E] to-[#BC1A1E] rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all duration-500"></div>
+                                        <button
+                                            onClick={handleMint}
+                                            disabled={
+                                                isMinting ||
+                                                isApproving ||
+                                                isConfirming ||
+                                                (transactionType === 'mint' && isConfirmed) ||
+                                                mintCompleted ||
+                                                (paymentMethod !== PAYMENT_FLR && !approvalStatus[paymentMethod])
+                                            }
+                                            className="relative w-full px-6 py-2 bg-black rounded-xl group transition-all duration-300 hover:shadow-2xl hover:shadow-[#BC1A1E]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <div className="absolute inset-0 bg-gradient-to-r from-[#BC1A1E] to-[#BC1A1E] opacity-0 group-hover:opacity-20 rounded-xl transition-opacity duration-300"></div>
+                                            <span className="relative flex items-center justify-center gap-2">
+                                                <Sparkles className="w-5 h-5 text-[#BC1A1E] group-hover:scale-110 transition-transform duration-300" />
+                                                <span className="text-base font-semibold text-white">
+                                                    {getMintButtonText()}
+                                                </span>
+                                            </span>
+                                        </button>
+                                    </div>
                                 </div>
+
+                                {referrerAddress && (
+                                    <div className="fixed bottom-4 right-4 bg-black z-20 border border-[#BC1A1E] rounded-lg p-2 text-sm text-white">
+                                        Referral Active: {referrerAddress.slice(0, 6)}...{referrerAddress.slice(-4)}
+                                    </div>
+                                )}
                             </div>
 
                             {/* NFT Image */}
@@ -375,14 +669,14 @@ const Tier6Page = () => {
                                             className="absolute inset-0 opacity-30"
                                             style={{
                                                 backgroundImage:
-                                                    "radial-gradient(circle at 2px 2px, rgba(188, 26, 30, 0.4) 2px, transparent 0)",
+                                                    "radial-gradient(circle at 2px 2px, rgba(46, 204, 113, 0.4) 2px, transparent 0)",
                                                 backgroundSize: "24px 24px",
                                             }}
                                         ></div>
                                         <div className="relative w-full h-full rounded-xl transform group-hover:scale-[1.02] transition-transform duration-500">
                                             <Image
                                                 src="/nfts/Iridium.png"
-                                                alt="Iridium Tier NFT"
+                                                alt="Iridium NFT"
                                                 fill
                                                 sizes="(min-width: 1024px) 32rem, 100vw"
                                                 className="object-contain p-2"
@@ -398,7 +692,7 @@ const Tier6Page = () => {
                         <div className="space-y-2 overflow-auto">
                             <h2 className="text-2xl font-bold text-center">Exclusive Benefits</h2>
                             {/* Responsive Benefits Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
                                 {benefits.map((benefit, index) => (
                                     <div
                                         key={index}

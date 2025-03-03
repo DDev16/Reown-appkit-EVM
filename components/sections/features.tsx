@@ -3,6 +3,7 @@ import { BookOpen, Lock, Gift, ShoppingBag, Users, Newspaper, ExternalLink } fro
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { useEffect } from 'react';
+import Link from 'next/link';
 
 const FeaturesSection = () => {
     useEffect(() => {
@@ -20,42 +21,48 @@ const FeaturesSection = () => {
             title: "Token-Gated Education",
             description: "Access exclusive DeFi educational content tailored to your membership tier level.",
             gradient: "from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E]",
-            animation: "fade-up"
+            animation: "fade-up",
+            route: "/our-features"
         },
         {
             icon: <Lock className="w-12 h-12" />,
             title: "Secure Platform",
             description: "Built with UUPS upgradeable contracts ensuring maximum security and scalability.",
             gradient: "from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E]",
-            animation: "fade-up"
+            animation: "fade-up",
+            route: "/our-features"
         },
         {
             icon: <Gift className="w-12 h-12" />,
             title: "Airdrops & Rewards",
             description: "Receive exclusive NFTs and tokens through our advanced airdrop system tool.",
             gradient: "from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E]",
-            animation: "fade-up"
+            animation: "fade-up",
+            route: "/our-features"
         },
         {
             icon: <ShoppingBag className="w-12 h-12" />,
             title: "Web3 Merchandise",
             description: "Shop exclusive merchandise using cryptocurrency through our secure payment gateway.",
             gradient: "from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E]",
-            animation: "fade-up"
+            animation: "fade-up",
+            route: "/our-features"
         },
         {
             icon: <Users className="w-12 h-12" />,
             title: "Community Access",
             description: "Join a thriving community of DeFi enthusiasts and experts through our platform.",
             gradient: "from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E]",
-            animation: "fade-up"
+            animation: "fade-up",
+            route: "/our-features"
         },
         {
             icon: <Newspaper className="w-12 h-12" />,
             title: "Latest Updates",
             description: "Stay informed with our integrated blog featuring the latest DeFi trends and insights.",
             gradient: "from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E]",
-            animation: "fade-up"
+            animation: "fade-up",
+            route: "/our-features"
         }
     ];
 
@@ -132,10 +139,10 @@ const FeaturesSection = () => {
                                     </div>
 
                                     <div className="pt-4 opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                                        <a href="#" className="inline-flex items-center text-[#BC1A1E] hover:text-[#FF4B51] transition-colors">
+                                        <Link href={feature.route} className="inline-flex items-center text-[#BC1A1E] hover:text-[#FF4B51] transition-colors">
                                             <span className="mr-2">Learn More</span>
                                             <ExternalLink className="w-4 h-4" />
-                                        </a>
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
