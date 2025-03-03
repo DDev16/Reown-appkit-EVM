@@ -101,7 +101,7 @@ export interface Creator {
     //   image: "/assets/flareLogo1.png",
     //   contentType: "Newsletter Writer",
     //   bio: "Connecting TradFi market movements with DeFi implications. Known for contrarian takes and spotting early market shifts across crypto ecosystems.",
-    //   specialization: "Tier 2 Contributor",
+    //   specialization: "Tier 2 Contributo",
     //   socials: {
     //     twitter: "https://twitter.com/thomaswright",
     //     discord: "https://discord.gg/wright-insights"
