@@ -420,7 +420,7 @@ const Tier3Page = () => {
         }
     };
 
-    // Updated handleMint function
+    // Updated handleMint function with higher gas limit
     const handleMint = async () => {
         if (isMinting || isApproving) return;
 
@@ -432,6 +432,9 @@ const Tier3Page = () => {
             const referrer = referrerAddress && /^0x[a-fA-F0-9]{40}$/.test(referrerAddress)
                 ? referrerAddress
                 : '0x0000000000000000000000000000000000000000';
+
+            // Set a higher gas limit to accommodate the token rewards
+            const gasLimit = BigInt(1000000); // Higher gas limit for complex operations
 
             if (paymentMethod === PAYMENT_FLR) {
                 // Mint with native token (FLR)
@@ -445,7 +448,8 @@ const Tier3Page = () => {
                     tier: TIER_3,
                     amount: 1,
                     referrer,
-                    price: price.toString()
+                    price: price.toString(),
+                    gasLimit: gasLimit.toString()
                 });
 
                 await writeContract({
@@ -457,7 +461,8 @@ const Tier3Page = () => {
                         BigInt(1),         // amount
                         referrer           // referrer address
                     ],
-                    value: price           // Properly formatted as BigInt
+                    value: price,          // Properly formatted as BigInt
+                    gas: gasLimit          // Set the gas limit explicitly
                 });
             } else {
                 // Mint with ERC20 token
@@ -465,7 +470,8 @@ const Tier3Page = () => {
                     tier: TIER_3,
                     amount: 1,
                     referrer,
-                    paymentMethod
+                    paymentMethod,
+                    gasLimit: gasLimit.toString()
                 });
 
                 await writeContract({
@@ -477,7 +483,8 @@ const Tier3Page = () => {
                         BigInt(1),               // amount
                         referrer,                // referrer address
                         BigInt(paymentMethod)    // payment method
-                    ]
+                    ],
+                    gas: gasLimit               // Set the gas limit explicitly
                 });
             }
 
@@ -499,7 +506,6 @@ const Tier3Page = () => {
             setTransactionType('none');
         }
     };
-
     // Format supply and price data
     const formatSupply = () => {
         if (!supplyData || !Array.isArray(supplyData)) return "0/25";
