@@ -266,7 +266,7 @@ export default function Tier1Page() {
             {/* Header with content type tabs */}
             <div className="mb-6 px-1">
                 <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-xl font-bold text-white">Top Tier Dashboard</h1>
+                    <h1 className="text-xl font-bold text-white"> Tier 2 Dashboard</h1>
                     <button
                         onClick={refreshData}
                         className="flex items-center justify-center px-4 py-2 bg-red-800 hover:bg-red-700 rounded text-sm font-medium transition-colors"

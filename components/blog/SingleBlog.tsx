@@ -151,13 +151,13 @@ const SingleBlog: React.FC<SingleBlogProps> = ({ post }) => {
                                     <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
                                     <span>{isLiked ? 'Liked' : 'Like'}</span>
                                 </button>
-                                <button
+                                {/* <button
                                     className="flex items-center gap-2 text-gray-400 hover:text-blue-500 
                                              transition-colors duration-300"
                                 >
                                     <MessageSquare className="w-5 h-5" />
                                     <span>Comment</span>
-                                </button>
+                                </button> */}
                                 <button
                                     onClick={handleShare}
                                     className="flex items-center gap-2 text-gray-400 hover:text-green-500 
@@ -168,14 +168,14 @@ const SingleBlog: React.FC<SingleBlogProps> = ({ post }) => {
                                 </button>
                             </div>
 
-                            <button
+                            {/* <button
                                 onClick={() => setIsBookmarked(!isBookmarked)}
                                 className={`flex items-center gap-2 transition-colors duration-300
                                           ${isBookmarked ? 'text-purple-500' : 'text-gray-400 hover:text-purple-500'}`}
                             >
                                 <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-current' : ''}`} />
                                 <span>{isBookmarked ? 'Saved' : 'Save'}</span>
-                            </button>
+                            </button> */}
                         </div>
                     </div>
                 </div>

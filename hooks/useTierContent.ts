@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, doc, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { 
   VideoItem, 
@@ -9,7 +9,7 @@ import {
   BlogItem, 
   CallItem,
   TestItem,
-  CourseLessonData,
+  CourseLessonData, // Import the new type
   TierContentData 
 } from '@/types/types';
 
@@ -18,83 +18,9 @@ export const useTierContent = (tier: number): TierContentData => {
   const [latestCourses, setLatestCourses] = useState<CourseItem[]>([]);
   const [latestBlogs, setLatestBlogs] = useState<BlogItem[]>([]);
   const [latestCalls, setLatestCalls] = useState<CallItem[]>([]);
-  const [latestTests, setLatestTests] = useState<TestItem[]>([]);
+  const [latestTests, setLatestTests] = useState<TestItem[]>([]); // Initialize with empty array
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Helper function to fetch lessons for a course
-  const fetchCourseLessons = async (courseId: string): Promise<CourseLessonData[]> => {
-    try {
-      // Query the top-level lessons collection instead of subcollection
-      const lessonsQuery = query(
-        collection(db, "lessons"),
-        where("courseId", "==", courseId),
-        orderBy("order", "asc") // Add orderBy if you have an index set up
-      );
-      
-      const lessonsSnapshot = await getDocs(lessonsQuery);
-
-      if (lessonsSnapshot.empty) {
-        console.log(`No lessons found for course ${courseId}`);
-        return [];
-      }
-
-      console.log(`Found ${lessonsSnapshot.size} lessons for course ${courseId}`);
-
-      // Map the lessons data
-      const lessonsData = lessonsSnapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          order: data.order || 0,
-          title: data.title || "Untitled Lesson",
-          type: data.type === 'pdf' ? 'pdf' : 'video',
-          url: data.url || '',
-          filename: data.filename || '',
-          duration: typeof data.duration === 'number' ? data.duration : 0
-        } as CourseLessonData;
-      });
-
-      return lessonsData; // No need to sort since we're using orderBy in the query
-
-    } catch (error) {
-      console.error(`Error fetching lessons for course ${courseId}:`, error);
-      
-      // Try falling back to subcollection method for backward compatibility
-      try {
-        console.log(`Attempting to fetch lessons from subcollection for course ${courseId}`);
-        const subcollectionQuery = query(collection(db, "courses", courseId, "lessons"));
-        const subcollectionSnapshot = await getDocs(subcollectionQuery);
-        
-        if (subcollectionSnapshot.empty) {
-          console.log(`No lessons found in subcollection for course ${courseId}`);
-          return [];
-        }
-        
-        console.log(`Found ${subcollectionSnapshot.size} lessons in subcollection`);
-        
-        // Map the lessons data
-        const subcollectionData = subcollectionSnapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            order: data.order || 0,
-            title: data.title || "Untitled Lesson",
-            type: data.type === 'pdf' ? 'pdf' : 'video',
-            url: data.url || '',
-            filename: data.filename || '',
-            duration: typeof data.duration === 'number' ? data.duration : 0
-          } as CourseLessonData;
-        });
-        
-        // Sort lessons by order
-        return subcollectionData.sort((a, b) => a.order - b.order);
-      } catch (fallbackError) {
-        console.error(`Fallback method also failed for course ${courseId}:`, fallbackError);
-        return [];
-      }
-    }
-  };
 
   // Fetch content method that can be called to refresh data
   const fetchContent = async (): Promise<void> => {
@@ -102,7 +28,7 @@ export const useTierContent = (tier: number): TierContentData => {
       setIsLoading(true);
       setError(null);
 
-      // Fetch videos (still using the old tier field)
+      // Fetch videos
       console.log("Fetching videos for tier:", tier);
       const videosQuery = query(
         collection(db, "videos"),
@@ -134,42 +60,30 @@ export const useTierContent = (tier: number): TierContentData => {
 
       setLatestVideos(sortedVideos);
 
-      // Fetch courses - UPDATED to use tiers array
-      console.log("Fetching courses for tier:", tier);
+      // Fetch courses
       const coursesQuery = query(
         collection(db, "courses"),
-        where("tiers", "array-contains", tier)
+        where("tier", "==", tier)
       );
       const coursesSnapshot = await getDocs(coursesQuery);
-      console.log("Courses snapshot size:", coursesSnapshot.size);
-      
-      // Get base course data first
-      const coursesPromises = coursesSnapshot.docs.map(async (doc) => {
+      const coursesList = coursesSnapshot.docs.map(doc => {
         const data = doc.data();
         
-        // Create base course object
-        const courseData: CourseItem = {
-            id: doc.id,
-            title: data.title || "Untitled Course",
-            description: data.description || "No description available",
-            thumbnail: data.thumbnail || "/placeholder-thumbnail.jpg",
-            lessons: data.lessons || 0,
-            date: data.date || new Date().toISOString(),
-            completed: data.completed || false,
-            tiers: data.tiers || [tier], // Include tiers array
-            ...data
-        };
+         // Create base course object
+    const courseData: CourseItem = {
+        id: doc.id,
+        title: data.title || "Untitled Course",
+        description: data.description || "No description available",
+        thumbnail: data.thumbnail || "/placeholder-thumbnail.jpg",
+        lessons: data.lessons || 0,
+        date: data.date || new Date().toISOString(),
+        completed: data.completed || false, // Ensure the completed property is included
+        ...data
+    };
         
-        // Fetch lessons from top-level collection
-        const lessonsData = await fetchCourseLessons(doc.id);
-        
-        // Update the course with lesson data and lesson count
-        if (lessonsData.length > 0) {
-          courseData.lessonData = lessonsData;
-          courseData.lessons = lessonsData.length; // Update the lesson count to match actual lessons
-          courseData.lessonSource = 'collection'; // Mark source of lessons
-        } else if (data.lessonData && Array.isArray(data.lessonData)) {
-          // Fallback to embedded lessonData if no collection found
+        // Process lesson data if it exists
+        if (data.lessonData && Array.isArray(data.lessonData)) {
+          // Ensure each lesson has all required fields properly typed
           courseData.lessonData = data.lessonData.map((lesson: any) => ({
             id: lesson.id || `lesson-${Math.random().toString(36).substring(2, 9)}`,
             order: typeof lesson.order === 'number' ? lesson.order : 0,
@@ -179,14 +93,10 @@ export const useTierContent = (tier: number): TierContentData => {
             filename: lesson.filename || '',
             duration: typeof lesson.duration === 'number' ? lesson.duration : 0
           })) as CourseLessonData[];
-          courseData.lessonSource = 'embedded'; // Mark source of lessons
         }
         
         return courseData;
       });
-      
-      // Wait for all course data to be processed
-      const coursesList = await Promise.all(coursesPromises);
 
       // Sort courses manually by date (newest first)
       const sortedCourses = [...coursesList].sort((a, b) => {
@@ -197,7 +107,7 @@ export const useTierContent = (tier: number): TierContentData => {
 
       setLatestCourses(sortedCourses);
 
-      // Fetch blogs (still using the old tier field)
+      // Fetch blogs
       const blogsQuery = query(
         collection(db, "blogs"),
         where("tier", "==", tier)
@@ -226,7 +136,7 @@ export const useTierContent = (tier: number): TierContentData => {
 
       setLatestBlogs(sortedBlogs);
 
-      // Fetch calls (still using the old tier field)
+      // Fetch calls
       const callsQuery = query(
         collection(db, "calls"),
         where("tier", "==", tier)
@@ -254,7 +164,7 @@ export const useTierContent = (tier: number): TierContentData => {
 
       setLatestCalls(sortedCalls);
       
-      // Fetch knowledge tests (still using the old tier field)
+      // Fetch knowledge tests
       try {
         const testsQuery = query(
           collection(db, "tests"),

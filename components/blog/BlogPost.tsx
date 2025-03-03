@@ -144,24 +144,24 @@ const BlogPost: React.FC<BlogPostProps> = ({ post }) => {
                     <div className="mt-auto pt-3 border-t border-red-500/20">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <button
+                                {/* <button
                                     onClick={() => setIsLiked(!isLiked)}
                                     className={`flex items-center gap-1 text-xs transition-colors duration-300
                                               ${isLiked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
                                 >
                                     <Heart className={`w-3 h-3 ${isLiked ? 'fill-current' : ''}`} />
                                     <span>{isLiked ? 'Liked' : 'Like'}</span>
-                                </button>
-                                <button
+                                </button> */}
+                                {/* <button
                                     onClick={handleShare}
                                     className="flex items-center gap-1 text-xs text-gray-400 hover:text-green-500 
                                              transition-colors duration-300"
                                 >
                                     <Share2 className="w-3 h-3" />
                                     <span>Share</span>
-                                </button>
+                                </button> */}
                             </div>
-
+                            {/* 
                             <button
                                 onClick={() => setIsBookmarked(!isBookmarked)}
                                 className={`flex items-center gap-1 text-xs transition-colors duration-300
@@ -169,7 +169,7 @@ const BlogPost: React.FC<BlogPostProps> = ({ post }) => {
                             >
                                 <Bookmark className={`w-3 h-3 ${isBookmarked ? 'fill-current' : ''}`} />
                                 <span>{isBookmarked ? 'Saved' : 'Save'}</span>
-                            </button>
+                            </button> */}
                         </div>
 
                         {/* Read More Link */}

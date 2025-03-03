@@ -104,13 +104,13 @@ const MEMBERSHIP_TIERS = [
         iconPath: '/tier-icons/Ag-icon.png',
         color: 'from-[#C0C0C0] via-[#C0C0C0] to-[#A9A9A9]'
     },
-    {
-        id: 12,
-        name: 'Video Library',
-        path: '/dashboard/video-library',
-        icon: <VideoIcon className="w-5 h-5" />,
-        color: 'from-pink-400 to-pink-600'
-    },
+    // {
+    //     id: 12,
+    //     name: 'Video Library',
+    //     path: '/dashboard/video-library',
+    //     icon: <VideoIcon className="w-5 h-5" />,
+    //     color: 'from-pink-400 to-pink-600'
+    // },
     {
         id: 13,
         name: 'Dictionary',

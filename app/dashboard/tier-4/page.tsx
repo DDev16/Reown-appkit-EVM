@@ -131,14 +131,14 @@ export default function Tier4Page() {
                     <Lock className="w-16 h-16 mx-auto text-red-600" />
                     <h2 className="text-2xl font-bold">Access Required</h2>
                     <p className="text-gray-400">
-                        You need to hold the Tier 3 token to access this content
+                        You need to hold the Tier 4 token to access this content
                     </p>
                     <div className="space-y-2">
                         <button className="px-6 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
-                            Purchase Tier 3 Membership
+                            Purchase 4 Membership
                         </button>
                         <p className="text-sm text-gray-500">
-                            Already own a Tier 3 NFT? Make sure it&apos;s in your connected wallet.
+                            Already own a 4 NFT? Make sure it&apos;s in your connected wallet.
                         </p>
                     </div>
                 </div>
@@ -266,7 +266,7 @@ export default function Tier4Page() {
             {/* Header with content type tabs */}
             <div className="mb-6 px-1">
                 <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-xl font-bold text-white"> Tier 3 Dashboard</h1>
+                    <h1 className="text-xl font-bold text-white"> Tier 4 Dashboard</h1>
                     <button
                         onClick={refreshData}
                         className="flex items-center justify-center px-4 py-2 bg-red-800 hover:bg-red-700 rounded text-sm font-medium transition-colors"

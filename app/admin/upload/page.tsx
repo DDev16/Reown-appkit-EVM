@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-    doc,
-    updateDoc,
-    addDoc,
-    collection,
-    serverTimestamp
-} from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
+
+
+
+
+
+
 import { db } from '@/lib/firebase';
 
 import ContentTypeSelector from './components/ContentTypeSelector';
@@ -75,7 +75,7 @@ export default function AdminUploadPage() {
         uploadThumbnail,
         uploadContentFile,
         uploadCourseLessonFiles,
-        uploadLessonsToCollection, // Use the new function
+
         saveContentToFirestore
     } = useContentUpload();
 
@@ -122,16 +122,16 @@ export default function AdminUploadPage() {
             callUrl: ''
         });
 
-        // Reset upload status with all the new fields
+
         setUploadStatus({
             isUploading: false,
             progress: 0,
             error: null,
             success: false,
-            fileUrl: null,
-            transferredMB: 0,
-            totalMB: 0,
-            state: 'running'
+            fileUrl: null
+
+
+
         });
     };
 
@@ -172,48 +172,48 @@ export default function AdminUploadPage() {
     // Validate form based on content type
     const validateForm = (): boolean => {
         if (!baseFormData.title || !baseFormData.description || !baseFormData.thumbnailFile || selectedTiers.length === 0) {
-            setUploadStatus(prev => ({
-                ...prev,
-                error: 'Please fill all required fields and select at least one tier',
-                state: 'error'
-            }));
+            setUploadStatus({
+                ...uploadStatus,
+                error: 'Please fill all required fields and select at least one tier'
+            });
+
             return false;
         }
 
         // Content-specific validation
         if (contentType === 'videos' && (!videoFormData.contentFile || !videoFormData.duration)) {
-            setUploadStatus(prev => ({
-                ...prev,
-                error: 'Please upload a video file and specify the duration',
-                state: 'error'
-            }));
+            setUploadStatus({
+                ...uploadStatus,
+                error: 'Please upload a video file and specify the duration'
+            });
+
             return false;
         }
 
         if (contentType === 'courses' && (!courseFormData.lessonFiles || courseFormData.lessonFiles.length === 0)) {
-            setUploadStatus(prev => ({
-                ...prev,
-                error: 'Please add at least one lesson to the course',
-                state: 'error'
-            }));
+            setUploadStatus({
+                ...uploadStatus,
+                error: 'Please add at least one lesson to the course'
+            });
+
             return false;
         }
 
         if (contentType === 'blogs' && (!blogFormData.author || !blogFormData.readTime)) {
-            setUploadStatus(prev => ({
-                ...prev,
-                error: 'Please specify the author and read time',
-                state: 'error'
-            }));
+            setUploadStatus({
+                ...uploadStatus,
+                error: 'Please specify the author and read time'
+            });
+
             return false;
         }
 
         if (contentType === 'tests' && (!testFormData.numQuestions || !testFormData.estimatedTime)) {
-            setUploadStatus(prev => ({
-                ...prev,
-                error: 'Please specify the number of questions and estimated time',
-                state: 'error'
-            }));
+            setUploadStatus({
+                ...uploadStatus,
+                error: 'Please specify the number of questions and estimated time'
+            });
+
             return false;
         }
 
@@ -223,11 +223,11 @@ export default function AdminUploadPage() {
             !callFormData.callTime ||
             !callFormData.callDuration
         )) {
-            setUploadStatus(prev => ({
-                ...prev,
-                error: 'Please fill all required fields for zoom calls',
-                state: 'error'
-            }));
+            setUploadStatus({
+                ...uploadStatus,
+                error: 'Please fill all required fields for zoom calls'
+            });
+
             return false;
         }
 
@@ -243,13 +243,13 @@ export default function AdminUploadPage() {
         }
 
         try {
-            setUploadStatus(prev => ({
-                ...prev,
+            setUploadStatus({
+                ...uploadStatus,
                 isUploading: true,
                 error: null,
-                progress: 0,
-                state: 'running'
-            }));
+            });
+
+
 
             // Upload thumbnail
             const thumbnailUrl = await uploadThumbnail(baseFormData.thumbnailFile!, contentType);
@@ -281,56 +281,56 @@ export default function AdminUploadPage() {
                 }
 
                 case 'courses': {
-                    console.log('Starting course upload process...');
-                    console.log(`Course has ${courseFormData.lessonFiles.length} lessons to upload for ${selectedTiers.length} tiers`);
+                    // For courses, we first create the course documents to get their IDs
+                    contentData = {
+                        ...baseContentData,
+                        lessons: courseFormData.lessonFiles.length,
+                        // We'll add the lessons array after uploading files
+                    };
 
-                    try {
-                        // UPDATED: Create a single course document with tiers array 
-                        // instead of creating separate documents for each tier
+                    // Save initial course data to get document IDs
+                    docIds = await saveContentToFirestore(contentType, contentData, selectedTiers);
 
-                        // 1. Create course document with basic information
-                        const courseData = {
-                            ...baseContentData,
-                            tiers: selectedTiers, // Store as array instead of single tier value
-                            lessons: courseFormData.lessonFiles.length,
-                            lessonCount: courseFormData.lessonFiles.length,
-                            createdAt: serverTimestamp(),
-                            date: new Date().toISOString(),
-                            status: 'pending'
-                        };
+                    // For each course document (one per tier), upload lesson files
+                    for (const courseId of docIds) {
+                        try {
+                            // Upload all lesson files for this course
+                            const { lessons } = await uploadCourseLessonFiles(
+                                courseFormData.lessonFiles,
+                                courseId
+                            );
 
-                        console.log(`Creating course document with tiers: ${selectedTiers.join(', ')}...`);
-                        const courseRef = await addDoc(collection(db, 'courses'), courseData);
-                        const courseId = courseRef.id;
-                        console.log(`Created course document with ID: ${courseId}`);
+                            // Update the course document with lesson data
+                            await updateDoc(doc(db, 'courses', courseId), {
+                                lessons: lessons.length,
+                                lessonData: lessons
+                            });
 
-                        // 2. Upload all lesson files and store lessons in lessons collection
-                        console.log(`Uploading ${courseFormData.lessonFiles.length} lesson files for course ${courseId}`);
+                        } catch (error) {
+                            console.error(`Error uploading lessons for course ${courseId}:`, error);
+                            throw error;
+                        }
 
-                        // Use the new uploadLessonsToCollection function that uploads to top-level lessons collection 
-                        // instead of subcollections
-                        const lessonCount = await uploadLessonsToCollection(
-                            courseFormData.lessonFiles,
-                            courseId
-                        );
 
-                        // 3. Update course document with status
-                        await updateDoc(doc(db, 'courses', courseId), {
-                            status: 'complete'
-                        });
 
-                        console.log(`Successfully uploaded ${lessonCount} lessons for course ${courseId}`);
 
-                        docIds = [courseId];
-                    } catch (error) {
-                        console.error('Error in course upload process:', error);
-                        setUploadStatus(prev => ({
-                            ...prev,
-                            error: `Upload error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                            isUploading: false,
-                            state: 'error'
-                        }));
-                        throw error;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     }
 
                     break;
@@ -389,15 +389,15 @@ export default function AdminUploadPage() {
                 }
             }
 
-            setUploadStatus(prev => ({
-                ...prev,
+            setUploadStatus({
+
                 isUploading: false,
                 progress: 100,
                 error: null,
                 success: true,
-                fileUrl: thumbnailUrl,
-                state: 'success'
-            }));
+                fileUrl: thumbnailUrl
+            });
+
 
             // Reset form after successful upload
             setTimeout(() => {
@@ -407,32 +407,19 @@ export default function AdminUploadPage() {
 
         } catch (error) {
             console.error('Upload error:', error);
-            setUploadStatus(prev => ({
-                ...prev,
+            setUploadStatus({
+                ...uploadStatus,
                 isUploading: false,
                 error: error instanceof Error ? error.message : 'An unknown error occurred',
-                success: false,
-                state: 'error'
-            }));
-        }
-    };
+                success: false
+            });
 
-    // Handle upload control actions
-    const handlePauseUpload = () => {
-        if (uploadStatus.pauseUpload) {
-            uploadStatus.pauseUpload();
-        }
-    };
 
-    const handleResumeUpload = () => {
-        if (uploadStatus.resumeUpload) {
-            uploadStatus.resumeUpload();
-        }
-    };
 
-    const handleCancelUpload = () => {
-        if (uploadStatus.cancelUpload) {
-            uploadStatus.cancelUpload();
+
+
+
+
         }
     };
 
@@ -499,13 +486,13 @@ export default function AdminUploadPage() {
                             />
                         )}
 
-                        {/* Upload status messages with control handlers */}
-                        <UploadStatus
-                            uploadStatus={uploadStatus}
-                            onPause={handlePauseUpload}
-                            onResume={handleResumeUpload}
-                            onCancel={handleCancelUpload}
-                        />
+                        {/* Upload status messages */}
+                        <UploadStatus uploadStatus={uploadStatus} />
+
+
+
+
+
 
                         {/* Submit button */}
                         <div className="mt-6">
@@ -525,4 +512,4 @@ export default function AdminUploadPage() {
             </div>
         </div>
     );
-}
+};
