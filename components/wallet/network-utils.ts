@@ -1,7 +1,7 @@
 export const getNetworkName = (chainId: number) => {
-    return chainId === 16 ? 'Coston Testnet' : 'Unknown Network';
+    return chainId === 14 ? 'Flare Networks' : 'Unknown Network';
 };
 
 export const getExplorerUrl = (chainId: number) => {
-    return chainId === 16 ? 'https://coston-explorer.flare.network' : '';
+    return chainId === 14 ? 'https://flare-explorer.flare.network/' : '';
 };

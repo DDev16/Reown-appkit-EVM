@@ -584,7 +584,7 @@ const Tier4Page = () => {
                             </h1>
                         </div>
                         <p className="text-xl text-gray-400 max-w-6xl mx-auto">
-                            Join our Professional Membership Tier 4 with advanced features and benefits
+                            Join our Professional Membership Gold Tier with advanced features and benefits
 
 
                         </p>

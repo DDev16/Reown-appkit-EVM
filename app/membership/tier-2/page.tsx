@@ -582,7 +582,7 @@ const Tier2Page = () => {
                             </h1>
                         </div>
                         <p className="text-xl text-gray-400 max-w-6xl mx-auto">
-                            Join our exclusive Tier 2 membership with premium benefits and advanced access
+                            Join our exclusive Rhodium membership with premium benefits and advanced access
                         </p>
                     </div>
 

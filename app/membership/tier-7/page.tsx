@@ -563,7 +563,7 @@ const Tier7Page = () => {
                             </h1>
                         </div>
                         <p className="text-xl text-gray-400 max-w-6xl mx-auto">
-                            Start your DeFi education journey with our most affordable membership
+                            Start your DeFi education journey with membership in the Osmium Tier.
 
 
 

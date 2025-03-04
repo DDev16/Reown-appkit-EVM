@@ -1,12 +1,13 @@
 "use client";
 import React, { useState } from 'react';
 import { ChevronDown, Plus, Minus } from 'lucide-react';
+import Link from 'next/link';
 
 const FAQ = () => {
     const faqs = [
         {
             question: "What are the membership tiers available?",
-            answer: "Our platform offers multiple membership tiers (Tier 1 - Tier 7), each providing access to exclusive educational content and benefits. Each tier builds upon the previous one, offering more advanced DeFi learning modules and features."
+            answer: "Our platform offers multiple membership tiers (Tier 1 - Tier 10), each providing access to exclusive educational content and benefits. Each tier builds upon the previous one, offering more advanced DeFi learning modules and features."
         },
         {
             question: "How does the token-gated education system work?",
@@ -16,13 +17,13 @@ const FAQ = () => {
             question: "What are the benefits of upgrading my membership tier?",
             answer: "Upgrading your membership tier provides access to more advanced DeFi courses, exclusive content, and potential airdrops. Higher tiers also receive priority access to new features and educational materials."
         },
-        // {
-        //     question: "How do I mint a membership NFT?",
-        //     answer: "You can mint membership NFTs through our dedicated minting page. Simply connect your wallet, select your desired tier, and complete the transaction. A 10% mint fee is automatically distributed to True Gems."
-        // },
+        {
+            question: "How do I mint a membership NFT?",
+            answer: "You can mint membership NFTs through our dedicated minting page. Simply connect your wallet, select your desired tier, and complete the transaction. "
+        },
         {
             question: "Can I participate in airdrops?",
-            answer: "Yes! NAirdrops are for NFT holders of tier 1-5, and they will be awarded if a specific amount of tokens is being held in the NFT holders' wallet. This includes all native platform tokens that will be part of the Defi Bull World Platform"
+            answer: "Yes! Airdrops are for NFT holders of tier 1-5, and they will be awarded if a specific amount of tokens is being held in the NFT holders' wallet. This includes all native platform tokens that will be part of the Defi Bull World Platform"
         }
     ];
 
@@ -126,12 +127,14 @@ const FAQ = () => {
                     <p className="text-gray-400 mb-6">
                         Still have questions? We&quote;re here to help!
                     </p>
-                    <button className="group relative px-8 py-4 font-semibold">
-                        <div className="absolute -inset-[1px] bg-gradient-to-r from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E] rounded-lg blur-md transition-all duration-500 group-hover:blur-lg" />
-                        <span className="relative bg-black block rounded-lg px-8 py-4 text-white transition-colors duration-300 group-hover:bg-black/80">
-                            Contact Support
-                        </span>
-                    </button>
+                    <Link href="/contact">
+                        <div className="group relative inline-block px-8 py-4 font-semibold cursor-pointer">
+                            <div className="absolute -inset-[1px] bg-gradient-to-r from-[#BC1A1E] via-[#FF4B51] to-[#BC1A1E] rounded-lg blur-md transition-all duration-500 group-hover:blur-lg" />
+                            <span className="relative bg-black block rounded-lg px-8 py-4 text-white transition-colors duration-300 group-hover:bg-black/80">
+                                Contact Support
+                            </span>
+                        </div>
+                    </Link>
                 </div>
             </div>
 

@@ -581,7 +581,7 @@ const Tier1Page = () => {
                             </h1>
                         </div>
                         <p className="text-xl text-gray-400 max-w-6xl mx-auto">
-                            Start your DeFi education journey with our super affordable membership
+                            Our Highest Tier NFT with exclusive benefits and limited supply.
                         </p>
                     </div>
 

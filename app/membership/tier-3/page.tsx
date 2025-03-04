@@ -584,7 +584,7 @@ const Tier3Page = () => {
                             </h1>
                         </div>
                         <p className="text-xl text-gray-400 max-w-6xl mx-auto">
-                            Experience our Elite Tier 3 membership with exceptional benefits and advanced opportunities
+                            Experience our Elite Tier membership with exceptional benefits and advanced opportunities
 
                         </p>
                     </div>

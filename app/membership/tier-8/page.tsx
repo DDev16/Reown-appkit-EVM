@@ -563,7 +563,7 @@ const Tier8Page = () => {
                             </h1>
                         </div>
                         <p className="text-xl text-gray-400 max-w-6xl mx-auto">
-                            Start your DeFi education journey with our most accessible membership
+                            Start your DeFi journey with our Palladium Tier NFT.
 
 
 

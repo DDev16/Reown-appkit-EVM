@@ -160,7 +160,7 @@ const TransactionHistory: React.FC = () => {
                                     <p className="text-sm text-yellow-400">Function: {tx.functionName}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-white font-semibold">{tx.value} C-FLR</p>
+                                    <p className="text-white font-semibold">{tx.value} FLR</p>
                                     <a
                                         href={`${getExplorerUrl(chainId)}/tx/${tx.hash}`}
                                         target="_blank"

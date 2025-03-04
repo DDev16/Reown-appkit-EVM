@@ -347,7 +347,7 @@ const ContentCreators: React.FC = () => {
                 {/* Call to Action */}
                 <div className="text-center mt-16">
                     <a
-                        href="/creators-apply"
+                        href="/contributors-apply"
                         className="inline-flex items-center px-8 py-3 bg-red-500 text-white rounded-full font-bold hover:bg-red-600 transition-colors group"
                     >
                         Become a Content Creator

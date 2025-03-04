@@ -562,7 +562,7 @@ const Tier9Page = () => {
                             </h1>
                         </div>
                         <p className="text-xl text-gray-400 max-w-6xl mx-auto">
-                            Start your DeFi education journey with our super affordable membership
+                            Mint your Rhenium Tier NFT and unlock exclusive benefits.
                         </p>
                     </div>
 
