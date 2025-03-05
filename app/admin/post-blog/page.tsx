@@ -1,6 +1,6 @@
 'use client';
 //app\admin\dashboard\blog\page.tsx
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
@@ -20,6 +20,11 @@ export default function BlogForm() {
     const [tagInput, setTagInput] = useState('');
     const [tags, setTags] = useState<string[]>([]);
 
+    // Debug logging of current tags
+    useEffect(() => {
+        console.log('Current tags state:', tags);
+    }, [tags]);
+
     const handleAddTag = () => {
         if (tagInput.trim()) {
             // Split by commas and handle multiple tags at once
@@ -29,14 +34,24 @@ export default function BlogForm() {
                 .filter(tag => tag !== '' && !tags.includes(tag));
 
             if (newTags.length > 0) {
-                setTags([...tags, ...newTags]);
+                console.log('Adding new tags:', newTags);
+                setTags(prevTags => {
+                    const updatedTags = [...prevTags, ...newTags];
+                    console.log('Updated tags array:', updatedTags);
+                    return updatedTags;
+                });
                 setTagInput('');
             }
         }
     };
 
     const handleRemoveTag = (tagToRemove: string) => {
-        setTags(tags.filter(tag => tag !== tagToRemove));
+        console.log('Removing tag:', tagToRemove);
+        setTags(prevTags => {
+            const updatedTags = prevTags.filter(tag => tag !== tagToRemove);
+            console.log('Tags after removal:', updatedTags);
+            return updatedTags;
+        });
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -52,6 +67,10 @@ export default function BlogForm() {
         setError('');
 
         try {
+            // Get the current tags array to ensure we use the latest state
+            const currentTags = [...tags];
+            console.log('Submitting form with tags:', currentTags);
+
             let imageUrl = '';
             if (image) {
                 // Create a reference with timestamp for uniqueness
@@ -76,11 +95,14 @@ export default function BlogForm() {
                 title,
                 content,
                 imageUrl,
-                tags: tags.length > 0 ? tags : ['General'], // Default to General if no tags
+                // Use the captured currentTags variable to ensure we're using the latest state
+                tags: currentTags.length > 0 ? currentTags : ['General'], // Default to General if no tags
                 createdAt: Timestamp.now()
             };
 
             console.log('Creating post with data:', postData);
+            console.log('Tags being saved:', postData.tags);
+
             const docRef = await addDoc(collection(db, 'posts'), postData);
             console.log('Post created with ID:', docRef.id);
 

@@ -418,7 +418,7 @@ const Tier5Page = () => {
         }
     };
 
-    // Updated handleMint function with higher gas limit
+    // Updated handleMint function with price buffer
     const handleMint = async () => {
         if (isMinting || isApproving) return;
 
@@ -440,13 +440,18 @@ const Tier5Page = () => {
                     throw new Error("Price data not available");
                 }
 
-                const price = BigInt(flrPriceData.toString());
+                const basePrice = BigInt(flrPriceData.toString());
+
+                // Add 7% buffer to the price to account for fluctuations
+                // (5% for price fluctuations, 2% extra for gas used in refund operation)
+                const priceWithBuffer = (basePrice * BigInt(107)) / BigInt(100);
 
                 console.log('Minting with FLR:', {
                     tier: TIER_5,
                     amount: 1,
                     referrer,
-                    price: price.toString(),
+                    basePrice: basePrice.toString(),
+                    priceWithBuffer: priceWithBuffer.toString(),
                     gasLimit: gasLimit.toString()
                 });
 
@@ -459,7 +464,7 @@ const Tier5Page = () => {
                         BigInt(1),         // amount
                         referrer           // referrer address
                     ],
-                    value: price,          // Properly formatted as BigInt
+                    value: priceWithBuffer, // Send price with buffer
                     gas: gasLimit          // Set the gas limit explicitly
                 });
             } else {

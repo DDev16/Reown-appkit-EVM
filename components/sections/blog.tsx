@@ -25,10 +25,13 @@ const BlogPreview: React.FC = () => {
                 const querySnapshot = await getDocs(q);
                 const fetchedPosts = querySnapshot.docs.map(doc => {
                     const data = doc.data();
+                    console.log('Post data from Firestore:', data); // Log the raw data to debug
                     return {
                         id: doc.id,
                         ...data,
-                        createdAt: data.createdAt
+                        createdAt: data.createdAt,
+                        // Ensure tags are properly handled
+                        tags: Array.isArray(data.tags) ? data.tags : (data.tags ? [data.tags] : ['General'])
                     } as BlogPostType;
                 });
 
@@ -68,7 +71,10 @@ const BlogPreview: React.FC = () => {
 
     // Extract category from tags (first tag)
     const getCategory = (post: BlogPostType) => {
-        return post.tags && post.tags.length > 0 ? post.tags[0] : 'General';
+        console.log('Post tags:', post.tags); // Debug log to check tags
+        if (!post.tags) return 'General';
+        if (typeof post.tags === 'string') return post.tags;
+        return Array.isArray(post.tags) && post.tags.length > 0 ? post.tags[0] : 'General';
     };
 
     return (
@@ -119,7 +125,7 @@ const BlogPreview: React.FC = () => {
                         {[...Array(3)].map((_, index) => (
                             <div
                                 key={index}
-                                className="relative rounded-xl p-6 backdrop-blur-sm border border-[#BC1A1E]/20 bg-black/90"
+                                className="relative rounded-xl p-6 backdrop-blur-sm border border-[#BC1A1E]/20 bg-black/90 h-full"
                             >
                                 <div className="relative h-56 rounded-lg overflow-hidden mb-6 bg-gray-800 animate-pulse"></div>
                                 <div className="space-y-4">
@@ -141,7 +147,7 @@ const BlogPreview: React.FC = () => {
                         {posts.map((post, index) => (
                             <article
                                 key={post.id}
-                                className="group relative"
+                                className="group relative h-full flex"
                                 data-aos="fade-up"
                                 data-aos-delay={index * 100}
                             >
@@ -152,15 +158,17 @@ const BlogPreview: React.FC = () => {
                                 <div className="absolute inset-[1px] rounded-xl opacity-0 group-hover:opacity-20 bg-gradient-to-b from-[#BC1A1E] to-transparent transition-opacity duration-500 blur-xl"></div>
 
                                 {/* Content */}
-                                <div className="relative rounded-xl p-6 backdrop-blur-sm border border-[#BC1A1E]/20 bg-black/90">
+                                <div className="relative rounded-xl p-6 backdrop-blur-sm border border-[#BC1A1E]/20 bg-black/90 flex flex-col w-full h-full">
                                     {/* Image Container */}
-                                    <div className="relative h-56 rounded-lg overflow-hidden mb-6">
+                                    <div className="relative h-56 w-full rounded-lg overflow-hidden mb-6">
                                         {post.imageUrl ? (
-                                            <img
-                                                src={post.imageUrl}
-                                                alt={post.title}
-                                                className="absolute inset-0 w-full h-full object-cover"
-                                            />
+                                            <div className="w-full h-full">
+                                                <img
+                                                    src={post.imageUrl}
+                                                    alt={post.title}
+                                                    className="absolute inset-0 w-full h-full object-contain object-center"
+                                                />
+                                            </div>
                                         ) : (
                                             <div className="absolute inset-0 bg-[#242223] flex items-center justify-center">
                                                 <span className="text-gray-400">Blog Image {index + 1}</span>
@@ -176,7 +184,7 @@ const BlogPreview: React.FC = () => {
                                     </div>
 
                                     {/* Post Info */}
-                                    <div className="space-y-4">
+                                    <div className="space-y-4 flex-grow">
                                         <div className="flex items-center text-sm text-gray-400 space-x-2">
                                             <span>{formatDate(post.createdAt)}</span>
                                             <span className="text-[#BC1A1E]">•</span>
@@ -188,7 +196,7 @@ const BlogPreview: React.FC = () => {
                                         <p className="text-gray-400 line-clamp-3">
                                             {post.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
                                         </p>
-                                        <div className="pt-4">
+                                        <div className="pt-4 mt-auto">
                                             <Link
                                                 href={`/blog/${post.id}`}
                                                 className="flex items-center text-[#BC1A1E] hover:text-[#FF4B51] font-semibold transition-colors duration-300 group/btn"

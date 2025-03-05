@@ -94,11 +94,7 @@ export default function DashboardPage() {
 
     // Parse ownership data
     const ownedTiers = userOwnershipData && userOwnershipData[0] ? userOwnershipData[0] : [];
-    const highestTier = userOwnershipData && userOwnershipData[1]
-        ? Number(userOwnershipData[1]) < Number.MAX_SAFE_INTEGER
-            ? Number(userOwnershipData[1])
-            : null
-        : null;
+
     const totalNFTs = userOwnershipData && userOwnershipData[2] ? Number(userOwnershipData[2]) : 0;
 
     // Parse referral stats data

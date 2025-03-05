@@ -433,7 +433,7 @@ const Tier2Page = () => {
                 : '0x0000000000000000000000000000000000000000';
 
             // Set a higher gas limit to accommodate the token rewards
-            const gasLimit = BigInt(1000000); // Higher gas limit for complex operations
+            const gasLimit = BigInt(100000); // Higher gas limit for complex operations
 
             if (paymentMethod === PAYMENT_FLR) {
                 // Mint with native token (FLR)

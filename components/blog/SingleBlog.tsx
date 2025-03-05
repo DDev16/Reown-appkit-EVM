@@ -78,12 +78,12 @@ const SingleBlog: React.FC<SingleBlogProps> = ({ post }) => {
             <article className="bg-black/90 backdrop-blur-lg rounded-2xl border border-gray-800 overflow-hidden">
                 {/* Featured Image */}
                 {post.imageUrl && (
-                    <div className="relative w-full h-96 overflow-hidden bg-gray-800">
+                    <div className="relative w-full h-96 overflow-hidden bg-black">
                         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-60 z-10" />
                         <img
                             src={post.imageUrl}
                             alt={post.title}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                             loading="lazy"
                         />
                     </div>

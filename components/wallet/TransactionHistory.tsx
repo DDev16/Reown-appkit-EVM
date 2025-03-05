@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 import { formatEther, keccak256, toHex } from 'viem';
-import { ArrowUpRight, ArrowDownLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowUpRight, ExternalLink, Clock } from 'lucide-react';
 import { getExplorerUrl } from '@/components/wallet/network-utils';
 import { shortenAddress } from '@/components/wallet/address-utils';
 
@@ -51,14 +51,22 @@ const TransactionHistory: React.FC = () => {
     const [displayedTransactions, setDisplayedTransactions] = useState<EnhancedTransaction[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const formatDate = (timestamp: number) => {
-        return new Date(timestamp * 1000).toLocaleString();
+    const getTimeAgo = (timestamp: number) => {
+        const now = Math.floor(Date.now() / 1000);
+        const seconds = now - timestamp;
+
+        if (seconds < 3600) return `${Math.floor(seconds / 60)} min ago`;
+        if (seconds < 86400) return `${Math.floor(seconds / 3600)} hr ago`;
+        if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
+        return `${Math.floor(seconds / 604800)} weeks ago`;
     };
 
     useEffect(() => {
         const fetchRecentTransactions = async () => {
             if (address) {
+                setIsLoading(true);
                 try {
                     const response = await fetch(`https://coston-explorer.flare.network/api?module=account&action=txlist&address=${address}&sort=desc&limit=100`);
                     const data = await response.json();
@@ -79,6 +87,8 @@ const TransactionHistory: React.FC = () => {
                     }
                 } catch (error) {
                     console.error('Error fetching recent transactions:', error);
+                } finally {
+                    setIsLoading(false);
                 }
             }
         };
@@ -92,92 +102,130 @@ const TransactionHistory: React.FC = () => {
         setDisplayedTransactions(allTransactions.slice(startIndex, endIndex));
     }, [currentPage, allTransactions]);
 
-    const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(prev => prev + 1);
-        }
-    };
-
-    const handlePrevPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(prev => prev - 1);
-        }
-    };
-
-    const PaginationControls = () => (
-        <div className="flex items-center justify-between mt-4 pb-2">
-            <button
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-                className={`flex items-center px-3 py-2 rounded ${currentPage === 1
-                    ? 'text-gray-500 cursor-not-allowed'
-                    : 'text-red-400 hover:text-red-300'
-                    }`}
-            >
-                <ChevronLeft className="w-4 h-4 mr-1" />
-                Previous
-            </button>
-            <span className="text-gray-400">
-                Page {currentPage} of {totalPages}
-            </span>
-            <button
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-                className={`flex items-center px-3 py-2 rounded ${currentPage === totalPages
-                    ? 'text-gray-500 cursor-not-allowed'
-                    : 'text-red-400 hover:text-red-300'
-                    }`}
-            >
-                Next
-                <ChevronRight className="w-4 h-4 ml-1" />
-            </button>
-        </div>
-    );
-
     return (
-        <div className="bg-gray-800 rounded-lg p-6">
-            <h2 className="text-2xl font-semibold text-white mb-4">Recent Transactions</h2>
-            {allTransactions.length > 0 ? (
-                <>
-                    <div className="space-y-4">
-                        {displayedTransactions.map((tx) => (
-                            <div key={tx.hash} className="bg-gray-700 p-4 rounded-lg flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-gray-400">{formatDate(tx.timestamp)}</p>
-                                    <p className="text-white">
-                                        {tx.from.toLowerCase() === address?.toLowerCase() ? (
-                                            <ArrowUpRight className="inline w-4 h-4 mr-2 text-red-400" />
-                                        ) : (
-                                            <ArrowDownLeft className="inline w-4 h-4 mr-2 text-green-400" />
-                                        )}
-                                        {tx.from.toLowerCase() === address?.toLowerCase() ? 'Sent' : 'Received'}
-                                    </p>
-                                    <p className="text-sm text-gray-400">
-                                        {tx.from.toLowerCase() === address?.toLowerCase() ?
-                                            `To: ${shortenAddress(tx.to)}` :
-                                            `From: ${shortenAddress(tx.from)}`}
-                                    </p>
-                                    <p className="text-sm text-yellow-400">Function: {tx.functionName}</p>
+        <div className="bg-black rounded-lg overflow-hidden">
+            <div className="flex justify-between items-center p-6">
+                <h2 className="text-xl font-medium text-white">Transaction History</h2>
+                <span className="text-xs text-gray-400">
+                    {allTransactions.length} Transactions
+                </span>
+            </div>
+
+            {/* Pagination Controls */}
+            {allTransactions.length > TRANSACTIONS_PER_PAGE && (
+                <div className="flex justify-between items-center p-4 border-t border-gray-800">
+                    <button
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className={`text-sm ${currentPage === 1 ? 'text-gray-600 cursor-not-allowed' : 'text-red-500 hover:text-red-400'}`}
+                    >
+                        Previous
+                    </button>
+
+                    <div className="text-xs text-gray-500">
+                        Page {currentPage} of {totalPages}
+                    </div>
+
+                    <button
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className={`text-sm ${currentPage === totalPages ? 'text-gray-600 cursor-not-allowed' : 'text-red-500 hover:text-red-400'}`}
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
+
+            {isLoading ? (
+                <div className="flex justify-center items-center p-6">
+                    <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin mr-3"></div>
+                    <p className="text-gray-400">Loading transactions...</p>
+                </div>
+            ) : allTransactions.length > 0 ? (
+                <div>
+                    {displayedTransactions.map((tx, index) => (
+                        <div
+                            key={tx.hash}
+                            className={`border-t border-gray-800 p-4 md:p-6 ${index % 2 === 0 ? 'bg-black' : 'bg-gray-900/20'}`}
+                        >
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                                <div className="flex items-start">
+                                    <div className="w-6 h-6 rounded-full bg-red-900/40 flex items-center justify-center mr-3 mt-1">
+                                        <ArrowUpRight className="w-3 h-3 text-red-500" />
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center">
+                                            <span className="text-white font-medium">Sent</span>
+                                            <span className="text-gray-500 text-xs ml-3 flex items-center">
+                                                <Clock className="w-3 h-3 mr-1 text-gray-600" />
+                                                {getTimeAgo(tx.timestamp)}
+                                            </span>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-10 mt-4">
+                                            <div>
+                                                <p className="text-gray-500 text-xs mb-1">To:</p>
+                                                <p className="text-gray-400 text-sm font-mono">
+                                                    {shortenAddress(tx.to)}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-gray-500 text-xs mb-1">Function:</p>
+                                                <p className="text-yellow-400 text-sm">
+                                                    {tx.functionName}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="text-right">
-                                    <p className="text-white font-semibold">{tx.value} FLR</p>
+                                <div className="sm:text-right mt-3 sm:mt-0 border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-800">
+                                    <p className="text-red-500 font-medium sm:text-right">
+                                        -{parseFloat(tx.value).toFixed(tx.value.includes('.') ? 0 : 2)} FLR
+                                    </p>
                                     <a
                                         href={`${getExplorerUrl(chainId)}/tx/${tx.hash}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-sm text-red-400 hover:text-red-300"
+                                        className="text-xs text-red-500 hover:text-red-400 flex items-center sm:justify-end mt-1"
                                     >
-                                        View Transaction
+                                        Explorer <ExternalLink className="w-3 h-3 ml-1" />
                                     </a>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                    <PaginationControls />
-                </>
+                        </div>
+                    ))}
+                </div>
             ) : (
-                <p className="text-gray-400">No recent transactions found.</p>
+                <div className="p-6 text-center">
+                    <p className="text-gray-400">No transaction history found.</p>
+                </div>
             )}
+            {/* Pagination Controls */}
+            {allTransactions.length > TRANSACTIONS_PER_PAGE && (
+                <div className="flex justify-between items-center p-4 border-t border-gray-800">
+                    <button
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className={`text-sm ${currentPage === 1 ? 'text-gray-600 cursor-not-allowed' : 'text-red-500 hover:text-red-400'}`}
+                    >
+                        Previous
+                    </button>
+
+                    <div className="text-xs text-gray-500">
+                        Page {currentPage} of {totalPages}
+                    </div>
+
+                    <button
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className={`text-sm ${currentPage === totalPages ? 'text-gray-600 cursor-not-allowed' : 'text-red-500 hover:text-red-400'}`}
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
+
+
         </div>
     );
 };

@@ -36,29 +36,65 @@ const BlogList = () => {
     const [availableTags, setAvailableTags] = useState<string[]>([]);
     const [loadingMore, setLoadingMore] = useState(false);
 
+    // Add logging for debugging
+    useEffect(() => {
+        console.log('Selected tag changed to:', selectedTag);
+    }, [selectedTag]);
+
     const fetchPosts = async (isInitial = true) => {
         try {
+            console.log('Fetching posts with tag filter:', selectedTag);
             setLoadingMore(!isInitial);
-            let q = query(
-                collection(db, 'posts'),
-                orderBy('createdAt', sortBy === 'newest' ? 'desc' : 'asc'),
-                limit(POSTS_PER_PAGE)
-            );
 
-            if (!isInitial && lastVisible) {
-                q = query(
-                    collection(db, 'posts'),
-                    orderBy('createdAt', sortBy === 'newest' ? 'desc' : 'asc'),
-                    startAfter(lastVisible),
-                    limit(POSTS_PER_PAGE)
-                );
-            }
+            let q;
 
+            // If filtering by tag, we need the composite index
             if (selectedTag !== 'all') {
-                q = query(q, where('tags', 'array-contains', selectedTag));
+                console.log('Filtering by tag:', selectedTag);
+                try {
+                    // For tag filtering, we need to construct query with individual constraints
+                    // Start with collection reference
+                    q = collection(db, 'posts');
+
+                    // Apply tag filter
+                    q = query(q, where('tags', 'array-contains', selectedTag));
+
+                    // Apply sorting
+                    q = query(q, orderBy('createdAt', sortBy === 'newest' ? 'desc' : 'asc'));
+
+                    // Apply pagination if needed
+                    if (!isInitial && lastVisible) {
+                        q = query(q, startAfter(lastVisible));
+                    }
+
+                    // Apply limit
+                    q = query(q, limit(POSTS_PER_PAGE));
+                } catch (indexError) {
+                    console.error('Index error, falling back to basic query:', indexError);
+                    setError('This query requires a Firestore index. Please follow the link in the console to create it.');
+                    setLoading(false);
+                    return;
+                }
+            } else {
+                // Standard query without tag filtering
+                // Start with collection reference
+                q = collection(db, 'posts');
+
+                // Apply sorting
+                q = query(q, orderBy('createdAt', sortBy === 'newest' ? 'desc' : 'asc'));
+
+                // Apply pagination if needed
+                if (!isInitial && lastVisible) {
+                    q = query(q, startAfter(lastVisible));
+                }
+
+                // Apply limit
+                q = query(q, limit(POSTS_PER_PAGE));
             }
 
             const querySnapshot = await getDocs(q);
+            console.log(`Fetched ${querySnapshot.docs.length} posts`);
+
             const fetchedPosts = querySnapshot.docs.map(doc => {
                 const data = doc.data();
                 return {
@@ -68,12 +104,27 @@ const BlogList = () => {
                 } as BlogPostType;
             });
 
+            // Collect available tags from posts only on initial load
             if (isInitial) {
-                const allTags = new Set<string>();
-                fetchedPosts.forEach(post => {
-                    post.tags?.forEach(tag => allTags.add(tag));
-                });
-                setAvailableTags(Array.from(allTags));
+                // Get all tags from all posts, not just filtered ones
+                try {
+                    const tagsQuery = await getDocs(
+                        query(collection(db, 'posts'), limit(100))
+                    );
+
+                    const allTags = new Set<string>();
+                    tagsQuery.docs.forEach(doc => {
+                        const data = doc.data();
+                        if (Array.isArray(data.tags)) {
+                            data.tags.forEach((tag: string) => allTags.add(tag));
+                        }
+                    });
+                    console.log('Available tags:', Array.from(allTags));
+                    setAvailableTags(Array.from(allTags));
+                } catch (tagErr) {
+                    console.error('Error fetching tags:', tagErr);
+                    // Continue with posts even if tag fetching fails
+                }
             }
 
             setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1] || null);
@@ -93,12 +144,24 @@ const BlogList = () => {
         }
     };
 
+    // This effect runs when selectedTag or sortBy changes
     useEffect(() => {
+        console.log('Filter changed, resetting and fetching posts');
         setLoading(true);
         setPosts([]);
         setLastVisible(null);
-        fetchPosts();
+        setHasMore(true);
+
+        // Fetch posts immediately - don't use setTimeout as it can cause issues
+        fetchPosts(true);
     }, [selectedTag, sortBy]);
+
+    // Handle tag selection without navigating
+    const handleTagChange = (value: string) => {
+        console.log('Tag selected:', value);
+        // Just update the state - no need to return false
+        setSelectedTag(value);
+    };
 
     const filteredPosts = posts.filter(post =>
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -131,8 +194,29 @@ const BlogList = () => {
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center space-y-4">
                     <p className="text-red-500 text-xl">{error}</p>
+                    {error.includes('index') ? (
+                        <div className="mb-4">
+                            <p className="text-white mb-2">Please create the required index in Firebase:</p>
+                            <a
+                                href="https://console.firebase.google.com/v1/r/project/defi-bull-world-67fbb/firestore/indexes?create_composite=ClNwcm9qZWN0cy9kZWZpLWJ1bGwtd29ybGQtNjdmYmIvZGF0YWJhc2VzLyhkZWZhdWx0KS9jb2xsZWN0aW9uR3JvdXBzL3Bvc3RzL2luZGV4ZXMvXxABGggKBHRhZ3MYARoNCgljcmVhdGVkQXQQAhoMCghfX25hbWVfXxAC"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 underline hover:text-blue-700"
+                            >
+                                Create Index in Firebase Console
+                            </a>
+                            <p className="text-gray-400 mt-2 text-sm">After creating the index, it may take a few minutes to activate</p>
+                        </div>
+                    ) : null}
                     <Button
-                        onClick={() => fetchPosts()}
+                        onClick={() => {
+                            setError('');
+                            // If there was an index error, revert to "all" tags
+                            if (error.includes('index')) {
+                                setSelectedTag('all');
+                            }
+                            fetchPosts();
+                        }}
                         variant="ghost"
                         className="hover:bg-gray-800"
                     >
@@ -171,7 +255,8 @@ const BlogList = () => {
                     <div className="flex gap-2 text-white">
                         <Select
                             value={selectedTag}
-                            onValueChange={setSelectedTag}
+                            onValueChange={handleTagChange}
+                            defaultValue="all"
                         >
                             <SelectTrigger className="w-[140px] [&>span]:text-white">
                                 <SelectValue placeholder="Filter by tag" />
@@ -224,7 +309,9 @@ const BlogList = () => {
                         <p className="text-gray-400 text-lg">
                             {searchQuery
                                 ? "No posts found matching your search."
-                                : "No blog posts available."}
+                                : selectedTag !== 'all'
+                                    ? `No posts found with tag "${selectedTag}".`
+                                    : "No blog posts available."}
                         </p>
                     </div>
                 )}
@@ -233,7 +320,7 @@ const BlogList = () => {
             </div>
 
             {/* Load More Button */}
-            {hasMore && !searchQuery && (
+            {hasMore && !searchQuery && filteredPosts.length > 0 && (
                 <div className="flex justify-center mt-8">
                     <Button
                         onClick={() => fetchPosts(false)}
