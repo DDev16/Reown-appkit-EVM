@@ -11,7 +11,7 @@ import TechStack from "@/components/sections/techStack";
 import Flare from "@/components/sections/flare";
 
 import SweepstakesComingSoon from "@/components/sections/sweepstakes";
-import RoadmapComingSoon from "@/components/sections/coming-soon-roadmap";
+import RoadmapComingSoon from "@/components/sections/coming";
 import Roadmap from "@/components/sections/roadmap";
 import AboutSection from "@/components/sections/about";
 

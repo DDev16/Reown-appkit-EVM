@@ -9,11 +9,15 @@ import "aos/dist/aos.css";
 import Particles from "@/components/ui/Particles";
 import ThreeParticleCursor from "@/components/ui/ThreeParticleCursor";
 import { Toaster } from "@/components/ui/toaster"
+import ComingSoon from "@/components/sections/coming";
 
 const inter = Inter({ subsets: ["latin"] });
 
+// Set this to false when you're ready to launch the full site
+const COMING_SOON_MODE = true;
+
 export const metadata: Metadata = {
-  title: "DeFi Bull World",
+  title: COMING_SOON_MODE ? "DeFi Bull World - Coming Soon" : "DeFi Bull World",
   description:
     "Empowering Web3 education through exclusive NFT memberships and token-gated content."
 };
@@ -29,12 +33,18 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ContextProvider cookies={cookies}>
-          <Toaster />
-          <Navbar />
-          <main className="pt-14">{children}</main>
-          <Footer />
-          <Particles />
-          <ThreeParticleCursor />
+          {COMING_SOON_MODE ? (
+            <ComingSoon />
+          ) : (
+            <>
+              <Toaster />
+              <Navbar />
+              <main className="pt-14">{children}</main>
+              <Footer />
+              <Particles />
+              <ThreeParticleCursor />
+            </>
+          )}
         </ContextProvider>
       </body>
     </html>
