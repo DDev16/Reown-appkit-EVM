@@ -103,8 +103,8 @@ const OwnedNFTs: React.FC = () => {
                             <div
                                 key={nftId}
                                 className={`relative flex-shrink-0 cursor-pointer transition-all duration-200 ${selectedNFT === nftId
-                                        ? 'ring-2 ring-red-500 scale-105'
-                                        : 'ring-1 ring-gray-800 hover:ring-red-900'
+                                    ? 'ring-2 ring-red-500 scale-105'
+                                    : 'ring-1 ring-gray-800 hover:ring-red-900'
                                     }`}
                                 onClick={() => setSelectedNFT(nftId)}
                             >
@@ -201,7 +201,7 @@ const OwnedNFTs: React.FC = () => {
                         </div>
                         <h3 className="text-xl font-medium text-white mb-2">No NFTs Found</h3>
                         <p className="text-gray-400 max-w-md mx-auto">
-                            You don't own any NFTs from this collection yet. Start collecting to see your NFTs displayed here.
+                            You dont own any NFTs from this collection yet. Start collecting to see your NFTs displayed here.
                         </p>
                         <button className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors">
                             Browse Collection
